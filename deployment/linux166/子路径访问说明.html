@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="2e4a45df0a621d6e020dcbf583be0d175f838109479382da84a25c4923863fa6"><title>Coze Studio 公网 /agent/ 子路径访问与运维 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">正式入口</a></li>
+<li><a href="#_2">原因与适配方式</a></li>
+<li><a href="#_3">运行版本与目录</a></li>
+<li><a href="#_4">后续构建</a></li>
+<li><a href="#_5">验证结果与边界</a></li>
+<li><a href="#_6">回退</a></li>
+<li><a href="#_7">对应源码</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：子路径访问说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">LINUX166 / 开发验证环境</div><h1>Coze Studio 公网 /agent/ 子路径访问与运维</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="子路径访问说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-10。服务器：<code>ssh linux166</code>。基线：<code>v0.5.1</code>，保留统一账号管理扩展。</p>
+<h2 id="_1">正式入口</h2>
+<p>平台入口为 <code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主平台</td>
+<td><code>https://ai.yaoxiaoyi.com/agent/</code></td>
+</tr>
+<tr>
+<td>登录</td>
+<td><code>https://ai.yaoxiaoyi.com/agent/sign</code></td>
+</tr>
+<tr>
+<td>管理后台</td>
+<td><code>https://ai.yaoxiaoyi.com/agent/admin/</code></td>
+</tr>
+<tr>
+<td>统一账号管理</td>
+<td><code>https://ai.yaoxiaoyi.com/agent/admin/#account-management</code></td>
+</tr>
+<tr>
+<td>模型管理</td>
+<td><code>https://ai.yaoxiaoyi.com/agent/admin/#model-management</code></td>
+</tr>
+<tr>
+<td>外部调用示例</td>
+<td><code>https://ai.yaoxiaoyi.com/agent/v3/chat</code></td>
+</tr>
+</tbody>
+</table>
+<p>API 调用者使用平台自身的 API Token。模型厂商的 Base URL 保持厂商提供的地址，<code>/agent/</code> 是本平台的访问前缀。</p>
+<p>内网 <code>http://192.168.1.166:8888/</code> 仍可访问，已执行浏览器回归。域名根路径继续保留原服务的认证行为。</p>
+<h2 id="_2">原因与适配方式</h2>
+<p>原页面虽然能从 <code>/agent/</code> 返回，但脚本、API 和页面导航使用 <code>/static/</code>、<code>/api/</code>、<code>/sign</code> 等根路径。这些请求进入域名根路径的其他服务，返回带 <code>Basic realm="zw"</code> 的 HTTP 401 响应，从而触发浏览器认证弹窗。</p>
+<p>本次适配包含三层：</p>
+<ol>
+<li>外层 Nginx 接收 <code>/agent/</code>，去除前缀后转发166，同时传递外部协议、Host 和 <code>X-Forwarded-Prefix</code>。外层配置由用户更新。</li>
+<li>前端构建把静态资源前缀设置为 <code>/agent/</code>。React Router 根据当前浏览器路径选择 <code>/agent</code> 或根路径作为 basename。</li>
+<li>页面入口加载 <code>app-base-path.js</code>，为同站的 Fetch、XHR、EventSource、WebSocket、历史记录及新窗口地址补齐前缀。已经包含前缀的地址保持不变，第三方地址保持不变。</li>
+</ol>
+<p>后台静态页面同样加载入口脚本，样式和管理脚本使用相对地址。登录跳转、整页刷新、新建智能体和知识库时使用的新窗口地址也进行了适配。</p>
+<p>166 的内层 Nginx 支持 <code>/agent/</code> 的内部重写，并按外层传入的协议和前缀处理 Cookie、重定向以及 MinIO 文件地址。公开访问时，登录 Cookie 的 Path 为 <code>/agent/</code>。</p>
+<h2 id="_3">运行版本与目录</h2>
+<p>前端发布目录为 <code>/home/coze/releases/web-agent-162566e17641</code>，约 275 MB。该目录通过只读挂载提供给 <code>coze-web</code>：</p>
+<pre><code class="language-text">/home/coze/releases/web-agent-162566e17641:/usr/share/nginx/html:ro,z
+</code></pre>
+<p>前端继续使用原固定摘要的 Nginx 镜像；本次替换挂载的前端产物和内层代理配置。后端继续使用已部署的账号管理镜像，未重新构建后端，未修改模型凭据及数据库结构。</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>构建副本</td>
+<td><code>/home/coze/build/subpath-source</code></td>
+</tr>
+<tr>
+<td>Node.js 工具</td>
+<td><code>/home/coze/tools/node</code>，本次为 <code>v22.23.4</code></td>
+</tr>
+<tr>
+<td>NPM 缓存</td>
+<td><code>/home/coze/build/npm-cache</code></td>
+</tr>
+<tr>
+<td>Rush 工具缓存</td>
+<td><code>/home/coze/build/rush-global</code></td>
+</tr>
+<tr>
+<td>PNPM 依赖及缓存</td>
+<td><code>/home/coze/build/subpath-source/common/temp</code></td>
+</tr>
+<tr>
+<td>临时文件</td>
+<td><code>/home/coze/build/frontend-tmp</code></td>
+</tr>
+<tr>
+<td>构建日志</td>
+<td><code>/home/coze/build/subpath-out</code></td>
+</tr>
+<tr>
+<td>当前 Compose</td>
+<td><code>/home/coze/src/coze-studio/docker/docker-compose.deploy.json</code></td>
+</tr>
+<tr>
+<td>内层 Nginx</td>
+<td><code>/home/coze/src/coze-studio/docker/nginx/conf.d/default.conf</code></td>
+</tr>
+</tbody>
+</table>
+<p>Node.js 安装包从官方发布地址获取并校验 SHA-256，具体版本、来源和摘要记录在 <code>子路径验收.json</code>。构建依赖使用仓库锁定的 Rush、PNPM 和依赖锁文件。</p>
+<p>全部构建数据位于 <code>/home</code>。本次收尾检查：系统分区可用约 67.7 GiB，<code>/home</code> 可用约 101.3 GiB。现有容量告警和启动前检查继续生效。后续发布应保留当前版本和必要回退版本，定期评估历史产物及构建缓存的占用。</p>
+<h2 id="_4">后续构建</h2>
+<p>将需发布的源码同步到独立构建副本后，可在166运行以下脚本执行专项测试和前端构建，复用该目录已经安装的依赖，默认只生成产物：</p>
+<pre><code class="language-bash">bash /home/coze/ops/build-agent-web.sh /home/coze/build/subpath-source
+</code></pre>
+<p>构建产物位于源码目录的 <code>frontend/apps/coze-studio/dist</code>。脚本限制并发和 Node 内存目标，不会自动重启平台。发布时应复制产物到新的版本目录，更新 Compose 中 <code>coze-web</code> 的只读挂载，然后只重建前端容器：</p>
+<pre><code class="language-bash">/home/coze/ops/compose.sh up -d --no-deps coze-web
+docker exec coze-web nginx -t
+</code></pre>
+<p>部署不能只复制单个页面脚本，应发布完整的 <code>dist</code>，同步本仓库的后台入口文件和内层 Nginx 配置，避免版本不匹配。</p>
+<h2 id="_5">验证结果与边界</h2>
+<ul>
+<li>Node 路径运行时专项测试通过 5 项，验证请求体、认证头、取消信号、流式连接地址、页面历史、新窗口及第三方地址的处理。</li>
+<li>Vitest 路由及 URL 专项测试通过 3 项。</li>
+<li><code>rush rebuild --to @coze-studio/app --parallelism 1</code> 构建成功，包含应用依赖图中的 258 项操作。上游 Browserslist 和模块类型提示未阻断构建。</li>
+<li>内层 Nginx 通过独立容器和正式容器的 <code>nginx -t</code>。</li>
+<li>隔离预览通过 11 项浏览器检查；随后公网正式地址也通过相同的 11 项检查。</li>
+<li>公网验证包含匿名跳转、真实邮箱密码登录、Cookie 路径、资源库深层链接及刷新、账号管理读取和写入、模型管理读取。</li>
+<li>验收期间没有同站请求越出 <code>/agent/</code>，没有 HTTP Basic 挑战，没有脚本或样式 HTTP 错误，没有页面脚本异常。</li>
+<li>内网根路径登录态访问正常；原公网根服务的认证行为保持一致。</li>
+<li>临时验收账号、个人空间和回环监听的预览容器均已清理，未留下临时测试用户。</li>
+</ul>
+<p>本次未运行整个仓库的全量测试，也未使用真实模型发起付费推理。流式连接和 WebSocket 的测试覆盖地址映射与参数保留，不代表已完成所有外部工具或模型链路的端到端验收。</p>
+<h2 id="_6">回退</h2>
+<p>本次发布前备份了 Compose、内层 Nginx 及后台静态文件。目录记录在 <code>/home/coze/ops/subpath-backup-path</code>，具体备份位于 <code>/home/coze/backups/subpath-时间戳</code>。</p>
+<p>由运维核对目录后，将 <code>compose.json</code>、<code>nginx.conf</code> 和 <code>admin</code> 内容分别恢复到原运行位置，再执行：</p>
+<pre><code class="language-bash">/home/coze/ops/compose.sh up -d --no-deps coze-web
+docker exec coze-web nginx -t
+</code></pre>
+<p>回退不恢复数据库，以保留发布后的业务数据。回到原前端后，公网 <code>/agent/</code> 适配将失效，因此此操作仅用于应急。</p>
+<h2 id="_7">对应源码</h2>
+<ul>
+<li><code>frontend/apps/coze-studio/rsbuild.config.ts</code>：静态资源前缀。</li>
+<li><code>frontend/apps/coze-studio/src/routes/index.tsx</code>：React Router basename。</li>
+<li><code>frontend/packages/arch/web-context/src/base-path.ts</code>：应用路径工具。</li>
+<li><code>backend/conf/admin/app-base-path.js</code>：页面请求和导航路径适配。</li>
+<li><code>backend/conf/admin/index.html</code>、<code>account-management.js</code>：后台静态页面适配。</li>
+<li><code>docker/nginx/conf.d/default.conf</code>：166 内层代理和文件地址适配。</li>
+<li>登录服务、URL 工具及智能体和知识库的新窗口入口：保持跳转地址处于应用路径内。</li>
+</ul></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-10 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

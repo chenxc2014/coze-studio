@@ -34,7 +34,7 @@ import {
 } from '@flowgram-adapter/free-layout-editor';
 import { EncapsulatePanel } from '@coze-workflow/feature-encapsulate';
 import { workflowQueryClient } from '@coze-workflow/base';
-import { I18n } from '@coze-arch/i18n';
+import { I18n, platformDisplayName } from '@coze-arch/i18n';
 import { Spin } from '@coze-arch/bot-semi';
 import { getFlags } from '@coze-arch/bot-flags';
 import { CustomError } from '@coze-arch/bot-error';
@@ -280,9 +280,7 @@ const WorkflowContainer = forwardRef<
       {!workflowState.projectId && (
         <Helmet>
           <title>
-            {I18n.t('workflow_tab_title', {
-              name: workflowState.info?.name,
-            })}
+            {workflowState.info?.name ? `${workflowState.info.name} - ${platformDisplayName}` : platformDisplayName}
           </title>
         </Helmet>
       )}

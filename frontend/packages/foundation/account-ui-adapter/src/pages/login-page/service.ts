@@ -65,7 +65,21 @@ export const useLoginService = ({
 
   useEffect(() => {
     if (loginStatus === 'logined') {
-      navigate('/');
+      // 登录后恢复本站页面；管理后台由服务端提供，需要整页跳转。
+      const target = new URLSearchParams(window.location.search).get('redirect') || '/';
+      const url = new URL(target, window.location.origin);
+      if (url.origin !== window.location.origin || !target.startsWith('/') || target.startsWith('//')) {
+        navigate('/');
+        return;
+      }
+      const pathname = url.pathname.replace(/^\/agent(?=\/|$)/, '') || '/';
+      const destination = `${pathname}${url.search}${url.hash}`;
+      if (/^\/admin(?:\/|$)/.test(pathname)) {
+        const base = /^\/agent(?:\/|$)/.test(window.location.pathname) ? '/agent' : '';
+        window.location.assign(`${base}${destination}`);
+      } else {
+        navigate(destination);
+      }
     }
   }, [loginStatus]);
 

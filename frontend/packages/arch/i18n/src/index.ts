@@ -24,6 +24,8 @@ import type {
   I18nKeysNoOptionsType,
 } from '@coze-studio/studio-i18n-resource-adapter';
 
+export { platformDisplayName } from './brand';
+
 import {
   type Intl,
   type I18nCore,

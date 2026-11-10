@@ -49,7 +49,7 @@ export const useCreateBotAction = ({
         url += urlSearch;
       }
       if (botId && newWindowRef.current) {
-        newWindowRef.current.location = url;
+        newWindowRef.current.location = window.CozePath?.url(url) ?? url;
       } else {
         destroyWindow();
       }
@@ -84,14 +84,15 @@ export const useCreateBotAction = ({
         return;
       }
       if (autoCreate) {
-        newWindowRef.current.location = baseUrl + urlSearch;
+        newWindowRef.current.location = window.CozePath?.url(baseUrl + urlSearch) ?? baseUrl + urlSearch;
       }
-      newWindowRef.current.location = baseUrl;
+      newWindowRef.current.location = window.CozePath?.url(baseUrl) ?? baseUrl;
     },
     onCopyProjectTemplateSuccess: param => {
       cozeMitt.emit('createProjectByCopyTemplateFromSidebar', param);
       if (newWindowRef.current) {
-        newWindowRef.current.location = `/space/${param.toSpaceId}/develop`;
+        const destination = `/space/${param.toSpaceId}/develop`;
+        newWindowRef.current.location = window.CozePath?.url(destination) ?? destination;
       }
     },
   });

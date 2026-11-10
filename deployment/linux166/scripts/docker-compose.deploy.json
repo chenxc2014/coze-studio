@@ -429,7 +429,8 @@
       ],
       "volumes": [
         "/home/coze/src/coze-studio/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,z",
-        "/home/coze/src/coze-studio/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro,z"
+        "/home/coze/src/coze-studio/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro,z",
+        "/home/coze/releases/web-agent-162566e17641:/usr/share/nginx/html:ro,z"
       ],
       "depends_on": [
         "coze-server"

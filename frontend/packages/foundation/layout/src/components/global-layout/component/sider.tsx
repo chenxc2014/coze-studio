@@ -18,7 +18,6 @@ import { type FC } from 'react';
 
 import classNames from 'classnames';
 import { Divider, Space } from '@coze-arch/coze-design';
-import { IconMenuLogo } from '@coze-arch/bot-icons';
 import { useRouteConfig } from '@coze-arch/bot-hooks';
 
 import { type LayoutProps } from '../types';
@@ -61,10 +60,14 @@ export const GlobalLayoutSider: FC<Omit<LayoutProps, 'hasSider'>> = ({
               'border-0 border-r-[1px] border-solid coz-stroke-primary',
           )}
         >
-          <IconMenuLogo
+          <button
+            type="button"
             onClick={onClickLogo}
-            className="cursor-pointer w-[40px] h-[40px]"
-          />
+            aria-label="返回药销易智能体平台首页"
+            className="cursor-pointer w-[40px] h-[40px] p-0 border-0 bg-transparent"
+          >
+            <img src="/agent/favicon.png?v=yaoxiaoyi-2" alt="药销易标志" className="w-[40px] h-[40px] object-contain" />
+          </button>
           <div className="mt-[16px]">
             {actions?.map((action, index) => (
               <GlobalLayoutActionBtn {...action} key={index} />

@@ -19,6 +19,7 @@ import { type FC, type PropsWithChildren, useState, useEffect } from 'react';
 
 import cls from 'classnames';
 import { Layout, SideSheet } from '@coze-arch/coze-design';
+import { platformDisplayName } from '@coze-arch/i18n';
 
 import { type LayoutProps } from './types';
 import { useLayoutResponsive } from './hooks';
@@ -64,13 +65,14 @@ export const GlobalLayout: FC<PropsWithChildren<LayoutProps>> = ({
     >
       {banner}
       <Layout
+        title={platformDisplayName}
         className={cls(
           'flex !flex-row items-stretch w-full coz-bg-plus',
           banner ? 'h-[calc(100%_-_30px)]' : 'h-full',
         )}
       >
         {hasSider ? siderContent : null}
-        <Layout className="flex-1 relative flex flex-col overflow-x-hidden coz-bg-plus">
+        <Layout title={platformDisplayName} className="flex-1 relative flex flex-col overflow-x-hidden coz-bg-plus">
           {children}
         </Layout>
         {mobileTipsModal}

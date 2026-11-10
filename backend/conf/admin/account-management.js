@@ -83,7 +83,7 @@
         case 'edit':dialog('编辑账号',`<p>${escape(account.email)}</p><label>姓名<input name="name" value="${escape(account.name)}" required maxlength="64"></label><p>邮箱是登录标识，暂不支持修改。</p>`,data=>perform('/update',{id:account.id,name:data.get('name')},'账号资料已更新。'));break;
         case 'password':dialog('重置密码',`<p>${escape(account.email)}</p><label>新密码<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label><p>保存后，该账号的网页会话将失效。API Token 不因重置密码而撤销。</p>`,async data=>{
           const ok=await perform('/reset-password',{id:account.id,password:data.get('password')},'密码已重置，该账号需要重新登录。');
-          if(ok&&account.id===currentUser) location.href='/sign?redirect=%2Fadmin%2F%23account-management';return ok;
+          if(ok&&account.id===currentUser) location.href=window.CozePath.url('/sign?redirect=%2Fadmin%2F%23account-management');return ok;
         });break;
         case 'role':if(confirm(`确认${account.is_admin?'取消':'授予'} ${account.email} 的管理员身份？管理员可以管理平台配置及所有账号。`)) perform('/role',{id:account.id,is_admin:!account.is_admin},'管理员身份已更新。');break;
         case 'status':if(confirm(`确认${account.disabled?'启用':'停用'} ${account.email}？${account.disabled?'启用后需要重新登录。':'该账号将无法登录，已有网页会话及 API Token 将无法继续使用。'}`)) perform('/status',{id:account.id,disabled:!account.disabled},'账号状态已更新。');break;

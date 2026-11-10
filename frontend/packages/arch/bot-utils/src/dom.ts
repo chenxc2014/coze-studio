@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { withAppBasePath } from '@coze-arch/web-context';
+
 /**
  * Get the latest scrollable element
  */
@@ -63,6 +65,6 @@ export const openNewWindow = async (
   }
 
   if (newWindow) {
-    newWindow.location = url;
+    newWindow.location = withAppBasePath(url);
   }
 };

@@ -19,7 +19,7 @@ import { useMemo, useState, type FC } from 'react';
 
 import { useShallow } from 'zustand/react/shallow';
 import { escape } from 'lodash-es';
-import { BaseEnum } from '@coze-arch/web-context';
+import { BaseEnum, withAppBasePath } from '@coze-arch/web-context';
 import { getSlardarInstance } from '@coze-arch/logger';
 import { I18n } from '@coze-arch/i18n';
 import { Typography, UIButton } from '@coze-arch/bot-semi';
@@ -99,7 +99,7 @@ export const GlobalError: FC = () => {
             if (!isLazyLoadError) {
               navigate(url);
             } else {
-              window.location.href = escape(url);
+              window.location.href = withAppBasePath(escape(url));
             }
           }}
         >

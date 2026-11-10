@@ -24,6 +24,7 @@ import {
 } from '@coze-workflow/components';
 import { KnowledgeListModalContent } from '@coze-data/knowledge-modal-adapter';
 import { I18n } from '@coze-arch/i18n';
+import { withAppBasePath } from '@coze-arch/web-context';
 import { UITabsModal } from '@coze-arch/bot-semi';
 import { type Dataset } from '@coze-arch/bot-api/knowledge';
 import { From } from '@coze-agent-ide/plugin-shared';
@@ -273,7 +274,7 @@ export const SkillModal: FC<SkillModalProps> = props => {
                             );
                           } else if (windowRef.current) {
                             if (id) {
-                              windowRef.current.location = `/space/${spaceID}/knowledge/${id}/upload?type=${unitType}`;
+                              windowRef.current.location = withAppBasePath(`/space/${spaceID}/knowledge/${id}/upload?type=${unitType}`);
                             } else {
                               windowRef.current.close();
                             }

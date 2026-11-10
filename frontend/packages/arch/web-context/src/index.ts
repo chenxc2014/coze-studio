@@ -15,6 +15,7 @@
  */
 
 export { redirect } from './location';
+export { getAppBasePath, withAppBasePath } from './base-path';
 export { GlobalEventBus } from './event-bus';
 export { globalVars } from './global-var';
 export { COZE_TOKEN_INSUFFICIENT_ERROR_CODE } from './const/custom';

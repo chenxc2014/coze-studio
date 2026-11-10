@@ -24,6 +24,14 @@ const API_PROXY_TARGET = `http://localhost:${
 }/`;
 
 const mergedConfig = defineConfig({
+  output: {
+    // 内网直连同样由 Nginx 提供 /agent/static/，共用一份构建产物。
+    assetPrefix: '/agent/',
+    copy: [
+      { from: './assets/favicon.ico', to: 'favicon.ico' },
+      { from: './assets/favicon.png', to: 'favicon.png' },
+    ],
+  },
   server: {
     strictPort: true,
     proxy: [
@@ -42,8 +50,7 @@ const mergedConfig = defineConfig({
     ],
   },
   html: {
-    title: '扣子 Studio',
-    favicon: './assets/favicon.png',
+    title: '药销易-智能体平台',
     template: './index.html',
     crossorigin: 'anonymous',
   },

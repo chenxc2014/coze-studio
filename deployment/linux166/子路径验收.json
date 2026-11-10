@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-10",
+  "public_url": "https://ai.yaoxiaoyi.com/agent/",
+  "frontend_release": "web-agent-e5173a8cedee",
+  "runtime_tests": {
+    "node": 5,
+    "vitest": 3
+  },
+  "preview": {
+    "mode": "preview",
+    "checks": [
+      "匿名访问跳转至 /agent/sign",
+      "真实邮箱密码登录并进入个人空间",
+      "登录 Cookie 限定在 /agent/",
+      "资源库深层页面打开和刷新成功",
+      "公网子路径账号管理页加载成功",
+      "子路径管理写接口与同源保护兼容",
+      "模型管理页子路径可加载",
+      "页面资源和接口没有越出 /agent/",
+      "未出现 HTTP Basic 认证挑战",
+      "脚本和样式均未返回错误",
+      "没有页面脚本异常"
+    ],
+    "passed": 11,
+    "success": true,
+    "same_origin_request_paths": 39,
+    "test_account_cleaned": true
+  },
+  "public": {
+    "mode": "public",
+    "checks": [
+      "匿名访问跳转至 /agent/sign",
+      "真实邮箱密码登录并进入个人空间",
+      "登录 Cookie 限定在 /agent/",
+      "资源库深层页面打开和刷新成功",
+      "公网子路径账号管理页加载成功",
+      "子路径管理写接口与同源保护兼容",
+      "模型管理页子路径可加载",
+      "页面资源和接口没有越出 /agent/",
+      "未出现 HTTP Basic 认证挑战",
+      "脚本和样式均未返回错误",
+      "没有页面脚本异常"
+    ],
+    "passed": 11,
+    "success": true,
+    "same_origin_request_paths": 39,
+    "test_account_cleaned": true
+  },
+  "intranet_root_regression": true,
+  "existing_root_auth_preserved": true,
+  "remaining_test_users": 0,
+  "node_sdk": {
+    "version": "v22.23.4",
+    "url": "https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-x64.tar.xz",
+    "sha256": "1805bcd35e6815559bd2eb97db438d3fdb0eb3a5e6a977b7c1badca76337e9ce"
+  }
+}

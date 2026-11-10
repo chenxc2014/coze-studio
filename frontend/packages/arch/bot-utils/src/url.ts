@@ -15,6 +15,7 @@
  */
 
 import queryString from 'query-string';
+import { withAppBasePath } from '@coze-arch/web-context';
 
 import { getIsMobile, getIsSafari } from './platform';
 
@@ -42,7 +43,7 @@ export function openUrl(url?: string) {
     return;
   }
   if (getIsMobile() && getIsSafari()) {
-    location.href = url;
+    location.href = withAppBasePath(url);
   } else {
     window.open(url, '_blank');
   }

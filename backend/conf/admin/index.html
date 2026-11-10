@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coze Studio 管理后台</title>
+    <title>药销易-智能体平台</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico?v=yaoxiaoyi-2">
     <style>
         * {
             margin: 0;
@@ -406,7 +407,8 @@
             text-align: center;
         }
 </style>
-    <link rel="stylesheet" href="/admin/account-management.css?v=1">
+    <script src="./app-base-path.js"></script>
+    <link rel="stylesheet" href="./account-management.css?v=2">
 </head>
 <body>
     <div class="admin-container">
@@ -414,14 +416,9 @@
             <div class="sidebar-header">
                 <div class="logo">
                     <div class="logo-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="3" width="7" height="7" rx="1" fill="#4A90E2"/>
-                            <rect x="14" y="3" width="7" height="7" rx="1" fill="#4A90E2"/>
-                            <rect x="3" y="14" width="7" height="7" rx="1" fill="#4A90E2"/>
-                            <rect x="14" y="14" width="7" height="7" rx="1" fill="#4A90E2"/>
-                        </svg>
+                        <img src="./platform-logo.png?v=yaoxiaoyi-2" alt="药销易标志" style="width:32px;height:32px;object-fit:contain">
                     </div>
-                    <span class="logo-text">Coze Studio</span>
+                    <span class="logo-text">药销易-智能体平台</span>
                 </div>
             </div>
             
@@ -982,13 +979,13 @@
         function handleApiCode(data) {
             const code = Number(data?.code);
             if (code === 700012006) {
-                window.location.href = '/sign?redirect=%2Fadmin';
+                window.location.href = window.CozePath.url('/sign?redirect=%2Fadmin');
                 return true;
             }
             if (code === 401) {
                 const msg = data?.msg || data?.message || t('error.generic');
                 alert(msg);
-                window.location.href = '/';
+                window.location.href = window.CozePath.url('/');
                 return true;
             }
             return false;
@@ -3483,6 +3480,6 @@
             `;
         }
     </script>
-    <script src="/admin/account-management.js?v=1"></script>
+    <script src="./account-management.js?v=2"></script>
 </body>
 </html>

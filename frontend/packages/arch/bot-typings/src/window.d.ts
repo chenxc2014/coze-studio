@@ -20,6 +20,8 @@ declare type MicroComponentsMapItem = {
 };
 
 interface Window {
+  /** 当前应用的挂载路径，由页面入口脚本初始化。 */
+  CozePath?: { basePath: string; url: (value: string) => string };
   /**
    * IDE plugin iframe mount method for unmounting
    */

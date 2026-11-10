@@ -26,6 +26,7 @@ import { FilterKnowledgeType } from '@coze-data/knowledge-modal-base';
 import { useKnowledgeListModal } from '@coze-data/knowledge-modal-adapter';
 import { useBizWorkflowKnowledgeIDEFullScreenModal } from '@coze-data/knowledge-ide-adapter';
 import { I18n } from '@coze-arch/i18n';
+import { withAppBasePath } from '@coze-arch/web-context';
 import { ConfigProvider } from '@coze-arch/bot-semi';
 import { DatasetStatus } from '@coze-arch/bot-api/knowledge';
 import { Button } from '@coze-arch/coze-design';
@@ -164,7 +165,7 @@ export const DatasetSelect = ({
           IDENav?.(`/knowledge/${id}?module=upload&type=${unitType}`);
         } else if (newWindowRef.current) {
           if (id) {
-            newWindowRef.current.location = `/space/${spaceID}/knowledge/${id}/upload?type=${unitType}`;
+            newWindowRef.current.location = withAppBasePath(`/space/${spaceID}/knowledge/${id}/upload?type=${unitType}`);
           } else {
             newWindowRef.current.close();
           }

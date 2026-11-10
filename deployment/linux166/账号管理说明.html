@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="d96fc54554705beacd9b95068b6396290ebe55325ecf44e878a570a13d92f538"><title>Coze Studio 统一账号管理与运维说明 · 部署与运维</title>
+<meta name="source-sha256" content="f490b7470c0fa2766b2370b0ec4966a28962f7af6403a01fb3b09b0222fb7d92"><title>Coze Studio 统一账号管理与运维说明 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -43,6 +43,7 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 <a class="button" href="账号管理说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
 <article id="content"><p>更新日期：2026-11-10。服务器：<code>ssh linux166</code>。基线：<code>v0.5.1</code>，增加本仓库的账号管理模块。</p>
 <h2 id="_1">入口与使用方式</h2>
+<p>正式公网入口为 <code>https://ai.yaoxiaoyi.com/agent/admin/#account-management</code>，登录页为 <code>https://ai.yaoxiaoyi.com/agent/sign</code>。子路径访问已完成浏览器验收，详情见<a href="子路径访问说明.md">子路径访问说明</a>。</p>
 <p>平台入口为 <code>http://192.168.1.166:8888</code>。管理员登录后，打开管理后台中的“配置管理 → 账号管理”，或直接访问：</p>
 <p><code>http://192.168.1.166:8888/admin/#account-management</code></p>
 <p>该页面面向平台管理员，统一维护全部未删除的平台账号。平台管理员可以管理平台模型和基础配置，请仅授予可信人员。</p>

@@ -19,7 +19,9 @@
 // Upon invocation, it sets location.href to the provided URL, thereby navigating to the webpage.
 // While no validation logic is currently implemented prior to redirection,
 // there is the potential for such checks to be included in the future as per your requirements.
+import { withAppBasePath } from './base-path';
+
 export const redirect = (href: string) => {
   // Here, some verification logic can be added later.
-  location.href = href;
+  location.href = withAppBasePath(href);
 };

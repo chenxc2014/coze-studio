@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="210a6bb82c691c474a506026828d9f9c8380169604f2e328ce856be712bc32df"><title>Coze Studio 开发验证环境 · 部署与运维</title>
+<meta name="source-sha256" content="cede84c338d12b6463d4969a69bfb7380fc619166c18b71add1d55b0eb3e8cbd"><title>Coze Studio 开发验证环境 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -149,6 +149,8 @@ systemctl list-timers 'coze-*'
 </code></pre>
 <p>禁止直接运行上游 <code>make clean</code>，该命令会删除数据目录。不要自动执行 <code>docker system prune --volumes</code>。同一环境应始终使用 <code>/home/coze/ops/compose.sh</code>，避免使用上游默认的浮动版本或创建另一套容器。</p>
 <h2 id="_6">管理员及模型配置</h2>
+<p>正式公网入口为 <code>https://ai.yaoxiaoyi.com/agent/</code>，管理后台为 <code>https://ai.yaoxiaoyi.com/agent/admin/</code>。2026-11-10 已完成子路径适配和公网浏览器验收，内网入口保留。构建、验证和回退说明见<a href="子路径访问说明.md">Markdown 文档</a>及 <a href="子路径访问说明.html">HTML 文档</a>。</p>
+<p>登录页名称、平台标题与图标的配置见<a href="登录页与品牌配置说明.md">品牌配置 Markdown</a>及 <a href="登录页与品牌配置说明.html">HTML 文档</a>。</p>
 <p>平台入口为 <code>http://192.168.1.166:8888</code>。管理员为 <code>admin@coze.local</code>，初始凭据仅保存在服务器 <code>/home/coze/ops/admin-initial.json</code>，权限为仅管理员可读。首次登录后可修改密码；该文件中的初始密码不会跟随更新。</p>
 <pre><code class="language-bash">ssh linux166 'cat /home/coze/ops/admin-initial.json'
 </code></pre>
@@ -168,7 +170,7 @@ systemctl list-timers 'coze-*'
 <p>知识库还需单独配置 Embedding 模型和内置对话模型。配置正确之前，不将文件上传成功视为知识库检索验收通过。</p>
 <p>源码检索已确认内置 XLSX 和 TXT 解析器；当前基线未检索到 <code>SKILL.md</code> 技能包直接导入实现。页面中的“技能”包括插件、工作流等资源，后续需单独实现或验证本地技能包的导入、依赖和沙盒执行。</p>
 <h2 id="_8">镜像与网络</h2>
-<p>Coze Studio 以 <code>0.5.1</code> 为基线；前端保持官方镜像，后端增加统一账号管理功能，使用本地构建的 <code>coze-local/server:accounts-二进制摘要前缀</code>。原始镜像摘要见同目录的核查记录，当前运行镜像以 <code>scripts/docker-compose.deploy.json</code> 及账号管理验收记录为准。</p>
+<p>Coze Studio 以 <code>0.5.1</code> 为基线；前端保持官方 Nginx 镜像并只读挂载带 <code>/agent/</code> 适配的自建前端产物，后端增加统一账号管理功能，使用本地构建的 <code>coze-local/server:accounts-二进制摘要前缀</code>。原始镜像摘要见同目录的核查记录，当前运行镜像及挂载以 <code>scripts/docker-compose.deploy.json</code> 和验收记录为准。</p>
 <p>基线引用的 <code>minio/minio:RELEASE.2025-06-13T11-33-47Z-cpuv1</code> 在部署时已无法从官方 Docker Hub 获取。改用 MinIO 官方 GitHub 发布的对应版本 Linux 二进制，以及官方 mc 二进制，分别核验 GitHub 发布资产的 SHA-256 后，用固定摘要的 Debian 基础镜像封装为 <code>coze-local/minio:2025-06-13</code>。服务器 <code>/home/coze/src/minio-runtime/provenance.json</code> 记录来源、版本和摘要。该替代保持原有 S3 服务接口，需在验证中检查桶和文件读写。</p>
 <p>镜像首次下载期间使用经 SSH 隧道转发的本机代理访问官方仓库；下载完成后移除 Docker 临时代理配置。日常运行不依赖该下载隧道。再次拉取或构建镜像前需确认服务器出网能力。</p>
 <h2 id="_9">备份</h2>

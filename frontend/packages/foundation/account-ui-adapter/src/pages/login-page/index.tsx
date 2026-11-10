@@ -16,7 +16,6 @@
 
 import { type FC, useState } from 'react';
 
-import { CozeBrand } from '@coze-studio/components/coze-brand';
 import { I18n } from '@coze-arch/i18n';
 import { Button, Form } from '@coze-arch/coze-design';
 import { SignFrame, SignPanel } from '@coze-arch/bot-semi';
@@ -37,12 +36,12 @@ export const LoginPage: FC = () => {
   const submitDisabled = !email || !password || hasError;
 
   return (
-    <SignFrame brandNode={<CozeBrand isOversea={IS_OVERSEA} />}>
+    <SignFrame brandNode={null}>
       <SignPanel className="w-[600px] h-[640px] pt-[96px]">
         <div className="flex flex-col items-center w-full h-full">
           <Favicon />
           <div className="text-[24px] font-medium coze-fg-plug leading-[36px] mt-[32px]">
-            {I18n.t('open_source_login_welcome')}
+            药销易-智能体平台
           </div>
           <div className="mt-[64px] w-[320px] flex flex-col items-stretch [&_.semi-input-wrapper]:overflow-hidden">
             <Form
@@ -105,16 +104,6 @@ export const LoginPage: FC = () => {
             >
               {I18n.t('register')}
             </Button>
-            <div className="mt-[12px] flex justify-center">
-              <a
-                data-testid="login.link.terms"
-                href="https://github.com/coze-dev/coze-studio?tab=Apache-2.0-1-ov-file"
-                target="_blank"
-                className="no-underline coz-fg-hglt"
-              >
-                {I18n.t('open_source_terms_linkname')}
-              </a>
-            </div>
           </div>
         </div>
       </SignPanel>

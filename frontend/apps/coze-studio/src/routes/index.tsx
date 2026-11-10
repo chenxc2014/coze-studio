@@ -18,7 +18,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { SpaceSubModuleEnum } from '@coze-foundation/space-ui-adapter';
 import { GlobalError } from '@coze-foundation/layout';
-import { BaseEnum } from '@coze-arch/web-context';
+import { BaseEnum, getAppBasePath } from '@coze-arch/web-context';
 
 import { Layout } from '../layout';
 import {
@@ -294,4 +294,4 @@ export const router: ReturnType<typeof createBrowserRouter> =
         },
       ],
     },
-  ]);
+  ], { basename: getAppBasePath() || '/' });

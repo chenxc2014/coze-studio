@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-import FaviconBase from './favicon-base.png';
-import FaviconAddon from './favicon-addon.png';
+import PlatformLogo from './platform-logo.png';
 
 export const Favicon = () => (
-  <div className="relative flex items-center">
+  <div className="flex items-center justify-center">
     <img
-      src={FaviconBase}
-      className="w-[100px] h-[100px] rounded-[21px] border border-solid coz-stroke-plus"
-    />
-    <img
-      src={FaviconAddon}
-      className="absolute left-1/2 translate-x-[34px] top-[40px] w-[51px]"
+      src={PlatformLogo}
+      alt="药销易标志"
+      className="w-[128px] h-[100px] object-contain"
     />
   </div>
 );

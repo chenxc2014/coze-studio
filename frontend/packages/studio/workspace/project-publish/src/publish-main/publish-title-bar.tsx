@@ -26,7 +26,7 @@ import {
   type ConnectorPublishConfig,
   type GetPublishRecordDetailRequest,
 } from '@coze-arch/idl/intelligence_api';
-import { I18n } from '@coze-arch/i18n';
+import { I18n, platformDisplayName } from '@coze-arch/i18n';
 import { IconCozArrowLeft } from '@coze-arch/coze-design/icons';
 import {
   Banner,
@@ -169,7 +169,7 @@ export function PublishTitleBar() {
       style={{ height: publishHeaderHeight }}
     >
       <Helmet>
-        <title>{I18n.t('Publish')}</title>
+        <title>{I18n.t('Publish')} - {platformDisplayName}</title>
       </Helmet>
       <div className="flex p-[16px] justify-between items-center  coz-stroke-primary border-b	border-x-0 border-t-0 border-solid pl-2">
         <div className="flex items-center">

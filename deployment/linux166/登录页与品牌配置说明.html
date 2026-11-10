@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="4c5b26c11ff342a9e745e569b94c795b313d300f0fb69b5a0cf5d3dfd8609ec6"><title>药销易智能体平台登录页与品牌配置 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">展示内容</a></li>
+<li><a href="#_2">图标来源</a></li>
+<li><a href="#_3">关键配置</a></li>
+<li><a href="#_4">构建、发布与回退</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：登录页与品牌配置说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">LINUX166 / 开发验证环境</div><h1>药销易智能体平台登录页与品牌配置</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="登录页与品牌配置说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-10。服务器：<code>ssh linux166</code>。</p>
+<h2 id="_1">展示内容</h2>
+<p>平台入口为 <code>https://ai.yaoxiaoyi.com/agent/</code>，登录页为 <code>https://ai.yaoxiaoyi.com/agent/sign</code>。</p>
+<ul>
+<li>登录页左上角不再展示原 Coze 图形与“扣子”字样。</li>
+<li>登录欢迎语为“药销易-智能体平台”。</li>
+<li>登录页不再展示“开源协议”入口。</li>
+<li>登录页中央标志、工作空间导航标志和管理后台品牌标志统一使用用户最新提供的药销易图片，并按原始比例展示。</li>
+<li>登录页、工作空间和管理后台的标签页标题使用“药销易-智能体平台”。智能体、应用和工作流编辑页保留资源名称等上下文，品牌名称统一为“药销易-智能体平台”。</li>
+<li>主平台与管理后台的 favicon 使用同一份 ICO 图片，提供 16、32、48、64、128、256 像素尺寸。</li>
+</ul>
+<h2 id="_2">图标来源</h2>
+<p>原图为用户最新提供的 <code>药销易-竖-纯图-无字-128-128.png</code>，尺寸为 128×128，包含透明通道。源 PNG 原样复制，不改变图形和颜色，替代之前的咨微标志。</p>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PNG 原图及兼容图标</td>
+<td><code>frontend/apps/coze-studio/assets/favicon.png</code></td>
+</tr>
+<tr>
+<td>主平台 ICO</td>
+<td><code>frontend/apps/coze-studio/assets/favicon.ico</code></td>
+</tr>
+<tr>
+<td>管理后台 ICO</td>
+<td><code>backend/conf/admin/favicon.ico</code></td>
+</tr>
+<tr>
+<td>管理后台品牌标志</td>
+<td><code>backend/conf/admin/platform-logo.png</code></td>
+</tr>
+<tr>
+<td>登录页中央标志</td>
+<td><code>frontend/packages/foundation/account-ui-adapter/src/pages/login-page/platform-logo.png</code></td>
+</tr>
+<tr>
+<td>生成 ICO 的脚本</td>
+<td><code>deployment/linux166/scripts/generate-brand-icons.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>ICO 使用透明正方形画布，在保持宽高比的前提下生成多个尺寸。管理后台 ICO 与主平台 ICO 的字节完全一致。生成脚本依赖 Pillow，仅用于开发时转换资源，前端运行和构建直接使用已生成文件。</p>
+<h2 id="_3">关键配置</h2>
+<ol>
+<li><code>frontend/packages/foundation/account-ui-adapter/src/pages/login-page/index.tsx</code> 移除左上品牌节点，并设置欢迎语。</li>
+<li>同目录 <code>favicon.tsx</code> 引用新的中央标志。</li>
+<li><code>frontend/apps/coze-studio/index.html</code> 和 <code>rsbuild.config.ts</code> 配置初始页面标题及 ICO 引用，并把图标复制到构建目录。</li>
+<li><code>frontend/packages/arch/i18n/src/brand.ts</code> 提供统一的 <code>platformDisplayName</code>。全局布局的两层组件库 <code>Layout</code> 显式传入该值，避免组件库自己的默认标题覆盖 HTML。</li>
+<li><code>frontend/packages/arch/resources/studio-i18n-resource/src/locales/zh-CN.json</code>、<code>en.json</code> 更新运行时平台名称、应用和工作流标题。页面标题工具、应用、工作流及发布页同步使用统一品牌名称。React Helmet 会在页面加载后设置标题，因此仅修改 HTML 的 title 不足以完成品牌更新。</li>
+<li><code>backend/conf/admin/index.html</code> 设置管理后台标题，并使用相对路径加载后台 ICO，兼容公网 <code>/agent/</code> 与内网入口。</li>
+</ol>
+<p>主平台图标地址为 <code>/agent/favicon.ico?v=yaoxiaoyi-2</code>，管理后台使用自身目录下的 <code>favicon.ico?v=yaoxiaoyi-2</code>。版本参数用于更新浏览器图标缓存；以后替换图标时应同时递增版本参数。</p>
+<h2 id="_4">构建、发布与回退</h2>
+<p>沿用<a href="子路径访问说明.md">子路径访问说明</a>中的独立构建、版本目录挂载和回退流程。变更前端产物与后台静态文件，不修改模型凭据、账号密码和数据库结构。</p>
+<p>构建命令：</p>
+<pre><code class="language-bash">bash /home/coze/ops/build-agent-web.sh /home/coze/build/subpath-source
+</code></pre>
+<p>部署前保留原 Compose、Nginx 配置和后台文件，发布完整的 <code>dist</code> 到新的 <code>/home/coze/releases/web-agent-版本</code> 目录，切换前端容器的只读挂载。当前版本、图标摘要和验证记录见 <code>品牌配置验收.json</code>。</p>
+<p>浏览器若仍显示旧图标或旧标题，可先使用 Ctrl+F5 强制刷新。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-10 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>
