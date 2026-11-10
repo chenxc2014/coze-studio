@@ -40,6 +40,7 @@ import (
 var UserApplicationSVC = &UserApplicationService{}
 
 type UserApplicationService struct {
+	Accounts  *AccountAdministration
 	oss       storage.Storage
 	DomainSVC user.User
 }

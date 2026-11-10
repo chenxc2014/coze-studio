@@ -15,6 +15,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	"github.com/coze-dev/coze-studio/backend/api/model/admin/config"
+	"github.com/coze-dev/coze-studio/backend/application/base/ctxutil"
+	"github.com/coze-dev/coze-studio/backend/application/user"
 	bizConf "github.com/coze-dev/coze-studio/backend/bizpkg/config"
 	"github.com/coze-dev/coze-studio/backend/bizpkg/config/modelmgr"
 	"github.com/coze-dev/coze-studio/backend/bizpkg/llm/modelbuilder"
@@ -44,9 +46,7 @@ func GetBasicConfiguration(ctx context.Context, c *app.RequestContext) {
 func SaveBasicConfiguration(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req config.SaveBasicConfigurationReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+	if !bindAccountAdmin(c, &req) {
 		return
 	}
 
@@ -91,9 +91,9 @@ func SaveBasicConfiguration(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	err = bizConf.Base().SaveBaseConfig(ctx, req.Configuration)
+	err = user.UserApplicationSVC.Accounts.SaveBasicConfig(ctx, ctxutil.MustGetUIDFromCtx(ctx), req.Configuration)
 	if err != nil {
-		internalServerErrorResponse(ctx, c, fmt.Errorf("save basic config failed: %w", err))
+		accountAdminResponse(c, nil, err)
 		return
 	}
 

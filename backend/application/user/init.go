@@ -28,13 +28,16 @@ import (
 )
 
 func InitService(ctx context.Context, db *gorm.DB, oss storage.Storage, idgen idgen.IDGenerator) *UserApplicationService {
+	controls := repository.NewAccountControlRepo(db)
 	UserApplicationSVC.DomainSVC = service.NewUserDomain(ctx, &service.Components{
-		IconOSS:   oss,
-		IDGen:     idgen,
-		UserRepo:  repository.NewUserRepo(db),
-		SpaceRepo: repository.NewSpaceRepo(db),
+		AccountControls: controls,
+		IconOSS:         oss,
+		IDGen:           idgen,
+		UserRepo:        repository.NewUserRepo(db),
+		SpaceRepo:       repository.NewSpaceRepo(db),
 	})
 	UserApplicationSVC.oss = oss
+	UserApplicationSVC.Accounts = NewAccountAdministration(db, oss, idgen)
 
 	return UserApplicationSVC
 }

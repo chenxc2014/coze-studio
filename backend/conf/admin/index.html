@@ -406,6 +406,7 @@
             text-align: center;
         }
 </style>
+    <link rel="stylesheet" href="/admin/account-management.css?v=1">
 </head>
 <body>
     <div class="admin-container">
@@ -449,6 +450,9 @@
                                 <span class="submenu-icon">📚</span>
                                 知识库配置
                             </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#" class="submenu-link" data-page="account-management"><span class="submenu-icon">👥</span>账号管理</a>
                         </li>
                     </ul>
                 </li>
@@ -951,6 +955,7 @@
                 'basic-config': { title: t('page.basic.title'), desc: t('page.basic.desc') },
                 'model-management': { title: t('page.model.title'), desc: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), desc: t('page.knowledge.desc') },
+                'account-management': { title: '账号管理', desc: '统一维护平台账号与管理员身份' },
             };
             const meta = map[hash] || { title: t('page.default.title'), desc: t('page.default.desc') };
             const pt = document.getElementById('pageTitle');
@@ -1030,7 +1035,8 @@
             const pageConfig = {
                 'basic-config': { title: t('page.basic.title'), description: t('page.basic.desc') },
                 'model-management': { title: t('page.model.title'), description: t('page.model.desc') },
-                'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') }
+                'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') },
+                'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' }
             };
 
             if (pageConfig[hash]) {
@@ -1188,7 +1194,8 @@
             const pageConfig = {
                 'basic-config': { title: t('page.basic.title'), description: t('page.basic.desc') },
                 'model-management': { title: t('page.model.title'), description: t('page.model.desc') },
-                'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') }
+                'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') },
+                'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' }
             };
             
             const config = pageConfig[pageName] || { title: t('page.default.title'), description: t('page.default.desc') };
@@ -1220,6 +1227,10 @@
 
         // 显示页面内容
         function showPageContent(pageName, title) {
+            if (pageName === 'account-management') {
+                window.loadAccountManagementPage();
+                return;
+            }
             // 如果是基础配置页面，加载config.html的内容
             if (pageName === 'basic-config') {
                 loadBasicConfigPage();
@@ -3472,5 +3483,6 @@
             `;
         }
     </script>
+    <script src="/admin/account-management.js?v=1"></script>
 </body>
 </html>

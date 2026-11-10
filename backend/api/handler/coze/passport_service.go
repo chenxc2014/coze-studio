@@ -102,8 +102,6 @@ func PassportWebEmailLoginPost(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	logs.Infof("[PassportWebEmailLoginPost] sessionKey: %s", sessionKey)
-
 	c.SetCookie(entity.SessionKey,
 		sessionKey,
 		consts.SessionMaxAgeSecond,

@@ -48,10 +48,11 @@ import (
 )
 
 type Components struct {
-	IconOSS   storage.Storage
-	IDGen     idgen.IDGenerator
-	UserRepo  repository.UserRepository
-	SpaceRepo repository.SpaceRepository
+	AccountControls repository.AccountControlRepository
+	IconOSS         storage.Storage
+	IDGen           idgen.IDGenerator
+	UserRepo        repository.UserRepository
+	SpaceRepo       repository.SpaceRepository
 }
 
 func NewUserDomain(ctx context.Context, c *Components) User {
@@ -72,6 +73,16 @@ func (u *userImpl) Login(ctx context.Context, email, password string) (user *use
 
 	if !exist {
 		return nil, errorx.New(errno.ErrUserInfoInvalidateCode)
+	}
+
+	if u.AccountControls != nil {
+		disabled, controlErr := u.AccountControls.IsDisabled(ctx, userModel.ID)
+		if controlErr != nil {
+			return nil, controlErr
+		}
+		if disabled {
+			return nil, errorx.New(errno.ErrUserInfoInvalidateCode)
+		}
 	}
 
 	// Verify the password using the Argon2id algorithm
@@ -390,6 +401,16 @@ func (u *userImpl) ValidateSession(ctx context.Context, sessionKey string) (
 
 	if !exist {
 		return nil, false, nil
+	}
+
+	if u.AccountControls != nil {
+		disabled, controlErr := u.AccountControls.IsDisabled(ctx, userModel.ID)
+		if controlErr != nil {
+			return nil, false, controlErr
+		}
+		if disabled {
+			return nil, false, nil
+		}
 	}
 
 	return &userEntity.Session{

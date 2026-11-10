@@ -27,6 +27,7 @@ import (
 
 	"github.com/coze-dev/coze-studio/backend/api/internal/httputil"
 	"github.com/coze-dev/coze-studio/backend/application/openauth"
+	"github.com/coze-dev/coze-studio/backend/application/user"
 	"github.com/coze-dev/coze-studio/backend/pkg/ctxcache"
 	"github.com/coze-dev/coze-studio/backend/pkg/errorx"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/conv"
@@ -146,6 +147,12 @@ func OpenapiAuthMW() app.HandlerFunc {
 		if apiKeyInfo == nil {
 			httputil.InternalError(ctx, c,
 				errorx.New(errno.ErrUserAuthenticationFailed, errorx.KV("reason", "api key invalid")))
+			return
+		}
+
+		disabled, accountErr := user.UserApplicationSVC.Accounts.IsDisabled(ctx, apiKeyInfo.UserID)
+		if accountErr != nil || disabled {
+			httputil.InternalError(ctx, c, errorx.New(errno.ErrUserAuthenticationFailed, errorx.KV("reason", "account unavailable")))
 			return
 		}
 

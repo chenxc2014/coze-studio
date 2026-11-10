@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="654eb1d89c2ec941ce03d791abb7a62a703fa73bcd4cf069a77f4cbd367fe5c5"><title>Coze Studio 开发验证环境 · 部署与运维</title>
+<meta name="source-sha256" content="210a6bb82c691c474a506026828d9f9c8380169604f2e328ce856be712bc32df"><title>Coze Studio 开发验证环境 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -153,6 +153,7 @@ systemctl list-timers 'coze-*'
 <pre><code class="language-bash">ssh linux166 'cat /home/coze/ops/admin-initial.json'
 </code></pre>
 <p>模型管理地址：<code>/admin/#model-management</code>。由管理员分别添加 DeepSeek、阿里百炼、豆包等服务。模型 Key 在平台中配置，不写入仓库。</p>
+<p>统一账号管理地址：<code>/admin/#account-management</code>。支持管理员集中查询、新增账号、编辑姓名、重置密码、启停及授予或取消管理员身份。使用方法、权限规则、源码位置和回退方式见同目录的<a href="账号管理说明.md">Markdown 说明</a>及 <a href="账号管理说明.html">HTML 说明</a>。</p>
 <h3 id="_7">本次验收结果</h3>
 <ul>
 <li>2026-11-10：11 个容器均在运行，具备健康检查的组件全部健康。</li>
@@ -167,7 +168,7 @@ systemctl list-timers 'coze-*'
 <p>知识库还需单独配置 Embedding 模型和内置对话模型。配置正确之前，不将文件上传成功视为知识库检索验收通过。</p>
 <p>源码检索已确认内置 XLSX 和 TXT 解析器；当前基线未检索到 <code>SKILL.md</code> 技能包直接导入实现。页面中的“技能”包括插件、工作流等资源，后续需单独实现或验证本地技能包的导入、依赖和沙盒执行。</p>
 <h2 id="_8">镜像与网络</h2>
-<p>Coze Studio 前后端固定为 <code>0.5.1</code>，其余服务保持基线版本。镜像摘要见同目录的核查记录。</p>
+<p>Coze Studio 以 <code>0.5.1</code> 为基线；前端保持官方镜像，后端增加统一账号管理功能，使用本地构建的 <code>coze-local/server:accounts-二进制摘要前缀</code>。原始镜像摘要见同目录的核查记录，当前运行镜像以 <code>scripts/docker-compose.deploy.json</code> 及账号管理验收记录为准。</p>
 <p>基线引用的 <code>minio/minio:RELEASE.2025-06-13T11-33-47Z-cpuv1</code> 在部署时已无法从官方 Docker Hub 获取。改用 MinIO 官方 GitHub 发布的对应版本 Linux 二进制，以及官方 mc 二进制，分别核验 GitHub 发布资产的 SHA-256 后，用固定摘要的 Debian 基础镜像封装为 <code>coze-local/minio:2025-06-13</code>。服务器 <code>/home/coze/src/minio-runtime/provenance.json</code> 记录来源、版本和摘要。该替代保持原有 S3 服务接口，需在验证中检查桶和文件读写。</p>
 <p>镜像首次下载期间使用经 SSH 隧道转发的本机代理访问官方仓库；下载完成后移除 Docker 临时代理配置。日常运行不依赖该下载隧道。再次拉取或构建镜像前需确认服务器出网能力。</p>
 <h2 id="_9">备份</h2>

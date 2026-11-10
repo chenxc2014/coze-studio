@@ -101,6 +101,7 @@ func startHttpServer() {
 	s.Use(middleware.I18nMW()) // must after SessionAuthMW
 
 	router.GeneratedRegister(s)
+	router.RegisterAccountAdministration(s)
 	s.Spin()
 }
 

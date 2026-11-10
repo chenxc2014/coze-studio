@@ -1,0 +1,2 @@
+FROM cozedev/coze-studio-server@sha256:bacce3aa5960a2f18362eac93317e42a8c0dbd125a44ec47519f12a8a27c7744
+COPY opencoze /app/opencoze
