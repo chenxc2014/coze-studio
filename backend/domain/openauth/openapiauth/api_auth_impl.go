@@ -112,7 +112,10 @@ func (a *apiAuthImpl) CheckPermission(ctx context.Context, req *entity.CheckPerm
 	if err != nil {
 		return nil, err
 	}
-	if apiKey.APIKey != req.ApiKey {
+	if apiKey == nil || apiKey.APIKey != req.ApiKey {
+		return nil, nil
+	}
+	if apiKey.ExpiredAt != entity.PermanentExpiration && apiKey.ExpiredAt <= time.Now().Unix() {
 		return nil, nil
 	}
 	apiKeyDo := &entity.ApiKey{

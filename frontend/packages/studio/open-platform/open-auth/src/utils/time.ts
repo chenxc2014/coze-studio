@@ -26,6 +26,7 @@ export const disabledDate = (date?: Date) => {
 export enum ExpirationDate {
   ONE = '1',
   THIRTY = '30',
+  PERMANENT = 'permanent',
   CUSTOMIZE = 'customize',
 }
 enum ServerTimeValue {
@@ -44,13 +45,20 @@ export const getExpirationOptions = () => {
       value: ExpirationDate.THIRTY,
     },
     {
+      label: I18n.t('api_status_permanent_1'),
+      value: ExpirationDate.PERMANENT,
+    },
+    {
       label: I18n.t('customize_key_1'),
       value: ExpirationDate.CUSTOMIZE,
     },
   ];
   const newOptions = dataOptionsList.map(item => {
     const { value } = item;
-    if (value === ExpirationDate.CUSTOMIZE) {
+    if (
+      value === ExpirationDate.CUSTOMIZE ||
+      value === ExpirationDate.PERMANENT
+    ) {
       return item;
     }
     const currentDate = dayjs();
@@ -100,5 +108,5 @@ export const getStatus = (d: number) => {
     return true;
   }
   const current = dayjs().unix();
-  return d >= current;
+  return d > current;
 };

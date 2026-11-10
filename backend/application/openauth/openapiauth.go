@@ -18,7 +18,6 @@ package openauth
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -84,15 +83,11 @@ func (s *OpenAuthApplicationService) CreatePersonalAccessToken(ctx context.Conte
 		AkType: entity.AkTypeCustomer,
 	}
 
-	if req.DurationDay == "customize" {
-		appReq.Expire = req.ExpireAt
-	} else {
-		expireDay, err := strconv.ParseInt(req.DurationDay, 10, 64)
-		if err != nil {
-			return resp, errors.New("invalid expireDay")
-		}
-		appReq.Expire = time.Now().Add(time.Duration(expireDay) * time.Hour * 24).Unix()
+	expiresAt, err := resolveTokenExpiration(req.DurationDay, req.ExpireAt, time.Now())
+	if err != nil {
+		return resp, err
 	}
+	appReq.Expire = expiresAt
 
 	apiKeyResp, err := openapiAuthDomainSVC.Create(ctx, appReq)
 	if err != nil {

@@ -18,6 +18,9 @@ package entity
 
 type AkType int32
 
+// 永久令牌沿用前端已约定的 -1，到期时间为其他值时必须正常校验。
+const PermanentExpiration int64 = -1
+
 const (
 	AkTypeCustomer  AkType = 0
 	AkTypeTemporary AkType = 1
