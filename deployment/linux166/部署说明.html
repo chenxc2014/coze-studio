@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="654eb1d89c2ec941ce03d791abb7a62a703fa73bcd4cf069a77f4cbd367fe5c5"><title>Coze Studio 开发验证环境 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">版本与范围</a></li>
+<li><a href="#_2">分区与存储规划</a></li>
+<li><a href="#_3">容量控制</a><ul>
+<li><a href="#_4">扩容路径</a></li>
+</ul>
+</li>
+<li><a href="#_5">服务管理</a></li>
+<li><a href="#_6">管理员及模型配置</a><ul>
+<li><a href="#_7">本次验收结果</a></li>
+</ul>
+</li>
+<li><a href="#_8">镜像与网络</a></li>
+<li><a href="#_9">备份</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：部署说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">LINUX166 / 开发验证环境</div><h1>Coze Studio 开发验证环境</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="http://192.168.1.166:8888" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="部署说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<div class="summary" aria-label="验收时容量快照">
+<div class="metric"><span>运行环境</span><strong>linux166</strong><small>Coze Studio · v0.5.1</small></div>
+<div class="metric"><span>系统分区可用</span><strong>67.7 GiB</strong><small>2026-11-10 验收快照</small></div>
+<div class="metric"><span>/home 分区可用</span><strong>111.7 GiB</strong><small>容量以服务器实际检查为准</small></div></div><article id="content"><h2 id="_1">版本与范围</h2>
+<ul>
+<li>上游：https://github.com/coze-dev/coze-studio</li>
+<li>基线：<code>v0.5.1</code>，提交 <code>72cecff858a5a18662c5d9d1a4764c53ebc98317</code>。</li>
+<li>本地开发分支：<code>custom/platform-baseline</code>。</li>
+<li>服务器：<code>ssh linux166</code>，Rocky Linux 9，8 个逻辑 CPU、约 16 GiB 内存。</li>
+<li>本轮只部署平台、验证基础服务和鉴权。对话、Embedding、知识库召回效果、技能调用及发布后真实对话需配置模型凭据后验证。</li>
+</ul>
+<h2 id="_2">分区与存储规划</h2>
+<p>安装前系统分区 <code>/</code> 为约 70 GiB，可用约 68 GiB；数据分区 <code>/home</code> 为约 121 GiB，可用约 120 GiB。两者均为 XFS，LVM 卷组没有未分配空间。不能将卷组未分配空间作为未来可用容量。</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coze Studio 源码与配置</td>
+<td><code>/home/coze/src/coze-studio</code></td>
+</tr>
+<tr>
+<td>Docker 容器、日志、卷及构建缓存</td>
+<td><code>/home/coze/runtime/docker</code></td>
+</tr>
+<tr>
+<td>containerd 镜像内容与快照</td>
+<td><code>/home/coze/runtime/containerd</code></td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td><code>/home/coze/data/mysql</code></td>
+</tr>
+<tr>
+<td>Redis</td>
+<td><code>/home/coze/data/bitnami/redis</code></td>
+</tr>
+<tr>
+<td>Elasticsearch</td>
+<td><code>/home/coze/data/bitnami/elasticsearch</code></td>
+</tr>
+<tr>
+<td>MinIO 上传文件及 Milvus 对象</td>
+<td><code>/home/coze/data/minio</code></td>
+</tr>
+<tr>
+<td>Milvus 本地数据</td>
+<td><code>/home/coze/data/milvus</code></td>
+</tr>
+<tr>
+<td>etcd</td>
+<td><code>/home/coze/data/bitnami/etcd</code></td>
+</tr>
+<tr>
+<td>NSQ 队列</td>
+<td><code>/home/coze/data/nsq</code></td>
+</tr>
+<tr>
+<td>元数据备份</td>
+<td><code>/home/coze/backups</code></td>
+</tr>
+<tr>
+<td>容量检查与运维脚本</td>
+<td><code>/home/coze/ops</code></td>
+</tr>
+<tr>
+<td>安装临时文件</td>
+<td><code>/home/coze/tmp</code></td>
+</tr>
+</tbody>
+</table>
+<p>Docker 和 containerd 在首次启动前已配置数据目录，并通过 systemd 的 <code>RequiresMountsFor</code> 依赖 <code>/home</code>，避免挂载缺失时误写系统分区。数据库、对象文件、向量索引使用显式绑定目录。</p>
+<p>容量预算建议：镜像、快照和构建缓存预留约 25 GiB，业务数据约 50 GiB，近期备份约 10 GiB，其余保留给升级和临时空间。预算不是磁盘配额，数据实际大小需持续检查。</p>
+<h2 id="_3">容量控制</h2>
+<ul>
+<li><code>/home</code> 剩余小于 25 GiB、系统分区剩余小于 15 GiB，或任一分区使用率达到 80%，容量检查返回失败。</li>
+<li>服务通过 systemd 启动前执行同样的检查；日常每十五分钟检查一次。</li>
+<li>当前检查结果：<code>/home/coze/ops/capacity-latest.json</code>。检查失败记录在 systemd journal，尚未接入短信、邮件等外部通知。</li>
+<li>告警不会自动删除业务数据，也不会自动停止正在运行的业务；需在阈值触发时及时处理或扩容。</li>
+<li>每个容器使用 <code>local</code> 日志驱动，单文件 20 MB、保留三份。</li>
+<li>主机 journal 限制 512 MB，运行时 journal 限制 128 MB。</li>
+<li>MySQL binlog 保留三天，单文件上限 100 MiB；活跃日志与其他数据库文件仍可能增长。</li>
+<li>单次请求体上限 50 MiB；这是请求限制，不是知识库总容量限制。</li>
+<li>Elasticsearch 堆限制为 512 MiB～1 GiB，各服务配置内存上限。</li>
+</ul>
+<h3 id="_4">扩容路径</h3>
+<p>现有 XFS 文件系统不能依赖缩容来重新分配空间。建议在 <code>/home</code> 可用空间接近 35 GiB 时开始扩容准备，预留 25 GiB 前完成处理：扩大虚拟磁盘并扩展对应 PV/LV/XFS，或新增数据盘后安排停机迁移。实际扩容前须重新检查 <code>lsblk</code>、<code>findmnt</code>、<code>pvs</code>、<code>vgs</code>、<code>lvs</code>，备份业务数据。</p>
+<h2 id="_5">服务管理</h2>
+<pre><code class="language-bash">ssh linux166
+systemctl status coze-studio
+/home/coze/ops/compose.sh ps
+systemctl stop coze-studio
+systemctl start coze-studio
+python3 /home/coze/ops/capacity.py
+df -hT / /home
+docker system df
+systemctl list-timers 'coze-*'
+</code></pre>
+<p>禁止直接运行上游 <code>make clean</code>，该命令会删除数据目录。不要自动执行 <code>docker system prune --volumes</code>。同一环境应始终使用 <code>/home/coze/ops/compose.sh</code>，避免使用上游默认的浮动版本或创建另一套容器。</p>
+<h2 id="_6">管理员及模型配置</h2>
+<p>平台入口为 <code>http://192.168.1.166:8888</code>。管理员为 <code>admin@coze.local</code>，初始凭据仅保存在服务器 <code>/home/coze/ops/admin-initial.json</code>，权限为仅管理员可读。首次登录后可修改密码；该文件中的初始密码不会跟随更新。</p>
+<pre><code class="language-bash">ssh linux166 'cat /home/coze/ops/admin-initial.json'
+</code></pre>
+<p>模型管理地址：<code>/admin/#model-management</code>。由管理员分别添加 DeepSeek、阿里百炼、豆包等服务。模型 Key 在平台中配置，不写入仓库。</p>
+<h3 id="_7">本次验收结果</h3>
+<ul>
+<li>2026-11-10：11 个容器均在运行，具备健康检查的组件全部健康。</li>
+<li>Windows 电脑直连登录页、八个入口 JS/CSS 资源均通过检查。</li>
+<li>管理员登录、Cookie 会话及管理员配置接口通过检查，公开注册关闭。</li>
+<li>MinIO 文件写入、读取通过检查，测试对象已清理。</li>
+<li>未认证管理 API 返回 HTTP 401；OpenAPI 按上游约定返回 HTTP 200 和业务错误码 <code>700012006</code>，调用方须检查业务码。</li>
+<li>首份元数据备份已成功生成；尚未执行完整恢复演练。</li>
+<li>验收时系统分区可用约 67.7 GiB，<code>/home</code> 可用约 111.7 GiB。XFS reflink 可能使不同目录 <code>du</code> 结果重复计数，容量判断应以 <code>df</code> 为准。</li>
+<li>修复 Nginx Cookie 域：上游在请求缺少 Origin 时会将端口写入 Cookie 域，导致部分客户端无法保存会话。代理层去除域中的端口，已通过真实登录复核。</li>
+</ul>
+<p>知识库还需单独配置 Embedding 模型和内置对话模型。配置正确之前，不将文件上传成功视为知识库检索验收通过。</p>
+<p>源码检索已确认内置 XLSX 和 TXT 解析器；当前基线未检索到 <code>SKILL.md</code> 技能包直接导入实现。页面中的“技能”包括插件、工作流等资源，后续需单独实现或验证本地技能包的导入、依赖和沙盒执行。</p>
+<h2 id="_8">镜像与网络</h2>
+<p>Coze Studio 前后端固定为 <code>0.5.1</code>，其余服务保持基线版本。镜像摘要见同目录的核查记录。</p>
+<p>基线引用的 <code>minio/minio:RELEASE.2025-06-13T11-33-47Z-cpuv1</code> 在部署时已无法从官方 Docker Hub 获取。改用 MinIO 官方 GitHub 发布的对应版本 Linux 二进制，以及官方 mc 二进制，分别核验 GitHub 发布资产的 SHA-256 后，用固定摘要的 Debian 基础镜像封装为 <code>coze-local/minio:2025-06-13</code>。服务器 <code>/home/coze/src/minio-runtime/provenance.json</code> 记录来源、版本和摘要。该替代保持原有 S3 服务接口，需在验证中检查桶和文件读写。</p>
+<p>镜像首次下载期间使用经 SSH 隧道转发的本机代理访问官方仓库；下载完成后移除 Docker 临时代理配置。日常运行不依赖该下载隧道。再次拉取或构建镜像前需确认服务器出网能力。</p>
+<h2 id="_9">备份</h2>
+<p>初始化后的数据库元数据每日 03:30 压缩备份到 <code>/home/coze/backups</code>，保留最近七份；单次压缩结果超过 5 GiB 或可用空间不足 25 GiB 时失败并记录日志。可手动执行：</p>
+<pre><code class="language-bash">systemctl start coze-backup.service
+journalctl -u coze-backup.service -n 20 --no-pager
+</code></pre>
+<p>该备份不包含 MinIO 中的上传文件、全部服务配置及完整向量索引，也不是异机容灾。正式投入使用前，应安排对象数据和受限配置文件的异机备份与恢复演练，避免在同一分区保留无限全量副本。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-10 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

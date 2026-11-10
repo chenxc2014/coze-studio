@@ -1,0 +1,52 @@
+{
+  "cozedev/coze-studio-server:0.5.1": {
+    "status": 200,
+    "digest": "sha256:bacce3aa5960a2f18362eac93317e42a8c0dbd125a44ec47519f12a8a27c7744",
+    "amd64": "sha256:2e47b5cf04e893143292b61bd22a812ccb4cb08a969babaf2a72f5f4bc84d216"
+  },
+  "cozedev/coze-studio-web:0.5.1": {
+    "status": 200,
+    "digest": "sha256:a137a16ab75b871b08911ca87359fc8981b225b63b94cf3e0979069fbd862aea",
+    "amd64": "sha256:207102379ac2e04e0037a71e00bfa656946e405f119d3d288eb08746cd5cf4f4"
+  },
+  "minio/minio:RELEASE.2025-06-13T11-33-47Z-cpuv1": {
+    "status": 404,
+    "digest": null,
+    "amd64": null
+  },
+  "minio/minio:RELEASE.2025-06-13T11-33-47Z": {
+    "status": 404,
+    "digest": null,
+    "amd64": null
+  },
+  "bitnamilegacy/elasticsearch:8.18.0": {
+    "status": 200,
+    "digest": "sha256:4a7d14222c876a87c1ddd38e1128d8e42df80071b09ec54db5c32586c9cf5a38",
+    "amd64": "sha256:e03c628fab2d833b6b7f5a00bafa943e25ba1a30caa78d2bc3b93527a4ec2b06"
+  },
+  "bitnamilegacy/etcd:3.5": {
+    "status": 200,
+    "digest": "sha256:1b9977cf4cce7546873e0ee50e684c38a38a4e7a27d22086fbd2b8a1b44a69d0",
+    "amd64": "sha256:4abe38869d5919c9ec70b2008713c2eb90c1b26d9e6700e126875894681b5b99"
+  },
+  "bitnamilegacy/redis:8.0": {
+    "status": 200,
+    "digest": "sha256:5927ff3702df7106bbb7dcc0f8e3d053d979253c3aecce53f07f40db990f823b",
+    "amd64": "sha256:72614af2fae91faddbb50d121477d9c50d5b2bc186359eadfa065c51b3103021"
+  },
+  "milvusdb/milvus:v2.5.10": {
+    "status": 200,
+    "digest": "sha256:02e1d60d71ab60f435c60076f4fed2abe59602ecd5e18dcfe229c8c558c4379d",
+    "amd64": "sha256:dbe2d4d9072b101425562dcf723ac3c390f6503047ec6daf8d38cd826988bf8a"
+  },
+  "library/mysql:8.4.5": {
+    "status": 200,
+    "digest": "sha256:679e7e924f38a3cbb62a3d7df32924b83f7321a602d3f9f967c01b3df18495d6",
+    "amd64": "sha256:bd045a5ea8c8d25f497731fea5c50c3aceae7bb22bff543c424bb60052d55840"
+  },
+  "nsqio/nsq:v1.2.1": {
+    "status": 200,
+    "digest": null,
+    "amd64": "sha256:732949fda1a87892fcf926042d62aa359ba0aae2021c7dc86edce58c169307ae"
+  }
+}

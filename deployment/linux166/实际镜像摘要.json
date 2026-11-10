@@ -1,0 +1,38 @@
+{
+  "mysql@sha256:679e7e924f38a3cbb62a3d7df32924b83f7321a602d3f9f967c01b3df18495d6": {
+    "id": "sha256:679e7e924f38a3cbb62a3d7df32924b83f7321a602d3f9f967c01b3df18495d6",
+    "digest": "mysql@sha256:679e7e924f38a3cbb62a3d7df32924b83f7321a602d3f9f967c01b3df18495d6"
+  },
+  "bitnamilegacy/redis@sha256:5927ff3702df7106bbb7dcc0f8e3d053d979253c3aecce53f07f40db990f823b": {
+    "id": "sha256:5927ff3702df7106bbb7dcc0f8e3d053d979253c3aecce53f07f40db990f823b",
+    "digest": "bitnamilegacy/redis@sha256:5927ff3702df7106bbb7dcc0f8e3d053d979253c3aecce53f07f40db990f823b"
+  },
+  "bitnamilegacy/elasticsearch@sha256:4a7d14222c876a87c1ddd38e1128d8e42df80071b09ec54db5c32586c9cf5a38": {
+    "id": "sha256:4a7d14222c876a87c1ddd38e1128d8e42df80071b09ec54db5c32586c9cf5a38",
+    "digest": "bitnamilegacy/elasticsearch@sha256:4a7d14222c876a87c1ddd38e1128d8e42df80071b09ec54db5c32586c9cf5a38"
+  },
+  "coze-local/minio:2025-06-13": {
+    "id": "sha256:e372f2cf9c63e28ee2544dc91bc29ad85e9eb0e48fcffd98021758a10ff42de8",
+    "digest": "coze-local/minio:2025-06-13"
+  },
+  "bitnamilegacy/etcd@sha256:1b9977cf4cce7546873e0ee50e684c38a38a4e7a27d22086fbd2b8a1b44a69d0": {
+    "id": "sha256:1b9977cf4cce7546873e0ee50e684c38a38a4e7a27d22086fbd2b8a1b44a69d0",
+    "digest": "bitnamilegacy/etcd@sha256:1b9977cf4cce7546873e0ee50e684c38a38a4e7a27d22086fbd2b8a1b44a69d0"
+  },
+  "milvusdb/milvus@sha256:02e1d60d71ab60f435c60076f4fed2abe59602ecd5e18dcfe229c8c558c4379d": {
+    "id": "sha256:02e1d60d71ab60f435c60076f4fed2abe59602ecd5e18dcfe229c8c558c4379d",
+    "digest": "milvusdb/milvus@sha256:02e1d60d71ab60f435c60076f4fed2abe59602ecd5e18dcfe229c8c558c4379d"
+  },
+  "nsqio/nsq@sha256:aa1ac075d45fc3dccaafbe180b8dea5421bfc17df7a9699693987ef35b5be4ad": {
+    "id": "sha256:aa1ac075d45fc3dccaafbe180b8dea5421bfc17df7a9699693987ef35b5be4ad",
+    "digest": "nsqio/nsq@sha256:aa1ac075d45fc3dccaafbe180b8dea5421bfc17df7a9699693987ef35b5be4ad"
+  },
+  "cozedev/coze-studio-server@sha256:bacce3aa5960a2f18362eac93317e42a8c0dbd125a44ec47519f12a8a27c7744": {
+    "id": "sha256:bacce3aa5960a2f18362eac93317e42a8c0dbd125a44ec47519f12a8a27c7744",
+    "digest": "cozedev/coze-studio-server@sha256:bacce3aa5960a2f18362eac93317e42a8c0dbd125a44ec47519f12a8a27c7744"
+  },
+  "cozedev/coze-studio-web@sha256:a137a16ab75b871b08911ca87359fc8981b225b63b94cf3e0979069fbd862aea": {
+    "id": "sha256:a137a16ab75b871b08911ca87359fc8981b225b63b94cf3e0979069fbd862aea",
+    "digest": "cozedev/coze-studio-web@sha256:a137a16ab75b871b08911ca87359fc8981b225b63b94cf3e0979069fbd862aea"
+  }
+}
