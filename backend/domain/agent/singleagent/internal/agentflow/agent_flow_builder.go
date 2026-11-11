@@ -86,14 +86,11 @@ func BuildAgent(ctx context.Context, conf *Config) (r *AgentRunner, err error) {
 		variables:            avs,
 	}
 
-	kr, err := newKnowledgeRetriever(ctx, &retrieverConfig{
-		knowledgeConfig: conf.Agent.Knowledge,
-	})
+	chatModel, modelInfo, err := modelbuilder.BuildModelBySettings(ctx, conf.Agent.ModelInfo)
 	if err != nil {
 		return nil, err
 	}
-
-	chatModel, modelInfo, err := modelbuilder.BuildModelBySettings(ctx, conf.Agent.ModelInfo)
+	kr, err := newKnowledgeRetriever(ctx, &retrieverConfig{knowledgeConfig: conf.Agent.Knowledge, chatModel: chatModel})
 	if err != nil {
 		return nil, err
 	}

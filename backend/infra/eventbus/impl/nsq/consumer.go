@@ -19,6 +19,7 @@ package nsq
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/nsqio/go-nsq"
 
@@ -78,6 +79,10 @@ type MessageHandler struct {
 }
 
 func (h *MessageHandler) HandleMessage(m *nsq.Message) error {
+	// 大型知识库导入可能长时间占用一个消息，定期续期以避免处理尚未结束就重复投递。
+	stopTouch := startMessageTouch(m.Touch, 20*time.Second)
+	defer stopTouch()
+
 	msg := &eventbus.Message{
 		Topic: h.Topic,
 		Group: h.Group,

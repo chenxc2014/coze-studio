@@ -102,6 +102,7 @@ func startHttpServer() {
 
 	router.GeneratedRegister(s)
 	router.RegisterAccountAdministration(s)
+	router.RegisterKnowledgeAddress(s)
 	s.Spin()
 }
 

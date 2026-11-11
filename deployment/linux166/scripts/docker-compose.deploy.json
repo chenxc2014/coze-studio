@@ -319,7 +319,7 @@
     "nsqd": {
       "image": "nsqio/nsq@sha256:aa1ac075d45fc3dccaafbe180b8dea5421bfc17df7a9699693987ef35b5be4ad",
       "container_name": "coze-nsqd",
-      "command": "/nsqd --lookupd-tcp-address=nsqlookupd:4160 --broadcast-address=nsqd --data-path=/data --max-bytes-per-file=104857600",
+      "command": "/nsqd --lookupd-tcp-address=nsqlookupd:4160 --broadcast-address=nsqd --data-path=/data --max-bytes-per-file=104857600 --msg-timeout=120s --max-msg-timeout=24h",
       "restart": "unless-stopped",
       "depends_on": {
         "nsqlookupd": {
@@ -377,7 +377,7 @@
       "pull_policy": "never"
     },
     "coze-server": {
-      "image": "coze-local/server:tokens-0b57a9ddee16",
+      "image": "coze-local/server:address-822f8afea1f8",
       "restart": "unless-stopped",
       "container_name": "coze-server",
       "env_file": [
@@ -418,7 +418,10 @@
         }
       },
       "mem_limit": "2g",
-      "pull_policy": "never"
+      "pull_policy": "never",
+      "environment": {
+        "COZE_ADDRESS_DOCUMENT_IDS": "7706726398408261632"
+      }
     },
     "coze-web": {
       "image": "cozedev/coze-studio-web@sha256:a137a16ab75b871b08911ca87359fc8981b225b63b94cf3e0979069fbd862aea",
@@ -430,7 +433,8 @@
       "volumes": [
         "/home/coze/src/coze-studio/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,z",
         "/home/coze/src/coze-studio/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro,z",
-        "/home/coze/releases/web-agent-ea214b060c09:/usr/share/nginx/html:ro,z"
+        "/home/coze/releases/web-agent-ea214b060c09:/usr/share/nginx/html:ro,z",
+        "/home/coze/src/coze-studio/backend/conf/admin/app-base-path.js:/etc/nginx/coze-app-base-path.js:ro,z"
       ],
       "depends_on": [
         "coze-server"

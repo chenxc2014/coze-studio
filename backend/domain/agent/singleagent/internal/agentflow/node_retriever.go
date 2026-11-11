@@ -25,6 +25,7 @@ import (
 	"github.com/cloudwego/eino/schema"
 
 	"github.com/coze-dev/coze-studio/backend/api/model/app/bot_common"
+	"github.com/coze-dev/coze-studio/backend/bizpkg/llm/modelbuilder"
 	crossknowledge "github.com/coze-dev/coze-studio/backend/crossdomain/knowledge"
 	knowledgeModel "github.com/coze-dev/coze-studio/backend/crossdomain/knowledge/model"
 	knowledgeEntity "github.com/coze-dev/coze-studio/backend/domain/knowledge/entity"
@@ -35,16 +36,19 @@ import (
 
 type retrieverConfig struct {
 	knowledgeConfig *bot_common.Knowledge
+	chatModel       modelbuilder.BaseChatModel
 }
 
 func newKnowledgeRetriever(_ context.Context, conf *retrieverConfig) (*knowledgeRetriever, error) {
 	return &knowledgeRetriever{
 		knowledgeConfig: conf.knowledgeConfig,
+		chatModel:       conf.chatModel,
 	}, nil
 }
 
 type knowledgeRetriever struct {
 	knowledgeConfig *bot_common.Knowledge
+	chatModel       modelbuilder.BaseChatModel
 }
 
 func (r *knowledgeRetriever) Retrieve(ctx context.Context, req *AgentRequest) ([]*schema.Document, error) {
@@ -66,6 +70,8 @@ func (r *knowledgeRetriever) Retrieve(ctx context.Context, req *AgentRequest) ([
 	if err != nil {
 		return nil, err
 	}
+	kr.AutoAddress = true
+	kr.ResolveAddress = newAddressResolver(r.chatModel, req.Input.Content, req.History)
 
 	resp, err := crossknowledge.DefaultSVC().Retrieve(ctx, kr)
 	if err != nil {
@@ -82,6 +88,12 @@ func (r *knowledgeRetriever) Retrieve(ctx context.Context, req *AgentRequest) ([
 
 func (r *knowledgeRetriever) PackRetrieveResultInfo(ctx context.Context, docs []*schema.Document) (string, error) {
 	packedRes := strings.Builder{}
+	for _, doc := range docs {
+		if doc != nil && doc.MetaData["structured_address"] == "true" {
+			packedRes.WriteString("以下是系统已自动读取的绑定知识库地址匹配资料。用户一次提问后直接综合回答，不展示页码、不要求用户翻页来驱动检索。依据匹配记录总数说明数量，不能把摘要条数当作总数；资料不完整时明确仅为摘要，不得声称完整名单。记录数不保证机构去重。本轮计数检索不附明细，不代表前轮没有检索到明细；不能仅据此断言前轮名单无依据或撤回名单，回答当前数量即可。无匹配直接说明，不换成其它地区或编造机构。需要澄清时先确认地址。不要展示内部编号或SQL。\n")
+			break
+		}
+	}
 	for idx, doc := range docs {
 		if doc == nil {
 			continue
@@ -147,6 +159,9 @@ func convertDocument(_ context.Context, docSlice []*knowledgeModel.RetrieveSlice
 			},
 		}
 		doc.WithScore(a.Score)
+		if a.Slice.Extra != nil && a.Slice.Extra["structured_address"] == "true" {
+			doc.MetaData["structured_address"] = "true"
+		}
 		return doc
 	}), nil
 }

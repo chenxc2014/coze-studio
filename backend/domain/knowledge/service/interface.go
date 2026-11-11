@@ -60,6 +60,7 @@ type Knowledge interface {
 	MGetSlice(ctx context.Context, request *MGetSliceRequest) (response *MGetSliceResponse, err error)
 	MGetDocument(ctx context.Context, request *MGetDocumentRequest) (response *MGetDocumentResponse, err error)
 	Retrieve(ctx context.Context, request *RetrieveRequest) (response *RetrieveResponse, err error)
+	QueryAddress(ctx context.Context, request *AddressQueryRequest) (*AddressQueryResponse, error)
 	CreateDocumentReview(ctx context.Context, request *CreateDocumentReviewRequest) (response *CreateDocumentReviewResponse, err error)
 	MGetDocumentReview(ctx context.Context, request *MGetDocumentReviewRequest) (response *MGetDocumentReviewResponse, err error)
 	SaveDocumentReview(ctx context.Context, request *SaveDocumentReviewRequest) error
@@ -216,7 +217,9 @@ type RetrieveContext struct {
 	// Retrieve the document information involved
 	Documents []*model.KnowledgeDocument
 	// A chat model for nl2sql and message to query
-	ChatModel modelbuilder.BaseChatModel
+	ChatModel      modelbuilder.BaseChatModel
+	AutoAddress    bool
+	ResolveAddress func(context.Context) (*knowledge.AddressRecall, error) `json:"-"`
 }
 
 type KnowledgeInfo struct {

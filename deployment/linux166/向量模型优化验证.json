@@ -1,0 +1,672 @@
+{
+  "started_at": "2026-11-11 12:56:38 +0800",
+  "sample": {
+    "seed": 20261111,
+    "source_rows": 19946,
+    "sample_rows": 500,
+    "index_columns": [
+      "医院名称",
+      "省",
+      "市",
+      "区县",
+      "机构类型",
+      "机构等级",
+      "公立/民营",
+      "地址"
+    ],
+    "mean_characters": 122.4,
+    "max_characters": 158,
+    "exact_duplicate_input_rows": 0,
+    "source_distinct_inputs": 19946,
+    "query_counts": {
+      "entity": 20,
+      "paraphrase": 20,
+      "condition": 10
+    },
+    "human_labeled_queries": false,
+    "sampling": "按源文件位置分层抽样并补足 500 条唯一索引文本"
+  },
+  "load_condition": "同一台服务器上的生产 BGE-M3 导入持续运行；测试单元 CPUWeight=10、Nice=10，速度是共享负载结果。12 核请求上限可能无法获得 12 个实际核心。",
+  "screens": [
+    {
+      "label": "screen-0",
+      "cores": 8,
+      "threads": 8,
+      "batch": 8,
+      "parallel": 1,
+      "rows": 64,
+      "seconds": 43.88,
+      "rows_per_minute": 87.51,
+      "actual_average_cpu_cores": 7.47
+    },
+    {
+      "label": "screen-1",
+      "cores": 12,
+      "threads": 12,
+      "batch": 16,
+      "parallel": 1,
+      "failed": true,
+      "error_type": "RemoteDisconnected"
+    },
+    {
+      "label": "screen-2",
+      "cores": 8,
+      "threads": 8,
+      "batch": 16,
+      "parallel": 2,
+      "rows": 64,
+      "seconds": 41.187,
+      "rows_per_minute": 93.23,
+      "actual_average_cpu_cores": 7.54
+    },
+    {
+      "label": "screen-3",
+      "cores": 8,
+      "threads": 8,
+      "batch": 32,
+      "parallel": 2,
+      "rows": 64,
+      "seconds": 45.884,
+      "rows_per_minute": 83.69,
+      "actual_average_cpu_cores": 7.42
+    }
+  ],
+  "full_runs": [
+    {
+      "label": "m3-baseline-500",
+      "cores": 8,
+      "threads": 8,
+      "batch": 8,
+      "parallel": 1,
+      "rows": 500,
+      "seconds": 362.18,
+      "rows_per_minute": 82.83,
+      "actual_average_cpu_cores": 7.5
+    },
+    {
+      "label": "m3-tuned-500",
+      "cores": 8,
+      "threads": 8,
+      "batch": 16,
+      "parallel": 2,
+      "rows": 500,
+      "seconds": 356.775,
+      "rows_per_minute": 84.09,
+      "actual_average_cpu_cores": 7.5
+    },
+    {
+      "label": "small-fp32-500",
+      "cores": 8,
+      "threads": 8,
+      "batch": 8,
+      "parallel": 1,
+      "rows": 500,
+      "seconds": 43.985,
+      "rows_per_minute": 682.05,
+      "dimensions": 512
+    },
+    {
+      "label": "small-fp32-500",
+      "cores": 8,
+      "threads": 8,
+      "batch": 16,
+      "parallel": 1,
+      "rows": 500,
+      "seconds": 36.759,
+      "rows_per_minute": 816.12,
+      "dimensions": 512
+    },
+    {
+      "label": "small-fp32-500",
+      "cores": 8,
+      "threads": 8,
+      "batch": 32,
+      "parallel": 1,
+      "rows": 500,
+      "seconds": 35.318,
+      "rows_per_minute": 849.42,
+      "dimensions": 512
+    }
+  ],
+  "quality": {
+    "m3": {
+      "all": {
+        "queries": 50,
+        "hit_at_1": 0.94,
+        "hit_at_5": 0.98,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.9629,
+        "precision_at_5": 0.252,
+        "recall_at_10": 0.8989
+      },
+      "entity": {
+        "queries": 20,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_10": 1.0
+      },
+      "paraphrase": {
+        "queries": 20,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.2,
+        "recall_at_10": 1.0
+      },
+      "condition": {
+        "queries": 10,
+        "hit_at_1": 0.7,
+        "hit_at_5": 0.9,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.8143,
+        "precision_at_5": 0.46,
+        "recall_at_10": 0.4946
+      }
+    },
+    "small": {
+      "all": {
+        "queries": 50,
+        "hit_at_1": 0.9,
+        "hit_at_5": 0.98,
+        "hit_at_10": 0.98,
+        "mrr_at_10": 0.9367,
+        "precision_at_5": 0.284,
+        "recall_at_10": 0.8985
+      },
+      "entity": {
+        "queries": 20,
+        "hit_at_1": 0.95,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.975,
+        "precision_at_5": 0.2,
+        "recall_at_10": 1.0
+      },
+      "paraphrase": {
+        "queries": 20,
+        "hit_at_1": 0.95,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.975,
+        "precision_at_5": 0.2,
+        "recall_at_10": 1.0
+      },
+      "condition": {
+        "queries": 10,
+        "hit_at_1": 0.7,
+        "hit_at_5": 0.9,
+        "hit_at_10": 0.9,
+        "mrr_at_10": 0.7833,
+        "precision_at_5": 0.62,
+        "recall_at_10": 0.4923
+      }
+    },
+    "small_with_query_instruction": {
+      "all": {
+        "queries": 50,
+        "hit_at_1": 0.92,
+        "hit_at_5": 0.98,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.9489,
+        "precision_at_5": 0.292,
+        "recall_at_10": 0.9039
+      },
+      "entity": {
+        "queries": 20,
+        "hit_at_1": 0.95,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.975,
+        "precision_at_5": 0.2,
+        "recall_at_10": 1.0
+      },
+      "paraphrase": {
+        "queries": 20,
+        "hit_at_1": 0.95,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.975,
+        "precision_at_5": 0.2,
+        "recall_at_10": 1.0
+      },
+      "condition": {
+        "queries": 10,
+        "hit_at_1": 0.8,
+        "hit_at_5": 0.9,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.8444,
+        "precision_at_5": 0.66,
+        "recall_at_10": 0.5197
+      }
+    }
+  },
+  "production_model_switched": false,
+  "tuned_vector_cosine_mean": 1.0,
+  "small_token_lengths": {
+    "max": 160,
+    "mean": 115.29,
+    "over_512": 0
+  },
+  "finished_at": "2026-11-11 13:17:30 +0800",
+  "validation_finished": true,
+  "limitations": [
+    "测试与生产导入共享服务器，不能把结果当作独占硬件基准。",
+    "质量评测在 500 条候选记录上进行，问题由记录和模板构造，并非人工标注的真实查询日志。",
+    "主质量比较未额外加入查询提示词，符合当前 Coze 通用向量接口行为。",
+    "不同模型不能复用现有索引；本次没有切换生产模型。"
+  ],
+  "baseline_model": {
+    "name": "BGE-M3 F16",
+    "runtime": "Ollama v0.40.16",
+    "dimensions": 1024,
+    "weight_sha256": "daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c"
+  },
+  "candidate_model": {
+    "name": "bge-small-zh-v1.5 FP32",
+    "runtime": "ONNX Runtime 1.19.2",
+    "dimensions": 512
+  },
+  "effective_m3_parallel": 1,
+  "requested_parallel_2_effective": false,
+  "test_operator_notes": {
+    "stopped_screen": "screen-1",
+    "reason": "共享负载下 12 线程组单条编码明显变慢，预筛提前中止；不将此组用于完整 500 行优选。",
+    "time": "2026-11-11 13:01:13"
+  },
+  "correctness": {
+    "rows": 32,
+    "batch_sizes": [
+      8,
+      32
+    ],
+    "dimensions": 512,
+    "minimum_cosine": 0.9999998807907104,
+    "max_absolute_component_difference": 7.450580596923828e-08,
+    "maximum_norm_error": 5.960464477539063e-08,
+    "all_finite": true,
+    "coze_dense_http_contract_passed": true,
+    "invalid_empty_batch_rejected": true
+  },
+  "health_after_test": {
+    "checked_at": "2026-11-11 13:41:36 +0800",
+    "production_service": "active",
+    "production_boot": "enabled",
+    "production_limits": "CPUQuotaPerSecUSec=8s\nMemoryMax=6442450944",
+    "test_ports_closed": true,
+    "test_service_enabled": "static",
+    "filesystem": {
+      "/": {
+        "available_gib": 67.64
+      },
+      "/home": {
+        "available_gib": 97.31
+      }
+    },
+    "containers": [
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy"
+      }
+    ],
+    "production_embedding_config": {
+      "OLLAMA_EMBEDDING_MODEL": "bge-m3-cpu",
+      "EMBEDDING_TYPE": "ollama",
+      "OLLAMA_EMBEDDING_DIMS": "1024",
+      "EMBEDDING_MAX_BATCH_SIZE": "8",
+      "OLLAMA_EMBEDDING_BASE_URL": "http://172.18.0.1:11434"
+    },
+    "knowledge_import": {
+      "checked_at": "2026-11-11T05:41:37.508391+00:00",
+      "document_id": "7706726398408261632",
+      "knowledge_id": "7706718830218706944",
+      "document_status": 4,
+      "document_final_slice_count": 0,
+      "error_present": false,
+      "completed_rows": 9500,
+      "processing_rows": 100,
+      "failed_rows": 0,
+      "import_complete": false,
+      "expected_rows": 19946,
+      "percent": 47.63
+    },
+    "public_pages": {
+      "/agent/sign": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "/agent/admin/app-base-path.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      }
+    }
+  },
+  "protocol": {
+    "recorded_at": "2026-11-11 13:03:30 +0800",
+    "sample_rows": 500,
+    "candidate_records": 500,
+    "queries": 50,
+    "labels": "由真实记录和确定性模板构造，非人工生产查询日志",
+    "primary_query_instruction": false,
+    "screen_rows": 64,
+    "full_validation_rows": 500,
+    "selection": "完整样本对比基线和预筛中最快可完成的参数组合，另比较小模型的 8/16/32 批大小",
+    "provisional_gates": {
+      "minimum_speedup": 2.0,
+      "minimum_hit_at_5_delta": -0.05,
+      "minimum_entity_hit_at_1_delta": -0.05,
+      "minimum_mrr_at_10_delta": -0.05,
+      "minimum_condition_precision_at_5_delta": -0.05
+    },
+    "decision_scope": "通过仅表示可进入真实业务问题复核，不表示允许直接切换生产或保证全量两万条上的相同质量。",
+    "production_model_switch_allowed": false
+  },
+  "assets": [
+    {
+      "file": "model.onnx",
+      "url": "https://huggingface.co/Xenova/bge-small-zh-v1.5/resolve/75c43b069aac4d136ba6bc1122f995fedcfd2781/onnx/model.onnx",
+      "sha256": "69a0b846f4f116b5e6aabf9546ea6754d02264f3211a13a1bd69b31b8040749a",
+      "bytes": 94851877
+    },
+    {
+      "file": "tokenizer.json",
+      "url": "https://huggingface.co/BAAI/bge-small-zh-v1.5/resolve/7999e1d3359715c523056ef9478215996d62a620/tokenizer.json",
+      "sha256": "48cea5d44424912a6fd1ea647bf4fe50b55ab8b1e5879c3275f80e339e8fae26",
+      "bytes": 439125
+    },
+    {
+      "file": "tokenizer_config.json",
+      "url": "https://huggingface.co/BAAI/bge-small-zh-v1.5/resolve/7999e1d3359715c523056ef9478215996d62a620/tokenizer_config.json",
+      "sha256": "e6f3b96db926a37d4039995fbf5ad17de158dfb8f6343d607e4dbaad18d75f5a",
+      "bytes": 367
+    },
+    {
+      "file": "config.json",
+      "url": "https://huggingface.co/BAAI/bge-small-zh-v1.5/resolve/7999e1d3359715c523056ef9478215996d62a620/config.json",
+      "sha256": "3853a7979202c348751b753e36f579c41d8da7d36af617d3d907e1fc9b441f2a",
+      "bytes": 776
+    }
+  ],
+  "candidate_speedup": 10.255,
+  "provisional_gate_passed": true,
+  "decision": "通过预登记门槛，可进入真实业务问题复核",
+  "gate_results": [
+    {
+      "name": "编码速度倍数",
+      "value": 10.254828,
+      "minimum": 2.0,
+      "passed": true
+    },
+    {
+      "name": "总体 Hit@5 差值",
+      "value": 0.0,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "name": "实体定位 Hit@1 差值",
+      "value": -0.05,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "name": "总体 MRR@10 差值",
+      "value": -0.0262,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "name": "条件检索 Precision@5 差值",
+      "value": 0.16,
+      "minimum": -0.05,
+      "passed": true
+    }
+  ],
+  "client_concurrency": {
+    "runs": [
+      {
+        "client_workers": 1,
+        "requested_model_parallel": 2,
+        "effective_model_parallel": 1,
+        "threads": 8,
+        "cpu_limit": 8,
+        "batch": 8,
+        "rows": 64,
+        "seconds": 43.393,
+        "rows_per_minute": 88.49
+      },
+      {
+        "client_workers": 2,
+        "requested_model_parallel": 2,
+        "effective_model_parallel": 1,
+        "threads": 8,
+        "cpu_limit": 8,
+        "batch": 8,
+        "rows": 64,
+        "seconds": 40.627,
+        "rows_per_minute": 94.52,
+        "max_absolute_component_difference": 0.0
+      }
+    ],
+    "two_client_speedup": 1.0681,
+    "shared_production_load": true,
+    "single_round_only": true,
+    "scope": "验证同一隔离模型的真实客户端并发请求；引擎仅 1 个实际 slot，不是两个模型副本。"
+  },
+  "address_followup": {
+    "available": true,
+    "queries": 80,
+    "report": "地址检索专项验证.html",
+    "quality": {
+      "m3": {
+        "all": {
+          "queries": 80,
+          "relevant_records_min": 1,
+          "relevant_records_max": 9,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.365,
+          "precision_at_10": 0.215,
+          "recall_at_10": 0.9975,
+          "ndcg_at_10": 0.9983,
+          "max_possible_precision_at_5": 0.3675,
+          "max_possible_precision_at_10": 0.2162
+        },
+        "full_address": {
+          "queries": 20,
+          "relevant_records_min": 1,
+          "relevant_records_max": 1,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.2,
+          "precision_at_10": 0.1,
+          "recall_at_10": 1.0,
+          "ndcg_at_10": 1.0,
+          "max_possible_precision_at_5": 0.2,
+          "max_possible_precision_at_10": 0.1
+        },
+        "spoken_address": {
+          "queries": 20,
+          "relevant_records_min": 1,
+          "relevant_records_max": 1,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.2,
+          "precision_at_10": 0.1,
+          "recall_at_10": 1.0,
+          "ndcg_at_10": 1.0,
+          "max_possible_precision_at_5": 0.2,
+          "max_possible_precision_at_10": 0.1
+        },
+        "street": {
+          "queries": 20,
+          "relevant_records_min": 1,
+          "relevant_records_max": 2,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.22,
+          "precision_at_10": 0.11,
+          "recall_at_10": 1.0,
+          "ndcg_at_10": 1.0,
+          "max_possible_precision_at_5": 0.22,
+          "max_possible_precision_at_10": 0.11
+        },
+        "district": {
+          "queries": 20,
+          "relevant_records_min": 2,
+          "relevant_records_max": 9,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.84,
+          "precision_at_10": 0.55,
+          "recall_at_10": 0.99,
+          "ndcg_at_10": 0.9933,
+          "max_possible_precision_at_5": 0.85,
+          "max_possible_precision_at_10": 0.555
+        }
+      },
+      "small": {
+        "all": {
+          "queries": 80,
+          "relevant_records_min": 1,
+          "relevant_records_max": 9,
+          "hit_at_1": 0.975,
+          "hit_at_5": 0.9875,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 0.9825,
+          "precision_at_5": 0.355,
+          "precision_at_10": 0.2138,
+          "recall_at_10": 0.9938,
+          "ndcg_at_10": 0.9817,
+          "max_possible_precision_at_5": 0.3675,
+          "max_possible_precision_at_10": 0.2162
+        },
+        "full_address": {
+          "queries": 20,
+          "relevant_records_min": 1,
+          "relevant_records_max": 1,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.2,
+          "precision_at_10": 0.1,
+          "recall_at_10": 1.0,
+          "ndcg_at_10": 1.0,
+          "max_possible_precision_at_5": 0.2,
+          "max_possible_precision_at_10": 0.1
+        },
+        "spoken_address": {
+          "queries": 20,
+          "relevant_records_min": 1,
+          "relevant_records_max": 1,
+          "hit_at_1": 0.9,
+          "hit_at_5": 0.95,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 0.93,
+          "precision_at_5": 0.19,
+          "precision_at_10": 0.1,
+          "recall_at_10": 1.0,
+          "ndcg_at_10": 0.946,
+          "max_possible_precision_at_5": 0.2,
+          "max_possible_precision_at_10": 0.1
+        },
+        "street": {
+          "queries": 20,
+          "relevant_records_min": 1,
+          "relevant_records_max": 2,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.22,
+          "precision_at_10": 0.11,
+          "recall_at_10": 1.0,
+          "ndcg_at_10": 1.0,
+          "max_possible_precision_at_5": 0.22,
+          "max_possible_precision_at_10": 0.11
+        },
+        "district": {
+          "queries": 20,
+          "relevant_records_min": 2,
+          "relevant_records_max": 9,
+          "hit_at_1": 1.0,
+          "hit_at_5": 1.0,
+          "hit_at_10": 1.0,
+          "mrr_at_10": 1.0,
+          "precision_at_5": 0.81,
+          "precision_at_10": 0.545,
+          "recall_at_10": 0.975,
+          "ndcg_at_10": 0.9807,
+          "max_possible_precision_at_5": 0.85,
+          "max_possible_precision_at_10": 0.555
+        }
+      }
+    },
+    "all_gates_passed": true
+  }
+}

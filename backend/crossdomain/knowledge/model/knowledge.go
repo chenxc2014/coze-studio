@@ -17,6 +17,7 @@
 package model
 
 import (
+	"context"
 	"github.com/bytedance/sonic"
 
 	"github.com/cloudwego/eino/schema"
@@ -108,6 +109,21 @@ type RetrieveRequest struct {
 
 	// recall strategy
 	Strategy *RetrievalStrategy
+	// 智能体可直接按其绑定知识的地址字段查询；识别器复用智能体所选模型。
+	AutoAddress    bool
+	ResolveAddress func(context.Context) (*AddressRecall, error) `json:"-"`
+}
+
+type AddressRecall struct {
+	Handled       bool   `json:"handled"`
+	Province      string `json:"province"`
+	City          string `json:"city"`
+	District      string `json:"district"`
+	Address       string `json:"address"`
+	Page          int    `json:"page"`
+	PageSize      int    `json:"page_size"`
+	CountOnly     bool   `json:"count_only"`
+	Clarification string `json:"clarification"`
 }
 
 type RetrievalStrategy struct {

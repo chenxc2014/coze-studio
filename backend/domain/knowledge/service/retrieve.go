@@ -65,6 +65,9 @@ func (k *knowledgeSVC) Retrieve(ctx context.Context, request *RetrieveRequest) (
 	if len(retrieveContext.Documents) == 0 {
 		return &knowledgeModel.RetrieveResponse{}, nil
 	}
+	if addressResponse, handled, addressErr := k.retrieveAddress(ctx, retrieveContext); handled {
+		return addressResponse, addressErr
+	}
 	chain := compose.NewChain[*RetrieveContext, []*knowledgeModel.RetrieveSlice]()
 	rewriteNode := compose.InvokableLambda(k.queryRewriteNode)
 	// vectorized recall
@@ -147,6 +150,8 @@ func (k *knowledgeSVC) newRetrieveContext(ctx context.Context, req *RetrieveRequ
 		KnowledgeInfoMap: knowledgeInfoMap,
 		Strategy:         req.Strategy,
 		Documents:        enableDocs,
+		AutoAddress:      req.AutoAddress,
+		ResolveAddress:   req.ResolveAddress,
 	}
 	return &resp, nil
 }

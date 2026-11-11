@@ -1,0 +1,203 @@
+{
+  "checked_at": "2026-11-11 22:16:12 +0800",
+  "success": true,
+  "checks": [
+    "匿名请求被拒绝且没有 Basic 挑战",
+    "原账号通过文档权限读取地址结果",
+    "匹配总数与数据库实际条件一致",
+    "所有结果符合市和区县条件",
+    "记录 ID 使用字符串且未丢失精度",
+    "第二页稳定排序且没有重复记录",
+    "下一页标记与总数相符",
+    "自然语言计数不伪造机构明细",
+    "自然语言地址条件被完整保留",
+    "非法分页被拒绝",
+    "问题与字段冲突被拒绝",
+    "距离问题不误当字段筛选被拒绝",
+    "无匹配时不返回其它地区",
+    "通配符和引号仅作为普通文本匹配",
+    "部分导入需要显式选择且标识正确"
+  ],
+  "passed": 15,
+  "temporary_account_cleaned": true,
+  "http_timings_ms": {
+    "requests": 10,
+    "median": 187.5,
+    "max": 625.0
+  },
+  "document_id": "7706726398408261632",
+  "partial_data_possible": false,
+  "embedding_model_switched": false,
+  "isolation_and_live_ui": {
+    "checked_at": "2026-11-11 14:52:30 +0800",
+    "success": true,
+    "checks": [
+      "临时普通账号可以登录",
+      "普通账号无法读取其它账号的真实知识文档",
+      "合成知识 ID 与现有资源不冲突",
+      "普通账号可以查询自己空间的知识文档",
+      "线上稳定分页没有重复且保留精确总数",
+      "线上页面正确显示自己的合成数据",
+      "线上页面可以翻到第二页",
+      "线上手机页面没有整页横向溢出",
+      "知识库页面显示地址查询入口",
+      "入口可以打开对应知识文档列表",
+      "线上资源接口保留子路径且没有 Basic 弹窗",
+      "线上页面没有脚本异常"
+    ],
+    "temporary_data_cleaned": true,
+    "synthetic_rows": 45,
+    "javascript_errors": [],
+    "basic_challenges": 0
+  },
+  "all_passed_checks": 27,
+  "initial_read_phase_created_temp_account": false,
+  "runtime_health": {
+    "checked_at": "2026-11-11 22:16:12 +0800",
+    "runtime_image": "coze-local/server:address-822f8afea1f8",
+    "runtime_image_id": "sha256:8f978cdf97ba1e9c340649330ff2b4bd56edd8d9cff97b7a462429628612d5d6",
+    "binary_sha256": "822f8afea1f81ced4658f508a9336222f46002faa668d5b2c4187a4cbbc904ad",
+    "production_embedding_service": "active",
+    "embedding_and_address_config": {
+      "OLLAMA_EMBEDDING_DIMS": "1024",
+      "COZE_ADDRESS_DOCUMENT_IDS": "7706726398408261632",
+      "OLLAMA_EMBEDDING_BASE_URL": "http://172.18.0.1:11434",
+      "EMBEDDING_MAX_BATCH_SIZE": "8",
+      "OLLAMA_EMBEDDING_MODEL": "bge-m3-cpu",
+      "EMBEDDING_TYPE": "ollama"
+    },
+    "knowledge_import": {
+      "checked_at": "2026-11-11T14:16:12.380433+00:00",
+      "document_id": "7706726398408261632",
+      "knowledge_id": "7706718830218706944",
+      "document_status": 1,
+      "document_final_slice_count": 19946,
+      "error_present": false,
+      "completed_rows": 19946,
+      "processing_rows": 0,
+      "failed_rows": 0,
+      "import_complete": true,
+      "expected_rows": 19946,
+      "percent": 100
+    },
+    "test_accounts_remaining": 0,
+    "test_tables_remaining": 0,
+    "original_slice_sequences": {
+      "rows": 19946,
+      "distinct": 19946,
+      "min": 0,
+      "max": 19945
+    },
+    "containers": [
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy"
+      }
+    ],
+    "filesystem": {
+      "/": {
+        "available_gib": 67.62
+      },
+      "/home": {
+        "available_gib": 94.31
+      }
+    },
+    "public_assets": {
+      "admin/knowledge-address.html": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/knowledge-address.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/knowledge-address.css": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/app-base-path.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "favicon.ico": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "sign": {
+        "status": 200,
+        "www_authenticate_present": false
+      }
+    },
+    "test_agents_active_remaining": 0,
+    "knowledge_queue": [
+      {
+        "channel_name": "cg_knowledge",
+        "depth": 0,
+        "in_flight_count": 0,
+        "requeue_count": 0,
+        "timeout_count": 1
+      }
+    ]
+  },
+  "original_read_phase_checked_at": "2026-11-11 14:40:03 +0800",
+  "original_read_phase_partial_data_possible": true,
+  "manual_query_initial_deployed_at": "2026-11-11 14:33 +0800",
+  "automatic_agent_verification": {
+    "report": "智能体自动地址检索验收.json",
+    "checked_at": "2026-11-11 22:15:59 +0800",
+    "success": true,
+    "conversations": 6,
+    "user_paging_required": false
+  }
+}

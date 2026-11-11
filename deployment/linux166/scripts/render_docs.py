@@ -48,7 +48,7 @@ def render(source, markdown):
     version = version_match.group(1) if version_match else '以原文为准'
     server_match = re.search(r'服务器：`ssh ([^`]+)`', text)
     server = server_match.group(1) if server_match else '部署环境'
-    url_match = re.search(r'平台入口为 `(https?://[^`]+)`', text)
+    url_match = re.search(r'平台入口(?:为\s*|[：:]\s*)`(https?://[^`]+)`', text)
     platform_url = url_match.group(1) if url_match else 'http://192.168.1.166:8888'
     date = re.search(r'20\d{2}-\d{2}-\d{2}', text)
     snapshot = date.group(0) if date else '以原文记录为准'

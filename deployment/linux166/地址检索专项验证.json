@@ -1,0 +1,337 @@
+{
+  "finished_at": "2026-11-11 13:40:02 +0800",
+  "validation_finished": true,
+  "production_model_switched": false,
+  "protocol": {
+    "recorded_at": "2026-11-11 13:39:37 +0800",
+    "business_intent": "查指定地址、街道或区县内的医疗机构，不是地理距离搜索",
+    "seed": 20261112,
+    "candidate_records": 500,
+    "queries": 80,
+    "query_kinds": {
+      "full_address": 20,
+      "spoken_address": 20,
+      "street": 20,
+      "district": 20
+    },
+    "labels": "完整地址按地址与行政字段匹配；口语地址按同市地址子串匹配；街道按同市同区县地址子串匹配；区县按行政字段匹配",
+    "human_labeled_queries": false,
+    "primary_query_instruction": false,
+    "ranking": "纯向量精确余弦排序，不经过生产 Milvus 或混合检索",
+    "gates": {
+      "minimum_all_hit_at_5_delta": -0.05,
+      "minimum_full_address_hit_at_1_delta": -0.05,
+      "minimum_spoken_address_hit_at_5_delta": -0.05,
+      "minimum_street_precision_at_5_delta": -0.05,
+      "minimum_district_precision_at_5_delta": -0.05
+    },
+    "decision_scope": "仅作为地址任务上的下一阶段筛查，不允许直接切换生产"
+  },
+  "quality": {
+    "m3": {
+      "all": {
+        "queries": 80,
+        "relevant_records_min": 1,
+        "relevant_records_max": 9,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.365,
+        "precision_at_10": 0.215,
+        "recall_at_10": 0.9975,
+        "ndcg_at_10": 0.9983,
+        "max_possible_precision_at_5": 0.3675,
+        "max_possible_precision_at_10": 0.2162
+      },
+      "full_address": {
+        "queries": 20,
+        "relevant_records_min": 1,
+        "relevant_records_max": 1,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.2,
+        "precision_at_10": 0.1,
+        "recall_at_10": 1.0,
+        "ndcg_at_10": 1.0,
+        "max_possible_precision_at_5": 0.2,
+        "max_possible_precision_at_10": 0.1
+      },
+      "spoken_address": {
+        "queries": 20,
+        "relevant_records_min": 1,
+        "relevant_records_max": 1,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.2,
+        "precision_at_10": 0.1,
+        "recall_at_10": 1.0,
+        "ndcg_at_10": 1.0,
+        "max_possible_precision_at_5": 0.2,
+        "max_possible_precision_at_10": 0.1
+      },
+      "street": {
+        "queries": 20,
+        "relevant_records_min": 1,
+        "relevant_records_max": 2,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.22,
+        "precision_at_10": 0.11,
+        "recall_at_10": 1.0,
+        "ndcg_at_10": 1.0,
+        "max_possible_precision_at_5": 0.22,
+        "max_possible_precision_at_10": 0.11
+      },
+      "district": {
+        "queries": 20,
+        "relevant_records_min": 2,
+        "relevant_records_max": 9,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.84,
+        "precision_at_10": 0.55,
+        "recall_at_10": 0.99,
+        "ndcg_at_10": 0.9933,
+        "max_possible_precision_at_5": 0.85,
+        "max_possible_precision_at_10": 0.555
+      }
+    },
+    "small": {
+      "all": {
+        "queries": 80,
+        "relevant_records_min": 1,
+        "relevant_records_max": 9,
+        "hit_at_1": 0.975,
+        "hit_at_5": 0.9875,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.9825,
+        "precision_at_5": 0.355,
+        "precision_at_10": 0.2138,
+        "recall_at_10": 0.9938,
+        "ndcg_at_10": 0.9817,
+        "max_possible_precision_at_5": 0.3675,
+        "max_possible_precision_at_10": 0.2162
+      },
+      "full_address": {
+        "queries": 20,
+        "relevant_records_min": 1,
+        "relevant_records_max": 1,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.2,
+        "precision_at_10": 0.1,
+        "recall_at_10": 1.0,
+        "ndcg_at_10": 1.0,
+        "max_possible_precision_at_5": 0.2,
+        "max_possible_precision_at_10": 0.1
+      },
+      "spoken_address": {
+        "queries": 20,
+        "relevant_records_min": 1,
+        "relevant_records_max": 1,
+        "hit_at_1": 0.9,
+        "hit_at_5": 0.95,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 0.93,
+        "precision_at_5": 0.19,
+        "precision_at_10": 0.1,
+        "recall_at_10": 1.0,
+        "ndcg_at_10": 0.946,
+        "max_possible_precision_at_5": 0.2,
+        "max_possible_precision_at_10": 0.1
+      },
+      "street": {
+        "queries": 20,
+        "relevant_records_min": 1,
+        "relevant_records_max": 2,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.22,
+        "precision_at_10": 0.11,
+        "recall_at_10": 1.0,
+        "ndcg_at_10": 1.0,
+        "max_possible_precision_at_5": 0.22,
+        "max_possible_precision_at_10": 0.11
+      },
+      "district": {
+        "queries": 20,
+        "relevant_records_min": 2,
+        "relevant_records_max": 9,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "hit_at_10": 1.0,
+        "mrr_at_10": 1.0,
+        "precision_at_5": 0.81,
+        "precision_at_10": 0.545,
+        "recall_at_10": 0.975,
+        "ndcg_at_10": 0.9807,
+        "max_possible_precision_at_5": 0.85,
+        "max_possible_precision_at_10": 0.555
+      }
+    }
+  },
+  "query_tokens_max": 43,
+  "query_tokens_over_512": 0,
+  "gate_results": [
+    {
+      "kind": "all",
+      "metric": "hit_at_5",
+      "delta": -0.0125,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "kind": "full_address",
+      "metric": "hit_at_1",
+      "delta": 0.0,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "kind": "spoken_address",
+      "metric": "hit_at_5",
+      "delta": -0.05,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "kind": "street",
+      "metric": "precision_at_5",
+      "delta": 0.0,
+      "minimum": -0.05,
+      "passed": true
+    },
+    {
+      "kind": "district",
+      "metric": "precision_at_5",
+      "delta": -0.03,
+      "minimum": -0.05,
+      "passed": true
+    }
+  ],
+  "all_gates_passed": true,
+  "label_limitations": [
+    "用户确认了问法类别，问题文本与相关项仍由字段和模板构造，没有人工逐题标注。",
+    "完整地址和口语地址存在配对，80 条问题不是 80 个相互独立的用户查询。",
+    "只在既有 500 条候选中评价，原语料向量复用，不代表全量两万条检索质量。",
+    "区县和街道题有多个相关项，Precision 与 NDCG 比仅看 Hit 更有解释力。"
+  ],
+  "precision_upper_bound_note": "根据每题在候选集中实际相关记录数，计算固定返回 k 条时可达到的理论 Precision 上限。",
+  "health_after_test": {
+    "checked_at": "2026-11-11 13:41:36 +0800",
+    "production_service": "active",
+    "production_boot": "enabled",
+    "production_limits": "CPUQuotaPerSecUSec=8s\nMemoryMax=6442450944",
+    "test_ports_closed": true,
+    "test_service_enabled": "static",
+    "filesystem": {
+      "/": {
+        "available_gib": 67.64
+      },
+      "/home": {
+        "available_gib": 97.31
+      }
+    },
+    "containers": [
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy"
+      }
+    ],
+    "production_embedding_config": {
+      "OLLAMA_EMBEDDING_MODEL": "bge-m3-cpu",
+      "EMBEDDING_TYPE": "ollama",
+      "OLLAMA_EMBEDDING_DIMS": "1024",
+      "EMBEDDING_MAX_BATCH_SIZE": "8",
+      "OLLAMA_EMBEDDING_BASE_URL": "http://172.18.0.1:11434"
+    },
+    "knowledge_import": {
+      "checked_at": "2026-11-11T05:41:37.508391+00:00",
+      "document_id": "7706726398408261632",
+      "knowledge_id": "7706718830218706944",
+      "document_status": 4,
+      "document_final_slice_count": 0,
+      "error_present": false,
+      "completed_rows": 9500,
+      "processing_rows": 100,
+      "failed_rows": 0,
+      "import_complete": false,
+      "expected_rows": 19946,
+      "percent": 47.63
+    },
+    "public_pages": {
+      "/agent/sign": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "/agent/admin/app-base-path.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      }
+    }
+  }
+}

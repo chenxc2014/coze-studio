@@ -15,6 +15,31 @@
     return url.href;
   };
   window.CozePath = Object.freeze({basePath, url:appURL});
+  const updateAddressEntry = () => {
+    const match = location.pathname.match(/\/space\/(\d+)\/knowledge\/(\d+)(?:\/|$)/);
+    let entry = document.getElementById('coze-knowledge-address-entry');
+    if (!match) { if (entry) entry.remove(); return; }
+    if (!entry) {
+      entry = document.createElement('a');
+      entry.id = 'coze-knowledge-address-entry';
+      entry.textContent = '地址查询';
+      entry.style.cssText = 'position:fixed;right:28px;bottom:24px;z-index:1000;padding:10px 18px;border-radius:8px;background:#2875b9;color:#fff;text-decoration:none;font:14px system-ui;box-shadow:0 3px 14px #17323f26';
+      document.body.append(entry);
+    }
+    const href = basePath + '/admin/knowledge-address.html?space_id=' + match[1] + '&dataset_id=' + match[2];
+    if (entry.getAttribute('href') !== href) entry.setAttribute('href', href);
+  };
+  const installAddressEntry = () => {
+    updateAddressEntry();
+    let scheduled = false;
+    new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => { scheduled = false; updateAddressEntry(); });
+    }).observe(document.body, {childList:true, subtree:true});
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installAddressEntry, {once:true});
+  else installAddressEntry();
   if (!basePath) return;
 
   const fetch = window.fetch.bind(window);

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="1091967ca63bd5b1067bcf8bd331664879b14e47d35f7b20946fc5bf201a9738"><title>本地向量服务与知识库导入排障说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">方案与适用范围</a></li>
+<li><a href="#coze">与 Coze 的连接</a></li>
+<li><a href="#_2">本次故障与修复</a></li>
+<li><a href="#_3">原知识的处理进度</a></li>
+<li><a href="#_4">日常检查</a></li>
+<li><a href="#_5">来源、升级与回退</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：本地向量服务说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">LINUX166 / 开发验证环境</div><h1>本地向量服务与知识库导入排障说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="本地向量服务说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><blockquote>
+<p>实施更新：原知识已完成 19,946 / 19,946 行处理，失败行 0。智能体已支持绑定知识库后自动按地址检索，一次组织回答，无需用户驱动翻页；知识库页面的分页查询入口保留作人工核对。原报告中的实施状态属于此前评测阶段，现行功能和验收见 <a href="地址查询使用与运维说明.html">地址查询使用与运维说明</a>。</p>
+</blockquote>
+<p>更新日期：2026-11-11。服务器：<code>ssh linux166</code>。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">方案与适用范围</h2>
+<p>Embedding 可以在本机部署，不必购买厂商服务。本环境采用 Ollama 的 BGE-M3 模型生成知识库向量，使用 CPU 推理。聊天模型继续使用原有配置，两者独立。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>当前配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务</td>
+<td><code>coze-embedding.service</code>，开机自启</td>
+</tr>
+<tr>
+<td>运行账号</td>
+<td>无登录权限的 <code>coze-embedding</code> 系统账号</td>
+</tr>
+<tr>
+<td>运行时</td>
+<td>Ollama <code>v0.40.16</code>，仅安装 CPU 组件</td>
+</tr>
+<tr>
+<td>权重</td>
+<td>BGE-M3 F16，约 1.16 GB，1024 维</td>
+</tr>
+<tr>
+<td>服务器资源</td>
+<td>16 核 CPU，系统可见内存约 20.3 GiB</td>
+</tr>
+<tr>
+<td>Coze 使用的别名</td>
+<td><code>bge-m3-cpu</code>，复用原权重，设置 <code>num_thread=8</code></td>
+</tr>
+<tr>
+<td>监听地址</td>
+<td><code>http://172.18.0.1:11434</code>，Docker 内部网关地址</td>
+</tr>
+<tr>
+<td>CPU / 内存上限</td>
+<td>8 核 CPU / 6 GiB 内存，内存高水位 5 GiB</td>
+</tr>
+<tr>
+<td>并发与批大小</td>
+<td>Ollama 并发 1；Coze Embedding 批大小 8</td>
+</tr>
+<tr>
+<td>模型与运行数据</td>
+<td><code>/home/coze/embedding</code></td>
+</tr>
+<tr>
+<td>公网端口</td>
+<td>未开放 Embedding 端口</td>
+</tr>
+</tbody>
+</table>
+<p>BGE-M3 支持中文等多语言及最长 8192 token 输入。部署使用稠密向量；没有启用 BGE-M3 的稀疏向量及多向量能力。模型信息参见 <a href="https://ollama.com/library/bge-m3">Ollama 模型页</a> 和 <a href="https://huggingface.co/BAAI/bge-m3">BAAI 模型说明</a>。</p>
+<p>本地服务不需要厂商 API Key，也不产生按量调用厂商向量接口的费用；仍消耗本机 CPU、内存、磁盘和电力。需要更快的大批量导入时，可考虑独立 GPU 推理节点或厂商服务，不能按小样本耗时推算整份 Excel 的处理速度。</p>
+<h2 id="coze">与 Coze 的连接</h2>
+<p>运行配置位于 <code>/home/coze/src/coze-studio/docker/.env</code>，相关非敏感配置为：</p>
+<pre><code class="language-bash">export EMBEDDING_TYPE=&quot;ollama&quot;
+export EMBEDDING_MAX_BATCH_SIZE=&quot;8&quot;
+export OLLAMA_EMBEDDING_BASE_URL=&quot;http://172.18.0.1:11434&quot;
+export OLLAMA_EMBEDDING_MODEL=&quot;bge-m3-cpu&quot;
+export OLLAMA_EMBEDDING_DIMS=&quot;1024&quot;
+</code></pre>
+<p>后台“知识库配置”在没有保存独立配置时读取这些环境变量。若以后在后台保存知识库配置，数据库中的配置优先，不应只修改 <code>.env</code> 后就认定配置已切换。</p>
+<p>服务设置 <code>OLLAMA_NO_CLOUD=1</code>。systemd 的网络允许范围仅包含回环地址、Coze Docker 网段及本机地址，其他目标被拒绝。166 环境中本机调用可能呈现为 <code>192.168.1.166</code> 源地址，因此允许列表中显式加入该地址。</p>
+<p>SELinux 保持 <code>Enforcing</code>。运行时、二进制、共享库和模型分别设置持久的 <code>usr_t</code>、<code>bin_t</code>、<code>lib_t</code>、<code>var_lib_t</code> 文件标签，没有通过关闭 SELinux 来启动服务。</p>
+<h2 id="_2">本次故障与修复</h2>
+<p>用户上传“浙江省医疗档案”表格时，初始故障为：</p>
+<pre><code class="language-text">code=105000004
+[slices2Columns] embed failed, [Ark] CreateEmbeddings error
+can't fetch endpoint sts token without endpoint
+</code></pre>
+<p>实际运行配置选择了 Ark，但向量模型名称、Base URL 和 API Key 均未设置。文件已上传，失败发生在后续生成向量及写入搜索索引时，单独配置聊天模型不能补齐 Embedding 配置。</p>
+<p>排查重试链路还发现以下问题，已补充源码修复及专项测试：</p>
+<ol>
+<li>解析结果写入 JSON 缓存后，表格列数据恢复为通用对象，丢失原有类型。现在从原始 JSON 字节恢复表头、列数据、创建人 ID 和空表头标记，避免 64 位 ID 经浮点数转换丢失精度。</li>
+<li>表格入库前缺少空数据检查，会触发数组越界。现在返回可定位的错误，避免异常被掩盖。</li>
+<li>重新处理接口没有工作表和行范围参数，不能用默认零值覆盖原先的工作表、表头和起始行选择。现在保留这些原始设置。</li>
+<li>GORM 结构体更新会忽略空字符串，导致重试时旧错误无法清除。状态更新改为显式写入这些字段。</li>
+<li>长任务超过 NSQ 默认消息超时会重新入队。处理器现在每 20 秒续期消息；166 的 NSQD 消息超时为 120 秒、最长处理窗口为 24 小时。</li>
+</ol>
+<p>本次失败任务原先留下一个 2048 维空向量索引。先备份索引结构，并使用普通统计和强一致性计数两次确认 0 行，再仅重建该空索引，使其匹配 1024 维模型。没有清空其他知识库或删除用户上传文件。</p>
+<p><strong>以后更换向量模型时，即使维度相同，也要按新的模型重新生成已有知识的向量，不能把不同模型的向量直接混用。</strong></p>
+<h2 id="_3">原知识的处理进度</h2>
+<p>原文件解析结果为 <strong>19,946 行</strong>，属于一次较大的全量导入。处理已重新提交，使用原账号会话，保留原来的工作表和解析设置。CPU 导入可能持续数小时；在完成前，不能把“服务已接通”当作“整份知识已入库”。</p>
+<p>扩容重启后消息队列中没有活动任务，Redis 的处理检查点也已丢失。核对数据库中的连续分段顺序后，从已完成的 700 行及正在处理的 100 行恢复检查点，保留已有索引和记录，然后通过原账号重新提交处理。</p>
+<p>本次知识 ID 为 <code>7706718830218706944</code>，文档 ID 为 <code>7706726398408261632</code>。验收和进度快照见 <a href="本地向量服务验收.json">本地向量服务验收.json</a>。进度记录不包含知识正文、账号密码、会话或 API Key。</p>
+<h2 id="_4">日常检查</h2>
+<pre><code class="language-bash">systemctl status coze-embedding --no-pager
+systemctl show coze-embedding -p MemoryCurrent -p CPUUsageNSec
+curl --noproxy '*' --max-time 10 http://172.18.0.1:11434/api/tags
+python3 /home/coze/ops/capacity.py --guard
+python3 /home/coze/ops/knowledge-index-status.py --document-id 7706726398408261632 --expected-rows 19946
+</code></pre>
+<p>端口只绑定内部网关，浏览器无需直接访问此地址。模型首次加载慢于后续调用；大表格导入期间，其他向量请求也可能排队。</p>
+<p>日志位于 <code>journalctl -u coze-embedding</code>，受现有 journald 容量上限约束。运维排查时避免启用请求正文调试，不将模型输入、用户密码和令牌写入报告。</p>
+<h2 id="_5">来源、升级与回退</h2>
+<p>运行时来源为 <a href="https://github.com/ollama/ollama/releases/tag/v0.40.16">Ollama 官方发行版</a>，SHA256 为：</p>
+<pre><code class="language-text">87bfafb2acbc89b2e6a1be0a9043de6aa75fb450696f86bc426e65fc448f788d
+</code></pre>
+<p>模型权重的官方 Ollama blob SHA256 为：</p>
+<pre><code class="language-text">daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c
+</code></pre>
+<p>官方模型下载链路较慢，因此从 <a href="https://huggingface.co/gpustack/bge-m3-GGUF/blob/main/bge-m3-FP16.gguf">GPUStack 的同一 GGUF 文件</a> 获取副本，并按上述官方 blob SHA256 校验完全一致。模型没有重新训练或转换。CPU 专用别名只增加运行参数，不复制权重。</p>
+<p>原运行 Compose、受限 <code>.env</code> 和空索引结构备份位于 <code>/home/coze/ops/embedding-backup-path</code> 指向的目录，权限仅限运维账号。<code>.env</code> 不复制到 Git 仓库或本说明中。</p>
+<p>后端和队列配置回退前应先确认是否有正在处理的导入任务。回退到最初版本会恢复未配置 Embedding 的状态，也会失去本次的表格重试和长任务修复；更换回向量模型时需要配套恢复或重建索引，不应直接覆盖数据库或清空全部向量数据。</p>
+<p>服务单元、非敏感运行参数和构建脚本随仓库文档一同保存。升级前校验新运行时与模型来源，在独立构建目录验证后再切换，模型、缓存和临时文件继续放在 <code>/home</code>，避免占满系统分区。</p>
+<p>后端构建使用 <a href="scripts/build-knowledge-server.sh">build-knowledge-server.sh</a>，服务单元见 <a href="scripts/coze-embedding.service">coze-embedding.service</a>。重启后的登录弹窗原因与修复见<a href="重启后访问修复说明.md">重启后访问修复说明</a>。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-11 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

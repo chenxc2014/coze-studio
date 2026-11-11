@@ -581,6 +581,9 @@ func (k *knowledgeSVC) ResegmentDocument(ctx context.Context, request *Resegment
 		return nil, err
 	}
 	docEntity.ChunkingStrategy = request.ChunkingStrategy
+	if docEntity.Type == knowledgeModel.DocumentTypeTable {
+		request.ParsingStrategy = retainTableSheetRange(docEntity.ParsingStrategy, request.ParsingStrategy)
+	}
 	docEntity.ParsingStrategy = request.ParsingStrategy
 	event := events.NewIndexDocumentEvent(docEntity.KnowledgeID, docEntity)
 	body, err := sonic.Marshal(event)

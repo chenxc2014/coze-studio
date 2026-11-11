@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-11-11T03:56:19.955814+00:00",
+  "service_configured": true,
+  "hardware": {
+    "cpu_count": 16,
+    "memory_GiB": 20.35,
+    "free_home_GiB": 97.85,
+    "free_root_GiB": 67.65
+  },
+  "runtime_image": "coze-local/server:knowledge-bcb33908269a",
+  "runtime_image_id": "sha256:c7233d4fa070084d459514b1cabd093a10855b07f6a51748dff92f722a1b94f0",
+  "model": "bge-m3-cpu",
+  "model_weight_sha256": "daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c",
+  "embedding_dimensions": 1024,
+  "cpu_limit": 8,
+  "threads": 8,
+  "memory_limit_GiB": 6,
+  "knowledge_import": {
+    "checked_at": "2026-11-11T03:56:19.955814+00:00",
+    "document_id": "7706726398408261632",
+    "knowledge_id": "7706718830218706944",
+    "document_status": 4,
+    "document_final_slice_count": 0,
+    "error_present": false,
+    "completed_rows": 1600,
+    "processing_rows": 100,
+    "failed_rows": 0,
+    "import_complete": false,
+    "expected_rows": 19946,
+    "percent": 8.02
+  },
+  "measured_rate": {
+    "sample_rows": 300,
+    "sample_seconds": 235.194,
+    "rows_per_minute": 76.53,
+    "estimated_remaining_minutes": 239.7,
+    "estimate_only": true
+  },
+  "verification": {
+    "specialized_go_tests": "缓存恢复、64 位 ID、表格边界、工作表范围、旧错误清除、消息续期及令牌鉴权通过",
+    "anonymous_login_no_basic_challenge": true,
+    "authenticated_knowledge_page_no_old_error": true,
+    "backend_offline_bootstrap_still_available": true,
+    "backend_rebuild_without_nginx_reload": true,
+    "dense_search_returned_target_document": true,
+    "dense_search_result_count": 3,
+    "selinux_enforcing": true
+  }
+}

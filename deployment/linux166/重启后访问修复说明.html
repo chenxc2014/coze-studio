@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="33cf6bf5930dcddf192dc0d243bde653627ea7719571abcce339ba5a2812b5fa"><title>重启后登录页出现认证弹窗的原因与修复 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">故障原因</a></li>
+<li><a href="#_2">已实施修复</a></li>
+<li><a href="#_3">验证结果</a></li>
+<li><a href="#_4">用户操作</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：重启后访问修复说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>重启后登录页出现认证弹窗的原因与修复</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="http://192.168.1.166:8888" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="重启后访问修复说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-11。正式入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">故障原因</h2>
+<p>扩容重启后，Docker 给后端容器重新分配了地址：实际地址为 <code>172.18.0.12</code>，前端 Nginx 却仍向旧地址 <code>172.18.0.4:8888</code> 转发。日志确认 <code>/admin/app-base-path.js</code> 和账号接口均因此返回 502。</p>
+<p>登录页面 HTML 和样式由前端正常提供，所以仍能看见登录表单。但关键的路径适配脚本当时依赖后端提供；脚本加载失败后，页面发起了不带 <code>/agent/</code> 的 <code>/api/passport/account/info/v2/</code> 请求。</p>
+<p>同一域名的根路径由另一个服务处理，响应包含 <code>WWW-Authenticate: Bearer realm="zw", Basic realm="zw"</code>。浏览器因此弹出 HTTP Basic 认证框。这不是 Windows 或 Linux 系统账号登录，也不应在这里输入服务器账号。</p>
+<h2 id="_2">已实施修复</h2>
+<ol>
+<li>Nginx 使用 Docker DNS <code>127.0.0.11</code>，缓存有效期 10 秒。后端和 MinIO 上游通过变量代理，容器地址变化后重新解析。</li>
+<li><code>/admin/app-base-path.js</code> 改由前端 Nginx 从只读挂载文件直接提供，不再依赖后端接口是否可用。外层 <code>/agent/</code> 前缀访问和内网根路径均兼容。</li>
+<li>linux166 运行 Compose、默认 Compose 和 OceanBase Compose 均补充该公共脚本挂载，保持配置一致。</li>
+</ol>
+<p>没有取消根路径服务原有的身份验证，也没有在代理上吞掉所有 401 响应。Coze 未登录账号接口返回其自身的 401 是正常行为，关键是响应不含 Basic 认证挑战。</p>
+<h2 id="_3">验证结果</h2>
+<ul>
+<li>正式地址匿名登录页检查：没有逃逸到根路径的请求，没有认证挑战，没有页面脚本错误。</li>
+<li>原账号知识页面检查：正常显示“浙江省医疗档案”，不再显示旧的数组越界错误，没有认证弹窗。</li>
+<li>后端重建后保持前端 Nginx 运行，验证接口依靠动态 DNS 恢复，不依赖人工重新加载 Nginx。</li>
+<li>独立回归容器中将后端指向不可用地址：登录页面和路径脚本仍为 200，账号接口为 502，未附带认证挑战；测试后容器已移除。</li>
+</ul>
+<p>原配置备份目录记录在 <code>/home/coze/ops/nginx-reboot-backup-path</code>。当前 Compose 和 Nginx 源码均保存在仓库中。</p>
+<h2 id="_4">用户操作</h2>
+<p>关闭原有认证弹窗，按 <code>Ctrl+F5</code> 刷新页面，然后在药销易平台自己的登录表单中使用平台账号登录。如果以后再次出现类似弹窗，应检查具体失败请求的地址与 <code>WWW-Authenticate</code> 响应头，不应直接取消其他服务的认证。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-11 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

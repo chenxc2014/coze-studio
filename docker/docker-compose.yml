@@ -390,8 +390,8 @@ services:
     restart: always
     container_name: coze-server
     env_file: *env_file
-    # environment:
-    #   LISTEN_ADDR: 0.0.0.0:8888
+    environment:
+      COZE_ADDRESS_DOCUMENT_IDS: ${COZE_ADDRESS_DOCUMENT_IDS:-}
     networks:
       - coze-network
     # ports:
@@ -427,6 +427,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Main nginx config
       - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro  # Proxy config
+      - ../backend/conf/admin/app-base-path.js:/etc/nginx/coze-app-base-path.js:ro
       # - ./nginx/ssl:/etc/nginx/ssl:ro  # SSL certificates (uncomment if using SSL)
     depends_on:
       - coze-server

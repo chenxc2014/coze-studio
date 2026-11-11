@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="3a6eb62df837e56909da172c062a44392817c74f0d457caeb21cb107b848d167"><title>地址检索专项验证报告 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">业务口径与结论</a></li>
+<li><a href="#_2">样本与执行方法</a></li>
+<li><a href="#_3">地址检索结果</a></li>
+<li><a href="#_4">预登记门槛</a></li>
+<li><a href="#_5">地址查询的实施建议</a></li>
+<li><a href="#_6">收尾与关联资料</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：地址检索专项验证.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">LINUX166 / 开发验证环境</div><h1>地址检索专项验证报告</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="地址检索专项验证.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><blockquote>
+<p>实施更新：原知识已完成 19,946 / 19,946 行处理，失败行 0。智能体已支持绑定知识库后自动按地址检索，一次组织回答，无需用户驱动翻页；知识库页面的分页查询入口保留作人工核对。原报告中的实施状态属于此前评测阶段，现行功能和验收见 <a href="地址查询使用与运维说明.html">地址查询使用与运维说明</a>。</p>
+</blockquote>
+<p>验证日期：2026-11-11。服务器：<code>ssh linux166</code>。平台入口为 <code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">业务口径与结论</h2>
+<p>用户确认：日常主要查“指定地址、街道或区县内的医疗机构”。因此地址范围的准确性比医院名称定位更贴近实际使用。本次不涉及坐标、距离或附近搜索。</p>
+<p>在既有 500 条候选上补测 80 个地址问题：BGE-M3 首条命中率 100.00%、前五条命中率 100.00%；小模型分别为 97.50%、98.75%。</p>
+<p>完整地址和街道路段两类共 40 题，两套方案首条均命中。省略省、区县但保留城市的 20 个口语地址问题，小模型有 2 题首条未命中，其中 1 题前五条未命中；BGE-M3 这 20 题首条均命中。</p>
+<p>两套模型均不能仅凭这份小样本报告获得生产验收结论。小模型通过预登记的地址筛查门槛，但口语地址指标位于允许下降 5 个百分点的边界。生产继续使用 BGE-M3，没有切换模型或重建索引。</p>
+<p><strong>建议优先完善地址字段筛选，再决定是否迁移轻量向量模型。</strong> 对明确区县或街道的查询，以结构化条件约束范围；向量作为口语表达、地址别称等召回补充；输出前再核对地址条件。</p>
+<h2 id="_2">样本与执行方法</h2>
+<ul>
+<li>复用此前固定抽取的 500 条真实 Excel 索引记录，以及已经生成的 BGE-M3 / BGE-small 语料向量，不重复编码整份知识。</li>
+<li>固定种子 <code>20261112</code>，构造完整地址、口语地址、街道路段、区县范围各 20 题，共 80 题。用户确认了问法类别，但没有人工逐题标注这 80 题。</li>
+<li>完整地址和口语地址使用配对记录，因此不应把 80 题视为 80 个相互独立的真实用户查询。完整地址题带省市区县，口语题省略省和区县、保留城市。</li>
+<li>相关项由真实字段匹配构造：完整地址按同市同区县地址匹配；口语地址按同市地址子串匹配；街道路段按同市同区县地址子串匹配；区县按市及区县字段匹配。</li>
+<li>评价采用纯向量精确余弦排序，没有把生成标签时使用的字段过滤作为被测算法，也没有用规则匹配自身获得“100%”来证明过滤器效果。</li>
+<li>仅给新增问题生成向量，主比较不加查询提示词。BGE-M3 使用独立 11435 测试实例，8 核配额、8 线程；生产导入继续运行。小模型使用已有 CPU ONNX 编码器。</li>
+<li>新增问题最长 43 token，超过 512 token 的为 0 条。测试没有覆盖长篇地址描述或所有错别字、历史地名和地址别称。</li>
+<li>原问题文本、候选内容和向量只留在服务器受限测试目录；本报告及 JSON 仅包含聚合指标。</li>
+</ul>
+<h2 id="_3">地址检索结果</h2>
+<p>Hit@1 / Hit@5 表示首条 / 前五条至少出现一个相关机构；Precision@5 表示前五条中相关机构的比例；NDCG@10 衡量前十条的相关性与排序质量，越高越好。</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>模型</th>
+<th>题数</th>
+<th>Hit@1</th>
+<th>Hit@5</th>
+<th>Precision@5</th>
+<th>Recall@10</th>
+<th>NDCG@10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>总体</td>
+<td>BGE-M3</td>
+<td>80</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>36.50%</td>
+<td>99.75%</td>
+<td>0.9983</td>
+</tr>
+<tr>
+<td>总体</td>
+<td>BGE-small</td>
+<td>80</td>
+<td>97.50%</td>
+<td>98.75%</td>
+<td>35.50%</td>
+<td>99.38%</td>
+<td>0.9817</td>
+</tr>
+<tr>
+<td>完整地址</td>
+<td>BGE-M3</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>20.00%</td>
+<td>100.00%</td>
+<td>1.0000</td>
+</tr>
+<tr>
+<td>完整地址</td>
+<td>BGE-small</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>20.00%</td>
+<td>100.00%</td>
+<td>1.0000</td>
+</tr>
+<tr>
+<td>口语 / 省略行政信息</td>
+<td>BGE-M3</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>20.00%</td>
+<td>100.00%</td>
+<td>1.0000</td>
+</tr>
+<tr>
+<td>口语 / 省略行政信息</td>
+<td>BGE-small</td>
+<td>20</td>
+<td>90.00%</td>
+<td>95.00%</td>
+<td>19.00%</td>
+<td>100.00%</td>
+<td>0.9460</td>
+</tr>
+<tr>
+<td>街道 / 路段</td>
+<td>BGE-M3</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>22.00%</td>
+<td>100.00%</td>
+<td>1.0000</td>
+</tr>
+<tr>
+<td>街道 / 路段</td>
+<td>BGE-small</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>22.00%</td>
+<td>100.00%</td>
+<td>1.0000</td>
+</tr>
+<tr>
+<td>区县范围</td>
+<td>BGE-M3</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>84.00%</td>
+<td>99.00%</td>
+<td>0.9933</td>
+</tr>
+<tr>
+<td>区县范围</td>
+<td>BGE-small</td>
+<td>20</td>
+<td>100.00%</td>
+<td>100.00%</td>
+<td>81.00%</td>
+<td>97.50%</td>
+<td>0.9807</td>
+</tr>
+</tbody>
+</table>
+<p>完整地址和口语地址题在这 500 条候选中每题只有 1 个相关记录，所以固定返回 5 条时，Precision@5 上限只有 20%。街道路段题每题有 1～2 条相关记录，平均理论上限为 22.00%；区县题每题有 2～9 条，平均理论上限为 85.00%。因此不能把原始 Precision 数值直接当作统一准确率。</p>
+<p>区县题的 BGE-M3 / 小模型 Precision@5 分别为 84% / 81%。虽然每题前五条均至少命中一家机构，但这并不保证每条结果都属于指定区县，也不保证列出区县全部机构。若用户问“有哪些”或要求完整清单，必须明确分页和总数，不能把向量 Top-k 直接当成全量列表。</p>
+<h2 id="_4">预登记门槛</h2>
+<p>记录时间：2026-11-11 13:39:37 +0800，先生成评测协议再编码地址问题。差值为小模型减 BGE-M3，允许最多下降 0.05。</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>指标</th>
+<th>差值</th>
+<th>最低要求</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>总体</td>
+<td>hit_at_5</td>
+<td>-0.0125</td>
+<td>-0.0500</td>
+<td>通过</td>
+</tr>
+<tr>
+<td>完整地址</td>
+<td>hit_at_1</td>
+<td>+0.0000</td>
+<td>-0.0500</td>
+<td>通过</td>
+</tr>
+<tr>
+<td>口语 / 省略行政信息</td>
+<td>hit_at_5</td>
+<td>-0.0500</td>
+<td>-0.0500</td>
+<td>通过</td>
+</tr>
+<tr>
+<td>街道 / 路段</td>
+<td>precision_at_5</td>
+<td>+0.0000</td>
+<td>-0.0500</td>
+<td>通过</td>
+</tr>
+<tr>
+<td>区县范围</td>
+<td>precision_at_5</td>
+<td>-0.0300</td>
+<td>-0.0500</td>
+<td>通过</td>
+</tr>
+</tbody>
+</table>
+<p>通过仅表示可以继续做更大范围地址检索复核，不等于已经证明模型无质量损失或允许直接替换生产。</p>
+<h2 id="_5">地址查询的实施建议</h2>
+<ol>
+<li>优先标准化省、市、区县、街道 / 路段、门牌号等地址字段。保留原始地址，规范全半角、空白和行政区划表达；不能仅因字符串包含“某路”就认定行政上属于同名街道。</li>
+<li>对明确行政范围先应用字段约束；同名街道必须结合市、区县，避免仅用地址相似度决定范围。街道路段可以在规范地址上匹配，并按实际业务评估别名规则。</li>
+<li>对“列出某区县所有机构”“有多少家”等问题，使用带权限、分页和计数的结构化查询路径；对口语、缺失信息或别称，再用语义召回辅助匹配。</li>
+<li>当前源码底层已有 DSL 与 Milvus 的 WithFilter 路径，说明过滤能力可作为扩展基础；本次没有实现从自然语言自动生成这些业务字段条件，也没有调整生产智能体或上线查询接口。</li>
+<li>后续验收扩大到全量记录，补充真实用户问法，并包含同名路、跨区县、地址无匹配及需要列出全部结果的负例；再决定轻量模型迁移与相关知识索引重建。</li>
+</ol>
+<p>Milvus 官方说明支持在向量检索前使用元数据条件缩小候选范围，参见 <a href="https://milvus.io/docs/filtered-search.md">Filtered Search</a>。这是建议方案的底层能力依据，本报告没有测量该组合方案的线上效果。</p>
+<h2 id="_6">收尾与关联资料</h2>
+<p>收尾检查：2026-11-11 13:41:36 +0800。测试监听 11435 / 11436 已关闭，生产服务 active，11 个容器运行正常。原知识导入已完成 9,500 / 19,946 行（47.63%），失败行 0，尚未全量完成。</p>
+<p>生产继续使用 <code>bge-m3-cpu</code>、1024 维、批大小 8。没有改写全局 Embedding 配置、原文件或现有生产向量。</p>
+<ul>
+<li>速度及原50题对比：<a href="向量模型优化验证.html">向量模型优化验证</a>。其中约 10.25 倍是编码速度，不能等同整库导入或地址筛选速度。</li>
+<li>聚合指标及协议：<code>地址检索专项验证.json</code>；对应脚本：<code>scripts/embedding-benchmark/bench-address.py</code>。</li>
+<li>私有问题：<code>/home/coze/build/embedding-bench/address-queries.json</code>；私有逐题数值：<code>results/address-details-private.json</code>，未进入源码仓库。</li>
+</ul></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-11 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

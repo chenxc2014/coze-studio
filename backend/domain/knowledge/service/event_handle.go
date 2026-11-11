@@ -350,8 +350,8 @@ func (k *knowledgeSVC) loadParsedDocument(ctx context.Context,
 			errorx.KV("msg", fmt.Sprintf("get object failed, err: %v", err)))
 	}
 
-	var parseResult []*schema.Document
-	if err = sonic.Unmarshal(data, &parseResult); err != nil {
+	parseResult, err := decodeCachedDocuments(data)
+	if err != nil {
 		return nil, nil, errorx.New(errno.ErrKnowledgeParseJSONCode,
 			errorx.KV("msg", fmt.Sprintf("marshal parse result failed, err: %v", err)))
 	}
@@ -752,11 +752,17 @@ func packInsertData(slices []*entity.Slice) (data []map[string]interface{}, err 
 	}()
 
 	for i := range slices {
+		if slices[i] == nil || len(slices[i].RawContent) == 0 || slices[i].RawContent[0] == nil || slices[i].RawContent[0].Table == nil {
+			return nil, errorx.New(errno.ErrKnowledgeSystemCode, errorx.KV("msg", "table slice has no column data"))
+		}
 		dataMap := map[string]any{
 			consts.RDBFieldID: slices[i].ID,
 		}
 		for j := range slices[i].RawContent[0].Table.Columns {
 			val := slices[i].RawContent[0].Table.Columns[j]
+			if val == nil {
+				return nil, errorx.New(errno.ErrKnowledgeSystemCode, errorx.KV("msg", "table slice has invalid column data"))
+			}
 			if val.ColumnName == consts.RDBFieldID {
 				continue
 			}

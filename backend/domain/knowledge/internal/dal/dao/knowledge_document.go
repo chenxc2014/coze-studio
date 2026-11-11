@@ -150,8 +150,9 @@ func (dao *KnowledgeDocumentDAO) DeleteDocuments(ctx context.Context, ids []int6
 
 func (dao *KnowledgeDocumentDAO) SetStatus(ctx context.Context, documentID int64, status int32, reason string) error {
 	k := dao.Query.KnowledgeDocument
-	d := &model.KnowledgeDocument{Status: status, FailReason: reason, UpdatedAt: time.Now().UnixMilli()}
-	_, err := k.WithContext(ctx).Debug().Where(k.ID.Eq(documentID)).Updates(d)
+	// map 会写入空字符串和零值，确保重试及处理成功后清除旧错误。
+	d := map[string]any{"status": status, "fail_reason": reason, "updated_at": time.Now().UnixMilli()}
+	_, err := k.WithContext(ctx).Where(k.ID.Eq(documentID)).Updates(d)
 	return err
 }
 
