@@ -1,0 +1,185 @@
+{
+  "checked_at": "2026-11-11 23:31:02 +0800",
+  "success": true,
+  "checks": [
+    "匿名不能访问插件授权接口",
+    "普通账号不能读取插件授权状态",
+    "普通账号不能更新或测试授权",
+    "管理员可查看两家插件且独立加密密钥就绪",
+    "没有真实密钥时状态为未配置",
+    "禁止跨站保存",
+    "未知供应商与非法密钥被拒绝",
+    "线上后台可打开插件授权菜单且密钥不回显",
+    "线上页面可以保存授权并清空输入",
+    "接口仅返回配置状态，不含明文或密文",
+    "数据库记录加密且有最后修改人",
+    "空输入保留原密钥",
+    "测试识别错误凭据：amap",
+    "测试识别错误凭据：tianyancha",
+    "页面正确显示供应商鉴权失败",
+    "线上手机页面没有整页横向溢出",
+    "线上页面可以显式清除授权",
+    "没有密钥落入浏览器存储",
+    "线上页面无脚本错误及 Basic 认证弹窗",
+    "普通用户智能体可通过后台共用授权执行真实插件",
+    "智能体对话不包含后台密钥",
+    "访问日志与插件请求日志不含测试密钥"
+  ],
+  "vendor_tests_with_synthetic_invalid_credentials": [
+    {
+      "provider": "amap",
+      "success": false,
+      "code": "10001",
+      "message": "Key 无效或尚未配置，请使用有效的 Web 服务 Key",
+      "http_status": 200
+    },
+    {
+      "provider": "tianyancha",
+      "success": false,
+      "code": "300009",
+      "message": "供应商账号或授权信息有误",
+      "http_status": 200
+    }
+  ],
+  "temporary_resources_cleaned": true,
+  "real_vendor_credentials_configured": false,
+  "runtime_health": {
+    "checked_at": "2026-11-11T23:34:58.294863+08:00",
+    "runtime_image": "coze-local/server:plugins-ec78c0f3a369",
+    "runtime_image_id": "sha256:ec7e7f6149c5642a003152ae3d125c413b45f850cc963810e28df12b7f3df77a",
+    "binary_sha256": "ec78c0f3a369b8c32af12ec7bac6af2152a7cae59d75d682291cd6fdd7ac4fef",
+    "encryption_key": {
+      "bytes": 32,
+      "mode": "0o600",
+      "mounted_value_matches": true,
+      "latest_backup_pair_exists": true,
+      "latest_backup_key_matches": true,
+      "latest_metadata_backup": "metadata-20261111-233455.sql.gz"
+    },
+    "test_accounts_remaining": 0,
+    "credential_records_remaining": 0,
+    "test_agents_active_remaining": 0,
+    "test_admin_email_remaining": false,
+    "knowledge_import": {
+      "checked_at": "2026-11-11T15:34:57.955855+00:00",
+      "document_id": "7706726398408261632",
+      "knowledge_id": "7706718830218706944",
+      "document_status": 1,
+      "document_final_slice_count": 19946,
+      "error_present": false,
+      "completed_rows": 19946,
+      "processing_rows": 0,
+      "failed_rows": 0,
+      "import_complete": true,
+      "expected_rows": 19946,
+      "percent": 100
+    },
+    "embedding_service": "active",
+    "containers": [
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": "not_configured"
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy"
+      }
+    ],
+    "filesystem": {
+      "/": {
+        "available_gib": 67.62
+      },
+      "/home": {
+        "available_gib": 93.25
+      }
+    },
+    "public_assets": {
+      "admin/": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/plugin-credentials.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/plugin-credentials.css": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/account-management.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "admin/app-base-path.js": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "favicon.ico": {
+        "status": 200,
+        "www_authenticate_present": false
+      },
+      "sign": {
+        "status": 200,
+        "www_authenticate_present": false
+      }
+    }
+  },
+  "isolated_ui_checks_passed": 14,
+  "original_address_chat_regression": {
+    "passed": true,
+    "seconds": 8.0,
+    "errors": false,
+    "source_record_matched": true
+  },
+  "mobile_layout_final_review": {
+    "card_width_at_least_300px_on_390px_viewport": true,
+    "whole_page_overflow": false
+  }
+}

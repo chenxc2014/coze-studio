@@ -15,6 +15,8 @@ os.umask(0o077)
 stamp = datetime.now().strftime('%Y%m%d-%H%M%S')
 temp = base / f'metadata-{stamp}.sql.gz.part'
 target = temp.with_suffix('')
+credential_key = Path('/home/coze/secrets/plugin-credential.key')
+key_target = base / f'metadata-{stamp}.plugin-key'
 process = subprocess.Popen(['docker','exec','coze-mysql','sh','-c',
     'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --single-transaction --routines --events --triggers --no-tablespaces --databases "$MYSQL_DATABASE"'],
     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -30,13 +32,22 @@ try:
     error = process.stderr.read().decode(errors='replace')
     if process.wait():
         raise RuntimeError('数据库导出失败：'+error)
+    # 密文数据库与独立加密密钥必须成对备份，文件仅限服务器管理员读取。
+    if credential_key.exists():
+        key_bytes = credential_key.read_bytes()
+        if len(key_bytes) != 32:
+            raise RuntimeError('插件凭据加密密钥长度不正确，备份未完成')
+        key_target.write_bytes(key_bytes)
+        key_target.chmod(0o600)
     temp.rename(target)
     # 只清理本脚本生成、超过七份的历史 SQL 备份。
     for old in sorted(base.glob('metadata-*.sql.gz'), reverse=True)[7:]:
+        old.with_name(old.name.removesuffix('.sql.gz') + '.plugin-key').unlink(missing_ok=True)
         old.unlink()
     print(f'元数据备份完成：{target.name}，{target.stat().st_size} 字节')
 except Exception:
     process.kill()
     process.wait()
     temp.unlink(missing_ok=True)
+    key_target.unlink(missing_ok=True)
     raise

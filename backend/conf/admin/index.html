@@ -409,6 +409,7 @@
 </style>
     <script src="./app-base-path.js"></script>
     <link rel="stylesheet" href="./account-management.css?v=2">
+    <link rel="stylesheet" href="./plugin-credentials.css?v=2">
 </head>
 <body>
     <div class="admin-container">
@@ -450,6 +451,9 @@
                         </li>
                         <li class="submenu-item">
                             <a href="#" class="submenu-link" data-page="account-management"><span class="submenu-icon">👥</span>账号管理</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#" class="submenu-link" data-page="plugin-credentials"><span class="submenu-icon">⚙</span>插件授权配置</a>
                         </li>
                     </ul>
                 </li>
@@ -953,6 +957,7 @@
                 'model-management': { title: t('page.model.title'), desc: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), desc: t('page.knowledge.desc') },
                 'account-management': { title: '账号管理', desc: '统一维护平台账号与管理员身份' },
+                'plugin-credentials': { title: '插件授权配置', desc: '统一维护常用插件的平台共用授权' },
             };
             const meta = map[hash] || { title: t('page.default.title'), desc: t('page.default.desc') };
             const pt = document.getElementById('pageTitle');
@@ -1033,7 +1038,8 @@
                 'basic-config': { title: t('page.basic.title'), description: t('page.basic.desc') },
                 'model-management': { title: t('page.model.title'), description: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') },
-                'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' }
+                'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' },
+                'plugin-credentials': { title: '插件授权配置', description: '统一维护常用插件的平台共用授权' }
             };
 
             if (pageConfig[hash]) {
@@ -1192,7 +1198,8 @@
                 'basic-config': { title: t('page.basic.title'), description: t('page.basic.desc') },
                 'model-management': { title: t('page.model.title'), description: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') },
-                'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' }
+                'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' },
+                'plugin-credentials': { title: '插件授权配置', description: '统一维护常用插件的平台共用授权' }
             };
             
             const config = pageConfig[pageName] || { title: t('page.default.title'), description: t('page.default.desc') };
@@ -1224,6 +1231,10 @@
 
         // 显示页面内容
         function showPageContent(pageName, title) {
+            if (pageName === 'plugin-credentials') {
+                window.loadPluginCredentialsPage();
+                return;
+            }
             if (pageName === 'account-management') {
                 window.loadAccountManagementPage();
                 return;
@@ -3481,5 +3492,6 @@
         }
     </script>
     <script src="./account-management.js?v=2"></script>
+    <script src="./plugin-credentials.js?v=1"></script>
 </body>
 </html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="b8b60e402e881f1d7f493d2a875a2ba411a487f4eaea1dcdbd80a7f5a6c025fd"><title>预览调试模型与知识库配置排障 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">现象与复现</a></li>
+<li><a href="#_2">根因</a></li>
+<li><a href="#_3">配置修复</a></li>
+<li><a href="#_4">验证动作与结果</a></li>
+<li><a href="#_5">排除的方向与使用提示</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：预览调试模型与知识库配置排障.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>预览调试模型与知识库配置排障</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="预览调试模型与知识库配置排障.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-11。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">现象与复现</h2>
+<p>智能体“通过地址查询医疗机构详情”在预览与调试中输入详细地址后，返回 <code>Something error:Internal Server Error</code>。</p>
+<p>复核使用目标账号现有有效会话，通过预览页面实际使用的 <code>POST /agent/api/conversation/chat</code> 接口，以草稿模式重放原问题。接口 HTTP 状态为 200，但回答内容是上述错误文字，不能只检查 HTTP 状态判断成功。</p>
+<p>本次浏览器控制连接不可用，因此验收使用同一对话接口，没有宣称已完成浏览器页面的视觉验收。未保存密码、Cookie 或 API Key。</p>
+<h2 id="_2">根因</h2>
+<p>目标草稿选择了模型 <code>100001</code>，属于豆包 / Ark 供应商，其配置不完整。后端模型调用实际返回：</p>
+<pre><code class="language-text">RequestError code: 400
+can't fetch endpoint sts token without endpoint
+</code></pre>
+<p>错误发生在智能体模型调用节点，前端显示的是通用 Internal Server Error，并非 Excel 导入失败或知识库向量服务不可用。</p>
+<p>进一步检查发现，目标草稿没有绑定任何知识库。仅修复模型选择后虽然可以生成回答，但模型按原人设规则尝试补充推测，未实际使用现有医疗档案。这是另一项配置缺失。</p>
+<h2 id="_3">配置修复</h2>
+<p>通过目标账号有权访问的草稿更新接口修改目标智能体：</p>
+<ul>
+<li>智能体 ID：<code>7706717182670929920</code>。</li>
+<li>模型从 <code>100001</code> 切换为平台已有可用的 <code>100002</code>，显示名称为 <code>DeepSeek Flash</code>。</li>
+<li>绑定现有“浙江省医疗档案”知识库，ID 为 <code>7706718830218706944</code>。</li>
+<li>将知识库检索设置为自动检索，使用户直接输入地址时能够先读取绑定知识。</li>
+</ul>
+<p>原人设、唯一 JSON 回复要求、知识库 Top-k / 阈值及其它检索选项保持原有配置。更新模型时平台按所选模型规则保存其支持的参数，以保存后的配置为准。</p>
+<p>本次属于草稿配置修复，没有修改平台业务源码、替换模型凭据、重建向量或重新导入文件，也没有执行发布。发布版本若需使用这些设置，应在草稿验收后按正常流程发布。</p>
+<h2 id="_4">验证动作与结果</h2>
+<ol>
+<li>修改前重放原始详细地址，复现同样的错误；日志定位到 Ark 缺少 endpoint。</li>
+<li>切换至 DeepSeek 后，对话恢复，但未绑定知识导致回答来自模型推测，不能将这一阶段视为检索修复完成。</li>
+<li>绑定现有知识并启用自动检索后，重放带括号备注的原始地址，约 9.7 秒返回成功 JSON，机构名称为“鹿城区上戍乡社区卫生服务中心”。</li>
+<li>使用不带括号备注、明确询问对应医疗机构详情的问法回归，约 7.8 秒返回同一机构，无通用错误。</li>
+<li>只读核对原始知识表，确认该机构及地址来自现有数据；同一门牌还出现在另一机构的复合地址中。回归回答按原人设的唯一结果要求选择了地址更直接匹配的记录。</li>
+</ol>
+<p>耗时来自两次单次实际对话，包含公网和模型生成时间，不代表并发性能承诺。原始表格没有机构标识和机构编码字段，回答将这两个字段留空，不能用内部切片编号冒充业务编码。</p>
+<h2 id="_5">排除的方向与使用提示</h2>
+<ul>
+<li>不应通过重新上传 Excel 或重建向量解决本次错误：日志指向聊天模型配置，原知识已处理完成。</li>
+<li>不应仅凭“已经能生成回答”判断知识库检索成功：还需检查是否实际绑定知识，并与原始记录核对。</li>
+<li>新建智能体时应选择已配置完整的模型，在智能体内实际添加知识库；上传知识文件不会自动绑定到所有智能体。</li>
+<li>设置更新后刷新编辑页再调试，避免页面仍显示修改前的模型或知识配置。</li>
+</ul>
+<p>本次用户补充了具体智能体、原始地址问法和错误文字，要求复现真实预览场景；修复以该场景和一条相邻问法回归为准。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-11 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

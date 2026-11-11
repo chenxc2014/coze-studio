@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="913ae218cae769b25c04c6b711eaa41223c63a267e3ec69441ffe77af19a3952"><title>智能体插件可用性检查 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">结论</a></li>
+<li><a href="#_2">实际调用结果</a></li>
+<li><a href="#_3">当前场景的能力缺口</a></li>
+<li><a href="#_4">后续配置与边界</a></li>
+<li><a href="#_5">验收证据</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：智能体插件可用性检查.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>智能体插件可用性检查</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="智能体插件可用性检查.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><blockquote>
+<p>实施更新：插件授权配置入口已上线，管理员可以在后台保存、清除并测试天眼查和高德授权。原检查中的供应商失败记录属于当时的空授权状态；现行使用方式见 <a href="插件授权配置使用与运维说明.html">插件授权配置使用与运维说明</a>。</p>
+</blockquote>
+<p>检查时间：2026-11-11T22:52:02.165486+08:00。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">结论</h2>
+<p>目标智能体“通过地址查询医疗机构详情”确实绑定了天眼查和高德地图的工具，两者都能被聊天模型实际调起，但当前均未取得成功的业务数据。运行服务器上的两项内置插件 <code>service_token</code> 都为空；插件被添加到智能体，不代表第三方服务授权已经配置。</p>
+<h2 id="_2">实际调用结果</h2>
+<p>使用目标账号现有有效会话，通过该智能体实际预览对话接口分别发起两次只读工具验证。检查依据是持久化的 <code>function_call</code> 和 <code>tool_response</code> 消息，不能只根据模型生成的回答认定工具执行成功。</p>
+<table>
+<thead>
+<tr>
+<th>插件</th>
+<th>实际选择的工具</th>
+<th>工具原始返回</th>
+<th>当前结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>天眼查</td>
+<td><code>abnormal_operation</code>，企业经营异常查询</td>
+<td><code>error_code=300008</code>，<code>reason=缺少必要参数</code></td>
+<td>业务调用失败；授权 Token 为空，需补齐有效授权后继续核验参数和接口权限</td>
+</tr>
+<tr>
+<td>高德地图</td>
+<td><code>placeAround</code>，周边搜索</td>
+<td><code>status=0</code>，<code>info=INVALID_USER_KEY</code>，<code>infocode=10001</code></td>
+<td>授权失败；当前没有取得周边地点数据</td>
+</tr>
+</tbody>
+</table>
+<p>两次对话总耗时分别约 26.8 秒和 28.2 秒，包含模型生成、知识检索和工具调用，不能当作第三方接口自身耗时。两次 HTTP 状态都是 200，但工具业务状态失败。</p>
+<p>天眼查测试包含公司全称和分页参数，高德测试包含合法格式的经纬度、搜索半径和地点类型。测试仅查询公开业务数据，没有申请凭据、修改插件设置或变更智能体绑定。</p>
+<h2 id="_3">当前场景的能力缺口</h2>
+<ul>
+<li>天眼查目前只勾选了经营异常查询，没有勾选企业搜索或企业基本信息查询。这个工具无法独立完成“按地址定位机构并读取机构详情”。</li>
+<li>高德目前只勾选了周边搜索，必填参数为经纬度 <code>location</code>。中文地址不能直接作为这个参数；若要支持地址输入后的查询链路，应按实际需求补选地理编码、地点搜索等工具。</li>
+<li>智能体原人设还提到“火山联网问答”，当前实际绑定列表没有这个插件，不能认为人设中提到的所有能力都会自动可用。</li>
+</ul>
+<h2 id="_4">后续配置与边界</h2>
+<p>天眼查需要有效的开放平台授权 Token，以及所调用接口的可用权限；高德需要有效的 Web 服务 API Key。聊天模型的 API Key 和这两家插件的授权互不替代。</p>
+<p>当前两项内置插件来自运行配置 <code>backend/conf/plugin/pluginproduct/plugin_meta.yaml</code>，通过服务认证配置向天眼查请求头、高德请求查询参数注入授权。该文件包含所有内置插件元数据；日后配置真实凭据时应保留服务器私有副本和备份，禁止将密钥提交到 Git。源码中保留空值模板。</p>
+<p>本次没有获得可用的插件凭据，因此没有宣称修复成功。补齐授权、确认第三方权限并调整必要工具后，应再次通过这个智能体的真实预览对话验证，并核对原始工具返回。</p>
+<h2 id="_5">验收证据</h2>
+<p>原始工具返回、工具 ID、会话 ID 和检查状态见同目录 <code>智能体插件可用性检查.json</code>。报告不包含密码、Cookie、API Key、授权 Token、供应商原始请求头或带授权值的 URL。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-11 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

@@ -377,7 +377,7 @@
       "pull_policy": "never"
     },
     "coze-server": {
-      "image": "coze-local/server:address-822f8afea1f8",
+      "image": "coze-local/server:plugins-ec78c0f3a369",
       "restart": "unless-stopped",
       "container_name": "coze-server",
       "env_file": [
@@ -388,7 +388,8 @@
       ],
       "volumes": [
         "/home/coze/src/coze-studio/docker/.env:/app/.env:z",
-        "/home/coze/src/coze-studio/backend/conf:/app/resources/conf:z"
+        "/home/coze/src/coze-studio/backend/conf:/app/resources/conf:z",
+        "/home/coze/secrets/plugin-credential.key:/run/secrets/coze-plugin-credentials.key:ro,z"
       ],
       "depends_on": {
         "mysql": {
@@ -420,7 +421,8 @@
       "mem_limit": "2g",
       "pull_policy": "never",
       "environment": {
-        "COZE_ADDRESS_DOCUMENT_IDS": "7706726398408261632"
+        "COZE_ADDRESS_DOCUMENT_IDS": "7706726398408261632",
+        "PLUGIN_CREDENTIAL_KEY_FILE": "/run/secrets/coze-plugin-credentials.key"
       }
     },
     "coze-web": {

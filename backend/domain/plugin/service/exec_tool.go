@@ -53,7 +53,11 @@ func (p *pluginServiceImpl) ExecuteTool(ctx context.Context, req *model.ExecuteT
 		return nil, errorx.Wrapf(err, "buildToolExecutor failed")
 	}
 
-	authInfo := executor.plugin.GetAuthInfo()
+	authInfo, err := resolvePluginCredential(ctx, req.PluginID, executor.plugin.GetAuthInfo())
+	if err != nil {
+		return nil, errorx.New(errno.ErrPluginExecuteToolFailed, errorx.KV(errno.PluginMsgKey, "无法读取平台插件授权，请联系管理员核对配置"))
+	}
+	executor.authInfo = authInfo
 	accessToken, authURL, err := p.acquireAccessTokenIfNeed(ctx, req, authInfo, executor.tool.Operation)
 	if err != nil {
 		return nil, errorx.Wrapf(err, "acquireAccessToken failed")
@@ -585,8 +589,9 @@ type toolExecutor struct {
 	userID         string
 	conversationID int64
 
-	plugin *entity.PluginInfo
-	tool   *entity.ToolInfo
+	plugin   *entity.PluginInfo
+	tool     *entity.ToolInfo
+	authInfo *model.AuthV2
 
 	projectInfo                *model.ProjectInfo
 	invalidRespProcessStrategy consts.InvalidResponseProcessStrategy
@@ -608,6 +613,9 @@ func newToolInvocation(t *toolExecutor) tool.Invocation {
 }
 
 func (t *toolExecutor) execute(ctx context.Context, argumentsInJson, accessToken, authURL string) (resp *ExecuteResponse, err error) {
+	if t.authInfo == nil {
+		t.authInfo = t.plugin.GetAuthInfo()
+	}
 	if argumentsInJson == "" {
 		return nil, errorx.New(errno.ErrPluginExecuteToolFailed,
 			errorx.KV(errno.PluginMsgKey, "argumentsInJson is required"))
@@ -626,7 +634,7 @@ func (t *toolExecutor) execute(ctx context.Context, argumentsInJson, accessToken
 				AccessToken: accessToken,
 				AuthURL:     authURL,
 			},
-			MetaInfo: t.plugin.GetAuthInfo(),
+			MetaInfo: t.authInfo,
 		},
 	})
 	if err != nil {

@@ -1,0 +1,41 @@
+{
+  "checked_at": "2026-11-11T22:52:02.165486+08:00",
+  "agent_id": "7706717182670929920",
+  "agent_name": "通过地址查询医疗机构详情",
+  "scene": "草稿智能体预览对话接口",
+  "configuration_changed": false,
+  "credentials_recorded": false,
+  "plugins": [
+    {
+      "name": "天眼查",
+      "plugin_id": "12",
+      "tool_id": "120003",
+      "tool_name": "abnormal_operation",
+      "service_token_present": false,
+      "actual_tool_invoked": true,
+      "business_call_success": false,
+      "conversation_id": "7706926016169508864",
+      "chat_total_seconds": 26.828,
+      "tool_response": {
+        "error_code": 300008,
+        "reason": "缺少必要参数"
+      }
+    },
+    {
+      "name": "高德地图",
+      "plugin_id": "22",
+      "tool_id": "220009",
+      "tool_name": "placeAround",
+      "service_token_present": false,
+      "actual_tool_invoked": true,
+      "business_call_success": false,
+      "conversation_id": "7706926017390051328",
+      "chat_total_seconds": 28.203,
+      "tool_response": {
+        "status": 0,
+        "info": "INVALID_USER_KEY",
+        "infocode": "10001"
+      }
+    }
+  ]
+}

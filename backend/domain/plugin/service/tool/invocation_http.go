@@ -106,22 +106,22 @@ func (h *httpCallImpl) Do(ctx context.Context, args *InvocationArgs) (request st
 	}
 	restyReq.SetContext(ctx)
 
-	logs.CtxDebugf(ctx, "[execute] url=%s, header=%s, method=%s, body=%s",
-		restyReq.URL, restyReq.Header, restyReq.Method, restyReq.Body)
+	logs.CtxDebugf(ctx, "[execute] method=%s, request=%s", restyReq.Method, requestStr)
 
 	httpResp, err := restyReq.Send()
 	if err != nil {
-		return "", "", errorx.New(errno.ErrPluginExecuteToolFailed, errorx.KVf(errno.PluginMsgKey, "http request failed, err=%s", err))
+		return "", "", errorx.New(errno.ErrPluginExecuteToolFailed, errorx.KVf(errno.PluginMsgKey, "http request failed, err=%s", redactPluginSecrets(err.Error(), httpReq)))
 	}
 
-	logs.CtxDebugf(ctx, "[execute] status=%s, response=%s", httpResp.Status(), httpResp.String())
+	responseText := redactPluginSecrets(httpResp.String(), httpReq)
+	logs.CtxDebugf(ctx, "[execute] status=%s", httpResp.Status())
 
 	if httpResp.StatusCode() != http.StatusOK {
 		return "", "", errorx.New(errno.ErrPluginExecuteToolFailed,
-			errorx.KVf(errno.PluginMsgKey, "http request failed, status=%s\nresp=%s", httpResp.Status(), httpResp.String()))
+			errorx.KVf(errno.PluginMsgKey, "http request failed, status=%s\nresp=%s", httpResp.Status(), responseText))
 	}
 
-	return requestStr, httpResp.String(), nil
+	return requestStr, responseText, nil
 }
 
 func (h *httpCallImpl) buildHTTPRequest(ctx context.Context, args *InvocationArgs) (httpReq *http.Request, err error) {
@@ -173,6 +173,7 @@ func (h *httpCallImpl) injectAuthInfo(ctx context.Context, httpReq *http.Request
 }
 
 func genRequestString(req *http.Request, body []byte) (string, error) {
+	req = redactedPluginRequest(req)
 	type Request struct {
 		Path   string            `json:"path"`
 		Header map[string]string `json:"header"`
