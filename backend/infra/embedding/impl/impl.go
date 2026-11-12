@@ -80,10 +80,18 @@ func GetEmbedding(ctx context.Context, cfg *config.EmbeddingConfig) (embedding.E
 		}
 
 	case config.EmbeddingType_Ollama:
-		emb, err = wrap.NewOllamaEmbedder(ctx, &ollama.EmbeddingConfig{
-			BaseURL: connInfo.BaseURL,
-			Model:   connInfo.Model,
-		}, int64(embeddingInfo.Dims), int(cfg.MaxBatchSize))
+		workers, poolErr := ollamaPoolConfigs(connInfo.BaseURL, connInfo.Model, int64(embeddingInfo.Dims))
+		if poolErr != nil {
+			return nil, poolErr
+		}
+		if len(workers) > 0 {
+			emb, err = wrap.NewOllamaPoolEmbedder(ctx, workers, int64(embeddingInfo.Dims), int(cfg.MaxBatchSize))
+		} else {
+			emb, err = wrap.NewOllamaEmbedder(ctx, &ollama.EmbeddingConfig{
+				BaseURL: connInfo.BaseURL,
+				Model:   connInfo.Model,
+			}, int64(embeddingInfo.Dims), int(cfg.MaxBatchSize))
+		}
 		if err != nil {
 			return nil, fmt.Errorf("init ollama embedding failed, err=%w", err)
 		}

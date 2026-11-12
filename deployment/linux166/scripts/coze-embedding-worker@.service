@@ -1,0 +1,47 @@
+[Unit]
+Description=Coze embedding worker %i
+After=network-online.target docker.service
+Wants=network-online.target
+RequiresMountsFor=/home/coze/embedding
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=coze-embedding
+Group=coze-embedding
+Slice=cozeembeddingpool.slice
+WorkingDirectory=/home/coze/embedding/pool/%i/models
+EnvironmentFile=/home/coze/embedding/pool/%i/worker.env
+Environment=OLLAMA_NUM_PARALLEL=1
+Environment=OLLAMA_MAX_LOADED_MODELS=1
+Environment=OLLAMA_MAX_QUEUE=32
+Environment=OLLAMA_KEEP_ALIVE=30m
+Environment=OLLAMA_CONTEXT_LENGTH=8192
+Environment=OLLAMA_NO_CLOUD=1
+Environment=GOMAXPROCS=8
+ExecStart=/home/coze/embedding/runtime/bin/ollama serve
+ExecStartPost=/usr/bin/python3 /home/coze/embedding/pool/embedding-worker-ready.py
+TimeoutStartSec=180
+Restart=on-failure
+RestartSec=5
+CPUQuota=800%
+MemoryHigh=4G
+MemoryMax=5G
+TasksMax=512
+LimitNOFILE=65536
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/coze/embedding/pool
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=127.0.0.0/8
+IPAddressAllow=::1/128
+IPAddressAllow=192.168.1.166/32
+IPAddressAllow=172.18.0.0/16
+
+[Install]
+WantedBy=multi-user.target

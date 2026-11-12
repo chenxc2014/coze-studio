@@ -1,0 +1,7 @@
+[Unit]
+Description=Coze embedding worker resource pool
+
+[Slice]
+CPUQuota=1600%
+MemoryHigh=8G
+MemoryMax=10G

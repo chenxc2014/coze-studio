@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="f567ce6ff4d3a5e9df6d547fc9159acab043ed72ab75ffda250ed2f65d25c98d"><title>双进程向量编码实施说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">已实施结果</a></li>
+<li><a href="#_2">生产配置</a></li>
+<li><a href="#_3">连接池启用范围与一致性</a></li>
+<li><a href="#16">同样 16 核预算的编码对照</a></li>
+<li><a href="#_4">完整导入与故障验收</a></li>
+<li><a href="#_5">版本、磁盘与回退</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：双进程向量编码实施说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">LINUX166 / 开发验证环境</div><h1>双进程向量编码实施说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="双进程向量编码实施说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<div class="summary" aria-label="验收时容量快照">
+<div class="metric"><span>运行环境</span><strong>linux166</strong><small>Coze Studio · 以原文为准</small></div>
+<div class="metric"><span>系统分区可用</span><strong>67.59 GiB</strong><small>2026-11-12 验收快照</small></div>
+<div class="metric"><span>/home 分区可用</span><strong>88.47 GiB</strong><small>容量以服务器实际检查为准</small></div></div><article id="content"><p>更新日期：2026-11-12。服务器：<code>ssh linux166</code>。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">已实施结果</h2>
+<p>双进程向量编码已上线。两个独立 Ollama 进程各使用 8 个推理线程，通过 Go 连接池并行处理同一份文档的两个编码批次；结果按输入顺序汇总，再交给原有写库、索引和断点流程。</p>
+<p>相同的 500 行虚构数据完整入库，耗时从 <strong>163.734 秒降至 138.547 秒</strong>，吞吐提升 <strong>18.18%</strong>，耗时减少 <strong>15.38%</strong>。本次收益约为两成，不能理解为进程数量翻倍就会得到两倍速度。</p>
+<p>“浙江省医院档案01”已完成 <strong>9,000/9,000 行</strong>，原“浙江省医疗档案”保持 <strong>19,946/19,946 行</strong>；两库失败行均为 0。实际客户文件在新版本切换前已经完成，本次没有为测速重导客户知识。</p>
+<h2 id="_2">生产配置</h2>
+<p>服务器为 24 个逻辑 CPU、31.06 GiB 内存，支持 AVX2、FMA。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>当前设置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工作进程 0</td>
+<td><code>coze-embedding-worker@0</code>；<code>172.18.0.1:11439</code>；8 线程；CPU <code>0-7</code></td>
+</tr>
+<tr>
+<td>工作进程 1</td>
+<td><code>coze-embedding-worker@1</code>；<code>172.18.0.1:11440</code>；8 线程；CPU <code>12-19</code></td>
+</tr>
+<tr>
+<td>资源组</td>
+<td><code>cozeembeddingpool.slice</code>；合计 16 核 CPU，内存高水位 8 GiB、上限 10 GiB，包含备用服务</td>
+</tr>
+<tr>
+<td>每个工作进程</td>
+<td>CPU 配额 8 核；内存高水位 4 GiB、上限 5 GiB；内部推理 slot 为 1</td>
+</tr>
+<tr>
+<td>原服务</td>
+<td><code>coze-embedding</code>，保留 <code>172.18.0.1:11434</code>、16 线程作为回退入口，也受同一资源组约束</td>
+</tr>
+<tr>
+<td>模型与批次</td>
+<td>BGE-M3 F16、<code>bge-m3-cpu</code>、1024 维；每个编码批次最多 8 行，原文档批次仍为 100 行</td>
+</tr>
+</tbody>
+</table>
+<p>两个工作进程使用互不重叠的 CPU 范围，其余 8 个逻辑 CPU 不用于这两个推理进程。其他平台服务仍由系统正常调度；CPU 范围来自当前服务器的实测，不应直接复制到核数或拓扑不同的机器。</p>
+<p>权重 blob 通过同文件系统的硬链接复用，没有再次下载或复制多份大型权重；进程仍分别占用运行缓冲区。全部模型、元数据、构建、备份继续放在 <code>/home/coze</code>。工作进程保持原有网络限制，仅绑定 Docker 内部网关，没有新增公网推理入口。</p>
+<p>工作进程已经开启开机自启和失败重启，启动后先完成 1024 维模型预热。已验证单个及两个工作进程停止后的启动恢复，没有为验收重新启动整台服务器。</p>
+<h2 id="_3">连接池启用范围与一致性</h2>
+<p>当前运行 Compose 的 <code>coze-server.environment</code> 增加：</p>
+<pre><code class="language-text">OLLAMA_EMBEDDING_WORKER_URLS=http://172.18.0.1:11439,http://172.18.0.1:11440
+OLLAMA_EMBEDDING_POOL_BASE_URL=http://172.18.0.1:11434
+OLLAMA_EMBEDDING_POOL_MODEL=bge-m3-cpu
+</code></pre>
+<p>只有知识库配置同时匹配上述 Base URL、模型名称，且已经明确向量维度时，才启用连接池。后台选择其他模型、修改 Base URL 或选择其他供应商，继续按原设置调用；自动探测维度也保留原入口。未设置工作进程列表时保持原串行行为。</p>
+<p>连接池优先分配空闲进程，所有共享该连接池的调用合计最多占用两个进程，每个进程同时只执行一个编码请求；每次调用最多创建两个编码协程。较短批次可以继续由空闲进程处理，不强制排到另一进程的慢批次后面。</p>
+<p>每个批次写入结果数组的原始位置。只有所有批次均返回正确数量、正确维度且数值有限的向量，才向上层返回完整结果，防止乱序向量对应到错误机构。</p>
+<p>一个进程调用失败时，在另一个进程补试一次；两个进程都失败，则整次编码返回错误和空结果，不把部分向量交给上层。原有 NSQ 重试和在途分段 ID 继续生效，当前文档批次的完成断点不会因为部分编码成功而提前推进。数据库、ES、Milvus 的既有处理流程未改为多个独立写入任务，也未新增跨存储事务保证。</p>
+<p>取消请求会终止等待和在途请求并释放进程。更换模型权重时必须同时维护工作进程中的模型清单，并重新评估既有向量兼容性；相同的模型名称或维度不代表不同权重的向量可以混用。</p>
+<h2 id="16">同样 16 核预算的编码对照</h2>
+<p>使用相同的 128 条已完成记录、相同索引列、相同权重、批大小 8，预热后按单进程、双进程、双进程、单进程交替测试。验收程序直接调用本次新增的 Go 连接池，没有写入客户知识索引。</p>
+<table>
+<thead>
+<tr>
+<th>CPU 调度条件</th>
+<th>方案</th>
+<th>两轮耗时（秒）</th>
+<th>合计行/分钟</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未固定 CPU 范围</td>
+<td>单进程 16 线程</td>
+<td>28.006 / 29.624</td>
+<td>266.53</td>
+</tr>
+<tr>
+<td>未固定 CPU 范围</td>
+<td>双进程各 8 线程</td>
+<td>31.135 / 26.982</td>
+<td>264.30</td>
+</tr>
+<tr>
+<td>固定不重叠 CPU 范围</td>
+<td>单进程 16 线程</td>
+<td>29.681 / 32.047</td>
+<td>248.83</td>
+</tr>
+<tr>
+<td>固定不重叠 CPU 范围</td>
+<td>双进程各 8 线程</td>
+<td>26.098 / 25.250</td>
+<td>299.14</td>
+</tr>
+</tbody>
+</table>
+<p>未固定 CPU 范围时合计吞吐变化约 -0.84%，没有稳定收益；为两个进程设置互不重叠的 CPU 范围后，相对同范围单进程对照提升 20.22%。因此上线时包含 CPU 范围配置，而不是只增加进程数量。</p>
+<p>所有组均返回 128 条、1024 维向量，与单进程结果的最大分量差为 0。两轮测试仍不足以覆盖虚拟化宿主机的所有负载波动，生产决策同时依据下面的完整入库验证。</p>
+<h2 id="_4">完整导入与故障验收</h2>
+<p>500 行测试数据全部为虚构机构，两个方案使用相同字段和内容，11 个语义索引列，平均编码输入 205 字符。测试通过资源所属账号调用正式 API 导入，从 API 抓取开始计时，直到文档完成，包含解析、编码及数据库、搜索索引写入。状态每 3 秒检查一次，计时存在相应采样误差。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>耗时（秒）</th>
+<th>行/分钟</th>
+<th>失败行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原单进程 16 线程</td>
+<td>163.734</td>
+<td>183.22</td>
+<td>0</td>
+</tr>
+<tr>
+<td>双进程各 8 线程</td>
+<td>138.547</td>
+<td>216.53</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>两次导入均确认：500 个唯一连续分段、500 条强一致向量记录；指定第 38 行的精确编码查询首条命中同一行；地址筛选仅返回相应机构。临时知识库和虚构来源文件均已删除。</p>
+<p>Go 专项测试覆盖全局并发上限、单进程限流、乱序完成后的结果顺序、慢批次下继续分配空闲进程、取消等待与在途请求、单点故障切换、双点故障及后续重试、错误条数与维度、空输入和模型作用域。两个测试包通过；本环境没有 C 编译器，未运行 Go 的 <code>-race</code> 检测，不将普通并发测试表述为竞态检测通过。</p>
+<p>真实进程验收中，停止一个工作进程后，剩余进程完成全部编码且向量一致；停止两个进程时确认返回失败、不返回部分向量；重新启动后完成预热并恢复。</p>
+<p>最新运行检查为 <code>2026-11-12T16:40:19.434599+08:00</code>。两个工作进程均收到新版本的平台编码请求，11 个平台容器运行正常，有健康检查的均健康。两个原知识库的分段、表格行数和状态全部通过；原地址查询返回 2 条匹配。平台、登录页、后台及路径适配脚本返回 200，没有 Basic Auth 挑战。</p>
+<h2 id="_5">版本、磁盘与回退</h2>
+<p>当前后端镜像：<code>coze-local/server:embedding-pool-eb05c7baed18</code>。二进制 SHA256：<code>eb05c7baed180c1a92e53bb2c9ec204de0fc3ba1f53e7f4ef40c36aec11ea905</code>。前端、模型凭据、插件主密钥挂载和数据库结构未改动。</p>
+<p>首次打包检查发现二进制执行权限遗漏，发布脚本自动恢复了原镜像。修正权限并验证镜像内文件可执行后，才重新发布并完成上述整库验收；该次失败没有作为上线结果保留。</p>
+<p>验收时系统分区可用约 67.59 GiB，<code>/home</code> 可用约 88.47 GiB。继续使用容量守卫；本次未增加新的大模型权重副本。</p>
+<pre><code class="language-bash">systemctl status coze-embedding-worker@0 coze-embedding-worker@1 --no-pager
+systemctl show cozeembeddingpool.slice -p CPUQuotaPerSecUSec -p MemoryCurrent -p MemoryMax
+systemctl show coze-embedding-worker@0 coze-embedding-worker@1 -p AllowedCPUs
+python3 /home/coze/ops/capacity.py --guard
+python3 /home/coze/ops/knowledge-index-status.py --document-id 7707166715007729664 --expected-rows 9000
+</code></pre>
+<p>切换前配置已备份到 <code>/home/coze/backups/embedding-pool-20261112-163547/compose.json</code>，元数据另由现有备份流程保存。需要回退时，先确认没有正在导入或待重试的知识任务，并核对备份后是否还有其他运行配置变更；若没有，恢复该 Compose 并只重建 <code>coze-server</code>，再停用两个新工作进程。原 11434 服务、原模型和原镜像均保留。</p>
+<p>参数及镜像回退不需要恢复数据库备份，也不需要删除本轮之后正常生成的知识向量，避免丢失用户后续数据。通用的服务器重启后中断任务自动恢复仍不是本次改动范围；本次实现的是编码层并行和进程故障切换。</p>
+<p>部署文件包括 <a href="scripts/coze-embedding-worker@.service">工作进程服务单元</a>、<a href="scripts/cozeembeddingpool.slice">资源组</a>、<a href="scripts/coze-embedding-worker-0-cpu.conf">进程0 CPU配置</a>、<a href="scripts/coze-embedding-worker-1-cpu.conf">进程1 CPU配置</a>、<a href="scripts/coze-embedding-pool-resource-group.conf">备用服务资源组配置</a> 和 <a href="scripts/embedding-worker-ready.py">启动预热脚本</a>。</p>
+<p>完整聚合结果见 <a href="双进程向量编码实施验收.json">双进程向量编码实施验收.json</a>。客户输入样本仅留在服务器受限构建目录，未写入仓库报告。代码和文档尚未提交、推送。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-12 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

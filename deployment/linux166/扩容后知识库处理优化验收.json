@@ -1,0 +1,478 @@
+{
+  "benchmark": {
+    "sample_rows": 64,
+    "mean_characters": 152.0,
+    "model": "bge-m3-cpu",
+    "dimensions": 1024,
+    "results": [
+      {
+        "threads": 8,
+        "batch": 8,
+        "seconds": 25.517,
+        "rows_per_minute": 150.49,
+        "average_cpu_cores": 7.94,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      },
+      {
+        "threads": 12,
+        "batch": 8,
+        "seconds": 20.958,
+        "rows_per_minute": 183.23,
+        "average_cpu_cores": 10.61,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      },
+      {
+        "threads": 16,
+        "batch": 8,
+        "seconds": 17.513,
+        "rows_per_minute": 219.26,
+        "average_cpu_cores": 13.19,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      },
+      {
+        "threads": 8,
+        "batch": 16,
+        "seconds": 28.397,
+        "rows_per_minute": 135.22,
+        "average_cpu_cores": 7.26,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      },
+      {
+        "threads": 12,
+        "batch": 16,
+        "seconds": 20.45,
+        "rows_per_minute": 187.77,
+        "average_cpu_cores": 10.53,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      },
+      {
+        "threads": 16,
+        "batch": 16,
+        "seconds": 17.062,
+        "rows_per_minute": 225.07,
+        "average_cpu_cores": 13.4,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      },
+      {
+        "threads": 8,
+        "batch": 8,
+        "seconds": 28.615,
+        "rows_per_minute": 134.19,
+        "average_cpu_cores": 7.21,
+        "min_cosine_to_baseline": 1.0,
+        "max_vector_difference": 0.0
+      }
+    ],
+    "started_at": "2026-11-12 15:33:17 +0800",
+    "warmup_seconds": 4.776,
+    "runtime_quota_restored": true,
+    "finished_at": "2026-11-12 15:36:01 +0800"
+  },
+  "applied": {
+    "applied_at": "2026-11-12 15:37:41 +0800",
+    "backup_path": "/home/coze/backups/cpu-expansion-20261112-153736",
+    "threads": 16,
+    "cpu_quota_percent": 1600,
+    "batch": 8,
+    "weights_unchanged": true,
+    "dimensions": 1024,
+    "platform_containers_restarted": false,
+    "memory_current_bytes": 2568589312,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "verification": {
+    "checked_at": "2026-11-12T15:52:56.069733+08:00",
+    "target": {
+      "checked_at": "2026-11-12T07:52:56.416714+00:00",
+      "document_id": "7707166715007729664",
+      "knowledge_id": "7707166400300711936",
+      "document_status": 4,
+      "document_final_slice_count": 0,
+      "error_present": false,
+      "completed_rows": 4200,
+      "processing_rows": 100,
+      "failed_rows": 0,
+      "import_complete": false
+    },
+    "original": {
+      "checked_at": "2026-11-12T07:52:56.809522+00:00",
+      "document_id": "7706726398408261632",
+      "knowledge_id": "7706718830218706944",
+      "document_status": 1,
+      "document_final_slice_count": 19946,
+      "error_present": false,
+      "completed_rows": 19946,
+      "processing_rows": 0,
+      "failed_rows": 0,
+      "import_complete": true
+    },
+    "completed_batch_timestamps": [
+      [
+        1794464705651,
+        100
+      ],
+      [
+        1794464801149,
+        100
+      ],
+      [
+        1794464872998,
+        100
+      ],
+      [
+        1794464939291,
+        100
+      ],
+      [
+        1794465008482,
+        100
+      ],
+      [
+        1794465079401,
+        100
+      ],
+      [
+        1794465152486,
+        100
+      ],
+      [
+        1794465273919,
+        100
+      ],
+      [
+        1794465608235,
+        100
+      ],
+      [
+        1794465744498,
+        100
+      ],
+      [
+        1794465867349,
+        100
+      ],
+      [
+        1794465965581,
+        100
+      ],
+      [
+        1794466059045,
+        100
+      ],
+      [
+        1794469125392,
+        100
+      ],
+      [
+        1794469152392,
+        100
+      ],
+      [
+        1794469181011,
+        100
+      ],
+      [
+        1794469208499,
+        100
+      ],
+      [
+        1794469236260,
+        100
+      ],
+      [
+        1794469265663,
+        100
+      ],
+      [
+        1794469293849,
+        100
+      ],
+      [
+        1794469321863,
+        100
+      ],
+      [
+        1794469349884,
+        100
+      ],
+      [
+        1794469377766,
+        100
+      ],
+      [
+        1794469407849,
+        100
+      ],
+      [
+        1794469436259,
+        100
+      ],
+      [
+        1794469466327,
+        100
+      ],
+      [
+        1794469505674,
+        100
+      ],
+      [
+        1794469538211,
+        100
+      ],
+      [
+        1794469566706,
+        100
+      ],
+      [
+        1794469594989,
+        100
+      ],
+      [
+        1794469622990,
+        100
+      ],
+      [
+        1794469658873,
+        100
+      ],
+      [
+        1794469687752,
+        100
+      ],
+      [
+        1794469718694,
+        100
+      ],
+      [
+        1794469751416,
+        100
+      ],
+      [
+        1794469782274,
+        100
+      ],
+      [
+        1794469815369,
+        100
+      ],
+      [
+        1794469844937,
+        100
+      ],
+      [
+        1794469882423,
+        100
+      ],
+      [
+        1794469914087,
+        100
+      ],
+      [
+        1794469941627,
+        100
+      ],
+      [
+        1794469969667,
+        100
+      ]
+    ],
+    "post_recovery_rate": {
+      "measured_intervals": 28,
+      "recent_batch_seconds": [
+        29.568,
+        37.486,
+        31.664,
+        27.54,
+        28.04
+      ],
+      "rows_per_minute": 198.99
+    },
+    "remaining_rows": 4800,
+    "remaining_minutes_at_observed_rate": 24.1,
+    "prefix_1300_unchanged": true,
+    "sequence_integrity": [
+      "4300",
+      "4300",
+      "0.00000",
+      "4299.00000"
+    ],
+    "embedding_limits": "CPUQuotaPerSecUSec=16s\nMemoryHigh=5368709120\nMemoryMax=6442450944",
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "available_memory_gib": 25.1,
+    "disk": {
+      "time": "2026-11-12T07:52:57.605235+00:00",
+      "filesystems": {
+        "/": {
+          "total_GiB": 69.94,
+          "free_GiB": 67.6,
+          "used_percent": 3.3
+        },
+        "/home": {
+          "total_GiB": 121.07,
+          "free_GiB": 89.93,
+          "used_percent": 25.7
+        }
+      },
+      "warnings": []
+    },
+    "containers": [
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": null,
+        "restart_count": 14
+      },
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      }
+    ],
+    "public_http": {
+      "sign": {
+        "status": 200,
+        "authentication_challenge": false
+      },
+      "admin/": {
+        "status": 200,
+        "authentication_challenge": false
+      },
+      "admin/app-base-path.js": {
+        "status": 200,
+        "authentication_challenge": false
+      }
+    },
+    "original_knowledge_query": {
+      "status": 200,
+      "code": 0,
+      "matched_rows": 2
+    },
+    "queue": {
+      "depth": 0,
+      "message_count": 1,
+      "channels": [
+        {
+          "channel_name": "cg_knowledge",
+          "depth": 0,
+          "in_flight_count": 1,
+          "deferred_count": 0,
+          "requeue_count": 0,
+          "timeout_count": 0
+        }
+      ]
+    }
+  },
+  "parallel_benchmark": {
+    "started_at": "2026-11-12 15:46:33 +0800",
+    "rows": 128,
+    "shared_test_cpu_budget": 8,
+    "production_threads": 16,
+    "production_quota_unchanged": true,
+    "results": [
+      {
+        "label": "single-8-a",
+        "processes": 1,
+        "threads_per_process": 8,
+        "batch": 8,
+        "seconds": 59.079,
+        "rows_per_minute": 130.0,
+        "average_cpu_cores": 7.61,
+        "minimum_vector_cosine": 1.0
+      },
+      {
+        "label": "dual-4-a",
+        "processes": 2,
+        "threads_per_process": 4,
+        "batch": 8,
+        "seconds": 53.631,
+        "rows_per_minute": 143.2,
+        "average_cpu_cores": 7.46,
+        "minimum_vector_cosine": 1.0
+      },
+      {
+        "label": "dual-4-b",
+        "processes": 2,
+        "threads_per_process": 4,
+        "batch": 8,
+        "seconds": 52.252,
+        "rows_per_minute": 146.98,
+        "average_cpu_cores": 7.51,
+        "minimum_vector_cosine": 1.0
+      },
+      {
+        "label": "single-8-b",
+        "processes": 1,
+        "threads_per_process": 8,
+        "batch": 8,
+        "seconds": 62.765,
+        "rows_per_minute": 122.36,
+        "average_cpu_cores": 7.53,
+        "minimum_vector_cosine": 1.0
+      }
+    ],
+    "units_stopped": true,
+    "finished_at": "2026-11-12 15:51:37 +0800",
+    "aggregate_throughput_gain_percent": 15.07
+  }
+}

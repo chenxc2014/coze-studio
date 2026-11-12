@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="1091967ca63bd5b1067bcf8bd331664879b14e47d35f7b20946fc5bf201a9738"><title>本地向量服务与知识库导入排障说明 · 部署与运维</title>
+<meta name="source-sha256" content="0b413ea85a810ead52a32d01ab746dee6550dc886f18f9fb603c50a160c49bab"><title>本地向量服务与知识库导入排障说明 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -41,7 +41,11 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 <article id="content"><blockquote>
 <p>实施更新：原知识已完成 19,946 / 19,946 行处理，失败行 0。智能体已支持绑定知识库后自动按地址检索，一次组织回答，无需用户驱动翻页；知识库页面的分页查询入口保留作人工核对。原报告中的实施状态属于此前评测阶段，现行功能和验收见 <a href="地址查询使用与运维说明.html">地址查询使用与运维说明</a>。</p>
 </blockquote>
-<p>更新日期：2026-11-11。服务器：<code>ssh linux166</code>。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<p>更新日期：2026-11-12。服务器：<code>ssh linux166</code>。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<blockquote>
+<p>扩容更新：当前服务器为 24 核、约 31.06 GiB 内存，BGE-M3 已调整为 16 个推理线程、16 核 CPU 配额，内存上限仍为 6 GiB。新文档“浙江省医院档案01”的重启中断任务已从原断点恢复；实测速度和进度快照见<a href="扩容后知识库处理优化说明.html">扩容后知识库处理优化说明</a>。下文“本次故障”及“原知识的处理进度”记录的是首次部署历史。</p>
+<p>双进程更新：向量编码已改为两个独立进程各 8 线程，合计 16 核配额；相同 500 行完整入库吞吐提升约 18%。原 11434 服务保留用于回退。当前配置、故障切换与验收见<a href="双进程向量编码实施说明.html">双进程向量编码实施说明</a>。</p>
+</blockquote>
 <h2 id="_1">方案与适用范围</h2>
 <p>Embedding 可以在本机部署，不必购买厂商服务。本环境采用 Ollama 的 BGE-M3 模型生成知识库向量，使用 CPU 推理。聊天模型继续使用原有配置，两者独立。</p>
 <table>
@@ -54,7 +58,7 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 <tbody>
 <tr>
 <td>服务</td>
-<td><code>coze-embedding.service</code>，开机自启</td>
+<td><code>coze-embedding-worker@0/@1</code>，开机自启、启动预热；原服务保留回退</td>
 </tr>
 <tr>
 <td>运行账号</td>
@@ -70,19 +74,19 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 </tr>
 <tr>
 <td>服务器资源</td>
-<td>16 核 CPU，系统可见内存约 20.3 GiB</td>
+<td>24 核 CPU，系统可见内存约 31.06 GiB，支持 AVX2、FMA</td>
 </tr>
 <tr>
 <td>Coze 使用的别名</td>
-<td><code>bge-m3-cpu</code>，复用原权重，设置 <code>num_thread=8</code></td>
+<td><code>bge-m3-cpu</code>；两个工作进程各 <code>num_thread=8</code>，原回退服务为 16</td>
 </tr>
 <tr>
 <td>监听地址</td>
-<td><code>http://172.18.0.1:11434</code>，Docker 内部网关地址</td>
+<td>工作进程使用 <code>172.18.0.1:11439/11440</code>；配置入口 <code>11434</code> 用作作用域匹配及回退</td>
 </tr>
 <tr>
 <td>CPU / 内存上限</td>
-<td>8 核 CPU / 6 GiB 内存，内存高水位 5 GiB</td>
+<td>含备用服务的资源组合计 16 核 / 10 GiB；工作进程各 8 核 / 5 GiB</td>
 </tr>
 <tr>
 <td>并发与批大小</td>
@@ -152,7 +156,7 @@ python3 /home/coze/ops/knowledge-index-status.py --document-id 77067263984082616
 <p>原运行 Compose、受限 <code>.env</code> 和空索引结构备份位于 <code>/home/coze/ops/embedding-backup-path</code> 指向的目录，权限仅限运维账号。<code>.env</code> 不复制到 Git 仓库或本说明中。</p>
 <p>后端和队列配置回退前应先确认是否有正在处理的导入任务。回退到最初版本会恢复未配置 Embedding 的状态，也会失去本次的表格重试和长任务修复；更换回向量模型时需要配套恢复或重建索引，不应直接覆盖数据库或清空全部向量数据。</p>
 <p>服务单元、非敏感运行参数和构建脚本随仓库文档一同保存。升级前校验新运行时与模型来源，在独立构建目录验证后再切换，模型、缓存和临时文件继续放在 <code>/home</code>，避免占满系统分区。</p>
-<p>后端构建使用 <a href="scripts/build-knowledge-server.sh">build-knowledge-server.sh</a>，服务单元见 <a href="scripts/coze-embedding.service">coze-embedding.service</a>。重启后的登录弹窗原因与修复见<a href="重启后访问修复说明.md">重启后访问修复说明</a>。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-11 · 无外部资源依赖</span></footer></main></div>
+<p>后端构建使用 <a href="scripts/build-knowledge-server.sh">build-knowledge-server.sh</a>，服务单元见 <a href="scripts/coze-embedding.service">coze-embedding.service</a>。重启后的登录弹窗原因与修复见<a href="重启后访问修复说明.md">重启后访问修复说明</a>。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-12 · 无外部资源依赖</span></footer></main></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
 const toast=document.getElementById('toast');let toastTimer;
 function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}

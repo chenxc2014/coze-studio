@@ -1,0 +1,311 @@
+{
+  "benchmark": {
+    "batch": 8,
+    "finished_at": "2026-11-12T16:19:40+08:00",
+    "mode": "benchmark",
+    "results": [
+      {
+        "label": "single-16-a",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 274.2284167163033,
+        "seconds": 28.005850349
+      },
+      {
+        "label": "dual-8-a",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 246.66635718539408,
+        "seconds": 31.135174199
+      },
+      {
+        "label": "dual-8-b",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 284.6383305767468,
+        "seconds": 26.981608501
+      },
+      {
+        "label": "single-16-b",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 259.24963998490273,
+        "seconds": 29.623956278
+      }
+    ],
+    "rows": 128,
+    "started_at": "2026-11-12T16:16:23+08:00",
+    "total_cpu_budget": 16,
+    "aggregate_throughput_gain_percent": -0.84
+  },
+  "affinity_benchmark": {
+    "batch": 8,
+    "finished_at": "2026-11-12T16:24:27+08:00",
+    "mode": "benchmark",
+    "results": [
+      {
+        "label": "single-16-a",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 258.74761783904563,
+        "seconds": 29.68143268
+      },
+      {
+        "label": "dual-8-a",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 294.27219201398344,
+        "seconds": 26.098286581
+      },
+      {
+        "label": "dual-8-b",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 304.16219150022397,
+        "seconds": 25.249686564
+      },
+      {
+        "label": "single-16-b",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 239.64785639971228,
+        "seconds": 32.047021473
+      }
+    ],
+    "rows": 128,
+    "started_at": "2026-11-12T16:22:00+08:00",
+    "total_cpu_budget": 16,
+    "aggregate_throughput_gain_percent": 20.22
+  },
+  "one_worker_down": {
+    "batch": 8,
+    "finished_at": "2026-11-12T16:33:21+08:00",
+    "mode": "check",
+    "results": [
+      {
+        "label": "pool-check",
+        "max_vector_difference": 0,
+        "minimum_cosine": 1,
+        "rows_per_minute": 140.61433677559415,
+        "seconds": 54.617474833
+      }
+    ],
+    "rows": 128,
+    "started_at": "2026-11-12T16:31:53+08:00",
+    "total_cpu_budget": 16
+  },
+  "two_workers_down": {
+    "batch": 8,
+    "failed_without_partial_results": true,
+    "finished_at": "2026-11-12T16:33:21+08:00",
+    "mode": "expect-error",
+    "rows": 128,
+    "started_at": "2026-11-12T16:33:21+08:00",
+    "total_cpu_budget": 16
+  },
+  "release": {
+    "image": "coze-local/server:embedding-pool-eb05c7baed18",
+    "base_image": "coze-local/server:history-c602742761f2",
+    "binary_sha256": "eb05c7baed180c1a92e53bb2c9ec204de0fc3ba1f53e7f4ef40c36aec11ea905",
+    "deployed_at": "2026-11-12 16:35:56 +0800",
+    "backup_path": "/home/coze/backups/embedding-pool-20261112-163547",
+    "worker_boot_enabled": true
+  },
+  "runtime_verification": {
+    "checked_at": "2026-11-12T16:40:19.434599+08:00",
+    "knowledge": [
+      {
+        "checked_at": "2026-11-12T08:40:19.871151+00:00",
+        "document_id": "7706726398408261632",
+        "knowledge_id": "7706718830218706944",
+        "document_status": 1,
+        "document_final_slice_count": 19946,
+        "error_present": false,
+        "completed_rows": 19946,
+        "processing_rows": 0,
+        "failed_rows": 0,
+        "import_complete": true,
+        "expected_rows": 19946,
+        "percent": 100
+      },
+      {
+        "checked_at": "2026-11-12T08:40:20.986261+00:00",
+        "document_id": "7707166715007729664",
+        "knowledge_id": "7707166400300711936",
+        "document_status": 1,
+        "document_final_slice_count": 9000,
+        "error_present": false,
+        "completed_rows": 9000,
+        "processing_rows": 0,
+        "failed_rows": 0,
+        "import_complete": true,
+        "expected_rows": 9000,
+        "percent": 100
+      }
+    ],
+    "containers": [
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": null,
+        "restart_count": 0
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0
+      }
+    ],
+    "image": "coze-local/server:embedding-pool-eb05c7baed18",
+    "pool_scope": {
+      "OLLAMA_EMBEDDING_WORKER_URLS": "http://172.18.0.1:11439,http://172.18.0.1:11440",
+      "OLLAMA_EMBEDDING_POOL_BASE_URL": "http://172.18.0.1:11434",
+      "OLLAMA_EMBEDDING_POOL_MODEL": "bge-m3-cpu"
+    },
+    "plugin_key_mount_preserved": true,
+    "workers": [
+      {
+        "unit": "coze-embedding-worker@0",
+        "active": true,
+        "enabled": true,
+        "allowed_cpus": "0-7",
+        "embed_http_requests_since_deploy": 35
+      },
+      {
+        "unit": "coze-embedding-worker@1",
+        "active": true,
+        "enabled": true,
+        "allowed_cpus": "12-19",
+        "embed_http_requests_since_deploy": 30
+      }
+    ],
+    "resource_group": "MemoryCurrent=2725560320\nCPUQuotaPerSecUSec=16s\nMemoryHigh=8589934592\nMemoryMax=10737418240",
+    "public_http": {
+      "/": 200,
+      "sign": 200,
+      "admin/": 200,
+      "admin/app-base-path.js": 200
+    },
+    "original_address_query": {
+      "status": 200,
+      "matched_rows": 2
+    },
+    "disk": {
+      "time": "2026-11-12T08:40:23.757266+00:00",
+      "filesystems": {
+        "/": {
+          "total_GiB": 69.94,
+          "free_GiB": 67.59,
+          "used_percent": 3.4
+        },
+        "/home": {
+          "total_GiB": 121.07,
+          "free_GiB": 88.47,
+          "used_percent": 26.9
+        }
+      },
+      "warnings": []
+    },
+    "binary_sha256": "eb05c7baed180c1a92e53bb2c9ec204de0fc3ba1f53e7f4ef40c36aec11ea905"
+  },
+  "unit_tests": {
+    "packages_passed": 2,
+    "race_detector_run": false,
+    "race_detector_reason": "远程构建环境未安装 C 编译器；已执行并发、取消、顺序与故障专项测试。"
+  },
+  "import_single": {
+    "label": "single",
+    "rows": 500,
+    "indexed_columns": 11,
+    "mean_input_characters": 205.0,
+    "seconds": 163.734,
+    "rows_per_minute": 183.22,
+    "failed_rows": 0,
+    "sequence_unique": true,
+    "address_query_matches": 1,
+    "vector_rows": 500,
+    "exact_row_vector_top1": true,
+    "customer_data_used": false,
+    "checked_at": "2026-11-12 16:30:43 +0800"
+  },
+  "import_pool": {
+    "label": "pool",
+    "rows": 500,
+    "indexed_columns": 11,
+    "mean_input_characters": 205.0,
+    "seconds": 138.547,
+    "rows_per_minute": 216.53,
+    "failed_rows": 0,
+    "sequence_unique": true,
+    "address_query_matches": 1,
+    "vector_rows": 500,
+    "exact_row_vector_top1": true,
+    "customer_data_used": false,
+    "checked_at": "2026-11-12 16:38:33 +0800"
+  },
+  "import_throughput_gain_percent": 18.18,
+  "import_elapsed_reduction_percent": 15.38,
+  "deployment_notes": {
+    "first_packaging_check_failed": "镜像内二进制执行权限遗漏，自动回退原镜像；已修正并通过镜像可执行权限检查后重新发布。",
+    "fixtures_cleaned": true,
+    "model_weights_changed": false,
+    "frontend_changed": false,
+    "database_schema_changed": false,
+    "git_committed": false
+  }
+}
