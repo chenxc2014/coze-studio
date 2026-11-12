@@ -1,0 +1,47 @@
+{
+  "checked_at": "2026-11-12 14:36:20 +0800",
+  "success": true,
+  "checks": [
+    "修复前在同一会话复现工具结果缺失导致的错误",
+    "相同会话及遗留历史在修复后可继续回答",
+    "原有不完整消息没有被删除或篡改",
+    "验证并非通过清空历史或减少记忆轮数实现"
+  ],
+  "synthetic_reproduction": [
+    {
+      "phase": "before",
+      "error_visible": true,
+      "seconds": 0.375,
+      "log_id": "b2ba4dec-c7d7-4e32-951d-8e45a28bf8ba"
+    },
+    {
+      "phase": "after",
+      "error_visible": false,
+      "answer": "验证通过",
+      "seconds": 3.438,
+      "log_id": "1316373e-5aa0-41a5-8202-b40b6371d9ab"
+    }
+  ],
+  "temporary_resources_cleaned": true,
+  "real_account_configuration_changed": false,
+  "real_agent_regression": {
+    "agent_id": "7706717182670929920",
+    "conversation_id": "7707165074959368192",
+    "question": "浣东街道康福路98号--诸暨市第五人民医院",
+    "run_id": "7707170211719282688",
+    "before_visible_error": "Something error:Internal Server Error",
+    "after_business_code": 404,
+    "after_internal_error": false,
+    "knowledge_exact_matches": {
+      "institution_name": 0,
+      "address_fragment": 0
+    },
+    "known_existing_address": {
+      "question": "(上戍)鹿城区藤桥镇上戍社区营上村渔藤路485号",
+      "run_id": "7707171070855348224",
+      "business_code": 200,
+      "expected_institution_matched": true
+    },
+    "original_agent_configuration_changed": false
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "checked_at": "2026-11-12T14:43:57.913299+08:00",
+  "runtime_image": "coze-local/server:history-c602742761f2",
+  "runtime_image_id": "sha256:9eb5079ae5fcbf32f981db2491e28eaadf15ccde2bd6c34260c93ceb8103e902",
+  "binary_sha256": "c602742761f2a7f650132d2cc0ec8b04c4eef861913f364b201164a17647a542",
+  "web_release": "/home/coze/releases/web-agent-api-357eb04d970b",
+  "knowledge_import": {
+    "checked_at": "2026-11-12T06:43:57.634988+00:00",
+    "document_id": "7706726398408261632",
+    "knowledge_id": "7706718830218706944",
+    "document_status": 1,
+    "document_final_slice_count": 19946,
+    "error_present": false,
+    "completed_rows": 19946,
+    "processing_rows": 0,
+    "failed_rows": 0,
+    "import_complete": true,
+    "expected_rows": 19946,
+    "percent": 100
+  },
+  "test_accounts_remaining": 0,
+  "test_knowledge_active_remaining": 0,
+  "plugin_key_mount_preserved": true,
+  "embedding_service": "active",
+  "containers": [
+    {
+      "name": "coze-server",
+      "status": "running",
+      "health": "not_configured"
+    },
+    {
+      "name": "coze-web",
+      "status": "running",
+      "health": "not_configured"
+    },
+    {
+      "name": "coze-nsqd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-milvus",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-mysql",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-elasticsearch",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-minio",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-etcd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-redis",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqadmin",
+      "status": "running",
+      "health": "not_configured"
+    },
+    {
+      "name": "coze-nsqlookupd",
+      "status": "running",
+      "health": "healthy"
+    }
+  ],
+  "public_assets": {
+    "/": {
+      "status": 200,
+      "www_authenticate_present": false
+    },
+    "sign": {
+      "status": 200,
+      "www_authenticate_present": false
+    },
+    "admin/": {
+      "status": 200,
+      "www_authenticate_present": false
+    },
+    "admin/app-base-path.js": {
+      "status": 200,
+      "www_authenticate_present": false
+    },
+    "admin/plugin-credentials.js": {
+      "status": 200,
+      "www_authenticate_present": false
+    },
+    "admin/examples/medical-institutions.json": {
+      "status": 200,
+      "www_authenticate_present": false
+    }
+  }
+}

@@ -377,7 +377,7 @@
       "pull_policy": "never"
     },
     "coze-server": {
-      "image": "coze-local/server:api-table-b840e42461a2",
+      "image": "coze-local/server:history-c602742761f2",
       "restart": "unless-stopped",
       "container_name": "coze-server",
       "env_file": [

@@ -434,39 +434,11 @@ func handlerWfInterruptEvent(_ context.Context, interruptEventData *crossworkflo
 	return "", defaultContentType, errorx.New(errno.ErrUnknowInterruptType)
 }
 
-func historyPairs(historyMsg []*message.Message) []*message.Message {
-
-	fcMsgPairs := make(map[int64][]*message.Message)
-	for _, one := range historyMsg {
-		if one.MessageType != message.MessageTypeFunctionCall && one.MessageType != message.MessageTypeToolResponse {
-			continue
-		}
-		if _, ok := fcMsgPairs[one.RunID]; !ok {
-			fcMsgPairs[one.RunID] = []*message.Message{one}
-		} else {
-			fcMsgPairs[one.RunID] = append(fcMsgPairs[one.RunID], one)
-		}
-	}
-
-	var historyAfterPairs []*message.Message
-	for _, value := range historyMsg {
-		if value.MessageType == message.MessageTypeFunctionCall {
-			if len(fcMsgPairs[value.RunID])%2 == 0 {
-				historyAfterPairs = append(historyAfterPairs, value)
-			}
-		} else {
-			historyAfterPairs = append(historyAfterPairs, value)
-		}
-	}
-	return historyAfterPairs
-
-}
-
 func transMessageToSchemaMessage(ctx context.Context, msgs []*message.Message, imagexClient imagex.ImageX) []*schema.Message {
 	schemaMessage := make([]*schema.Message, 0, len(msgs))
 
 	for _, msgOne := range msgs {
-		if msgOne.ModelContent == "" {
+		if msgOne == nil || msgOne.ModelContent == "" {
 			continue
 		}
 		if msgOne.MessageType == message.MessageTypeVerbose || msgOne.MessageType == message.MessageTypeFlowUp {
@@ -474,7 +446,7 @@ func transMessageToSchemaMessage(ctx context.Context, msgs []*message.Message, i
 		}
 		var sm *schema.Message
 		err := json.Unmarshal([]byte(msgOne.ModelContent), &sm)
-		if err != nil {
+		if err != nil || sm == nil {
 			continue
 		}
 		if len(sm.ReasoningContent) > 0 {
@@ -483,7 +455,7 @@ func transMessageToSchemaMessage(ctx context.Context, msgs []*message.Message, i
 		schemaMessage = append(schemaMessage, parseMessageURI(ctx, sm, imagexClient))
 	}
 
-	return schemaMessage
+	return normalizeToolHistory(schemaMessage)
 }
 
 func parseMessageURI(ctx context.Context, mcMsg *schema.Message, imagexClient imagex.ImageX) *schema.Message {

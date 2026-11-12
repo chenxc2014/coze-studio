@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="d0360181555146859d54d8e84a52f2cf035a787abca05aaa6a69b20be76f586b"><title>会话工具消息配对修复说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">现象与根因</a></li>
+<li><a href="#_2">修复内容</a></li>
+<li><a href="#_3">验证方式与结果</a></li>
+<li><a href="#_4">构建与运行版本</a></li>
+<li><a href="#_5">回退</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：会话工具消息配对修复说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>会话工具消息配对修复说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="会话工具消息配对修复说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-12。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">现象与根因</h2>
+<p>“通过地址查询医疗机构详情”预览中，输入“浣东街道康福路98号--诸暨市第五人民医院”，部分已有会话返回 <code>Something error:Internal Server Error</code>，新建会话有时能返回回答。</p>
+<p>对应后端日志显示聊天模型返回 HTTP 400，明确原因是 assistant 消息声明了 <code>tool_calls</code>，后续却没有覆盖全部 <code>tool_call_id</code> 的工具结果。平台将这个模型请求错误转为前端的通用错误提示。</p>
+<p>发现两个相互叠加的问题：一次并行工具事件可能包含多条结果，但原写入逻辑只保存 <code>ToolsMessage[0]</code>；历史配对又按同一运行轮次中相关消息数量的奇偶数判断。两个调用及两个结果构成三条消息，本应有效，却可能被奇偶规则误删；两个调用但只存了一个结果构成两条消息，又可能被错误放行。</p>
+<h2 id="_2">修复内容</h2>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>调整</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>保存工具结果</td>
+<td>遍历并保存事件中的全部工具结果，每条保留独立的 <code>tool_call_id</code>；只有首条复用原预创建的展示消息</td>
+</tr>
+<tr>
+<td>加载历史</td>
+<td>反序列化后按实际调用 ID 检查紧随其后的工具结果，保留已经配对的调用及结果，不再使用奇偶数规则</td>
+</tr>
+<tr>
+<td>遗留不完整记录</td>
+<td>只修正发送给模型的历史快照，剔除未配对调用及孤立、重复结果；不伪造结果，不修改或删除原数据库消息</td>
+</tr>
+<tr>
+<td>普通正文</td>
+<td>保留用户消息和助手正文；跳过空记录、无效 JSON 和 null，避免异常历史引发空指针错误</td>
+</tr>
+</tbody>
+</table>
+<p>配对仅在同一条 assistant 工具调用后的连续工具结果中进行，不跨越下一条用户或普通助手消息查找结果，不会把其它轮次中重复的调用 ID 错配进来。</p>
+<p>本轮未调整真实智能体的人设、模型、知识库绑定、插件授权或记忆轮数；未清空真实会话或重新导入医疗档案。</p>
+<h2 id="_3">验证方式与结果</h2>
+<ol>
+<li>在原运行日志中找到多次相同模型协议错误；真实历史中确认存在“声明两个调用、只保存一个工具结果”的记录。</li>
+<li>新增 Go 回归测试，覆盖完整和部分完成的并行调用、ID 不匹配、孤立及重复结果、跨轮次边界、无效历史、原对象不被修改，以及全部并行结果分别保存后能再被加载。</li>
+<li>使用临时普通账号、临时智能体和合成工具记录复现：原版本同一会话会报错；修复后保留同一组不完整记录即可继续回答。校验原消息摘要不变，记忆轮数保持十轮，验证时总轮数不足十轮，排除清空历史或自然移出记忆窗口造成的假通过。</li>
+<li>在用户指定智能体及现有预览上下文中重问原问题，已正常返回业务 JSON，不再出现通用内部错误。当前绑定知识库未找到该名称及门牌片段的明确匹配，业务返回 404；这只表示当前数据未命中，不是对机构真实存在与否的判断。</li>
+</ol>
+<p>隔离测试账号、智能体、会话及合成消息已清理。详细结果见 <code>会话工具消息配对修复验收.json</code>；原医疗档案保持 19946 行完成、0 失败。接口和浏览器错误消除不等同于知识库外信息已经获得联网权威核验，本轮不把模型生成的机构更名或地址推测作为已核实事实。</p>
+<h2 id="_4">构建与运行版本</h2>
+<p>后端二进制 SHA256：<code>c602742761f2a7f650132d2cc0ec8b04c4eef861913f364b201164a17647a542</code>。</p>
+<p>运行镜像：<code>coze-local/server:history-c602742761f2</code>。前端继续使用 <code>/home/coze/releases/web-agent-api-357eb04d970b</code>，本轮仅发布后端。构建、镜像、数据库、备份和模型仍在 <code>/home/coze</code>，发布前执行容量守卫及元数据备份，保留插件主密钥原挂载。</p>
+<p>后端源码及测试位于 <code>backend/domain/conversation/agentrun/internal/</code>，修改 <code>message_builder.go</code>、<code>message_event.go</code> 和 <code>singleagent_run.go</code>，新增 <code>history_messages.go</code>、<code>tool_response_messages.go</code>、<code>history_messages_test.go</code>。</p>
+<p>隔离构建沿用 Go 1.24.13、共享依赖及构建缓存，限制并发为 3；专项命令为：</p>
+<pre><code class="language-bash">go test -p 3 -run '^(TestToolHistory.*|TestParseMessageURI|TestAddress.*|TestCachedTableDocumentsPreserveMetadata|TestAPITable.*)$' ./domain/conversation/agentrun/internal ./domain/agent/singleagent/internal/agentflow ./domain/knowledge/service ./domain/knowledge/apitable
+</code></pre>
+<h2 id="_5">回退</h2>
+<p>发布前的运行 Compose 位于 <code>/home/coze/ops/history-backup-path</code> 指向的 <code>/home/coze/backups/history-repair-.../compose.json</code>。核对路径后恢复到 <code>/home/coze/src/coze-studio/docker/docker-compose.deploy.json</code>，再执行 <code>/home/coze/ops/compose.sh up -d --no-deps coze-server</code>。</p>
+<p>回退仅切换后端镜像，不要求删除客户数据或恢复旧数据库；原先不完整的历史消息仍保留，旧版可能再次触发同样错误。前端、模型凭据和插件主密钥保持原配置。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-12 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

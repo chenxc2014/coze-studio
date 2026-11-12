@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="5f2ac78952d1ea53b96a3ff906fbfe0b1a52696260e22206661c2e03e1de4f3a"><title>Coze Studio 开发验证环境 · 部署与运维</title>
+<meta name="source-sha256" content="50b2d2cbb76a2de23d4cdd27488a577ea080da0834b9a1d81ea400629ac56db5"><title>Coze Studio 开发验证环境 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -48,7 +48,8 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 <div class="summary" aria-label="验收时容量快照">
 <div class="metric"><span>运行环境</span><strong>linux166</strong><small>Coze Studio · v0.5.1</small></div>
 <div class="metric"><span>系统分区可用</span><strong>67.7 GiB</strong><small>2026-11-12 验收快照</small></div>
-<div class="metric"><span>/home 分区可用</span><strong>111.7 GiB</strong><small>容量以服务器实际检查为准</small></div></div><article id="content"><p>2026-11-12 后续功能更新：<a href="API表格导入使用与运维说明.md">API 表格导入使用与运维说明</a>（另有同名 HTML），支持示例 API、四步导入、自动更新和智能体检索。服务器已扩容至 16 逻辑 CPU、约 20.35 GiB 内存；下文保留首次安装时的资源与范围记录，当前运行镜像和容量以专项说明及实时检查为准。</p>
+<div class="metric"><span>/home 分区可用</span><strong>111.7 GiB</strong><small>容量以服务器实际检查为准</small></div></div><article id="content"><p>2026-11-12 后端修复：<a href="会话工具消息配对修复说明.md">会话工具消息配对修复说明</a>（另有同名 HTML），修复并行工具结果保存不全及历史配对错误导致的预览内部错误。</p>
+<p>2026-11-12 后续功能更新：<a href="API表格导入使用与运维说明.md">API 表格导入使用与运维说明</a>（另有同名 HTML），支持示例 API、四步导入、自动更新和智能体检索。服务器已扩容至 16 逻辑 CPU、约 20.35 GiB 内存；下文保留首次安装时的资源与范围记录，当前运行镜像和容量以专项说明及实时检查为准。</p>
 <h2 id="_1">版本与范围</h2>
 <ul>
 <li>上游：https://github.com/coze-dev/coze-studio</li>

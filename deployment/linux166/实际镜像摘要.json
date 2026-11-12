@@ -42,5 +42,9 @@
   "coze-local/server:api-table-b840e42461a2": {
     "id": "sha256:1c36bbb51b6798ccde0030572bc337106fbdd87a0df4daa993e3825216586d20",
     "digest": "coze-local/server:api-table-b840e42461a2"
+  },
+  "coze-local/server:history-c602742761f2": {
+    "id": "sha256:9eb5079ae5fcbf32f981db2491e28eaadf15ccde2bd6c34260c93ceb8103e902",
+    "digest": "coze-local/server:history-c602742761f2"
   }
 }
