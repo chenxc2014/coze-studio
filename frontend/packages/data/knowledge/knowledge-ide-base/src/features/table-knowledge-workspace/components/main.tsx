@@ -22,7 +22,7 @@ import { type TableViewMethods } from '@coze-common/table-view';
 import { I18n } from '@coze-arch/i18n';
 import { EmptyState, Spin, Layout } from '@coze-arch/coze-design';
 import { IconSegmentEmpty } from '@coze-arch/bot-icons';
-import { type DocumentInfo } from '@coze-arch/bot-api/knowledge';
+import { type DocumentInfo, DocumentSource } from '@coze-arch/bot-api/knowledge';
 
 import styles from '../styles/index.module.less';
 import { useGetSliceListData } from '../hooks/inner/use-get-slice-list-data';
@@ -30,6 +30,7 @@ import { TableUIContext } from '../context/table-ui-context';
 import { TableDataContext } from '../context/table-data-context';
 import { TableActionsContext } from '../context/table-actions-context';
 import { TableDataView } from './table-data-view';
+import { APISourcePanel } from './api-source-panel';
 
 const MAX_TOTAL = 1000;
 
@@ -41,6 +42,7 @@ export interface TableKnowledgeWorkspaceProps {
 
 export const TableKnowledgeWorkspace = ({
   isReloading,
+  reload,
 }: TableKnowledgeWorkspaceProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentWrapperRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,7 @@ export const TableKnowledgeWorkspace = ({
   const canEdit = useKnowledgeStore(state => state.canEdit);
   const documentList = useKnowledgeStore(state => state.documentList)?.filter(
     doc => doc.document_id,
-  ) as { document_id: string }[];
+  ) as DocumentInfo[];
   const [curIndex, setCurIndex] = useState(0);
   const [curSliceId, setCurSliceId] = useState('');
   const [delSliceIds, setDelSliceIds] = useState<string[]>([]);
@@ -59,6 +61,7 @@ export const TableKnowledgeWorkspace = ({
     loadMoreSliceList,
     isLoadingSliceList,
     isLoadingMoreSliceList,
+    reloadSliceList,
   } = useGetSliceListData();
 
   const slices = sliceListData?.list;
@@ -128,6 +131,12 @@ export const TableKnowledgeWorkspace = ({
               'knowledge-ide-base-slice-list-ui-content',
             )}
           >
+            {documentList?.[0]?.source_type === DocumentSource.Web && documentList[0].document_id ? (
+              <APISourcePanel documentID={documentList[0].document_id} canEdit={Boolean(canEdit)} onUpdated={() => {
+                reload?.();
+                reloadSliceList();
+              }} />
+            ) : null}
             <Spin
               spinning={isLoadingSliceList}
               wrapperClassName={styles.spin}

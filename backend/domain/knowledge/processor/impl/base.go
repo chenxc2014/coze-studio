@@ -88,6 +88,7 @@ func (p *baseDocProcessor) BuildDBModel() error {
 			SourceType:    int32(p.Documents[i].Source),
 			Status:        int32(knowledge.KnowledgeStatusInit),
 			ParseRule: &model.DocumentParseRule{
+				APISource:        p.Documents[i].APISource,
 				ParsingStrategy:  p.Documents[i].ParsingStrategy,
 				ChunkingStrategy: p.Documents[i].ChunkingStrategy,
 			},

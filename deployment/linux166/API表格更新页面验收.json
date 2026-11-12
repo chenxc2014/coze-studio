@@ -1,0 +1,22 @@
+{
+  "checked_at": "2026-11-12 10:18:42 +0800",
+  "success": true,
+  "checks": [
+    "匿名不能访问 API 导入",
+    "拒绝跨站写请求",
+    "拒绝不安全抓取目标 http://127.0.0.1/data.json",
+    "拒绝不安全抓取目标 https://127.0.0.1/data.json",
+    "拒绝不安全抓取目标 https://169.254.169.254/latest/meta-data",
+    "API 数据已真正入库并保留 API 来源",
+    "其他账号不能读取或更新 API 来源",
+    "点击立即更新后新行自动显示，无需手工刷新浏览器",
+    "更新页面没有脚本错误"
+  ],
+  "answers": [],
+  "temporary_accounts_and_active_knowledge_cleaned": true,
+  "notes": [
+    "接口与机构均为本次合成数据",
+    "到期时间仅调整临时测试文档",
+    "未修改真实用户、知识库、模型或插件凭据"
+  ]
+}

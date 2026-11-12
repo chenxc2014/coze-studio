@@ -29,6 +29,7 @@ import { TextLocalAddUpdateConfig } from '@coze-data/knowledge-resource-processo
 import { TextCustomAddUpdateConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/text/first-party/custom/add';
 import { TableLocalIncrementalConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/table/first-party/local/incremental';
 import { TableLocalAddConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/table/first-party/local/add';
+import { TableAPIAddConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/table/first-party/api/add';
 import { TableCustomIncrementalConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/table/first-party/custom/incremental';
 import { TableCustomAddConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/table/first-party/custom/add';
 import { ImageFileAddConfig } from '@coze-data/knowledge-resource-processor-base/features/knowledge-type/image/file';
@@ -50,6 +51,9 @@ const getConfigV2 = () => ({
   [UnitType.TABLE_DOC]: {
     [OptType.ADD]: TableLocalAddConfig,
     [OptType.INCREMENTAL]: TableLocalIncrementalConfig,
+  },
+  [UnitType.TABLE_API]: {
+    [OptType.ADD]: TableAPIAddConfig,
   },
   [UnitType.TABLE_CUSTOM]: {
     [OptType.ADD]: TableCustomAddConfig,

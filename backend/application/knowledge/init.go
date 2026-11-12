@@ -40,5 +40,8 @@ func InitService(ctx context.Context, c *ServiceComponents, bus search.ResourceE
 	KnowledgeSVC.DomainSVC = knowledgeDomainSVC
 	KnowledgeSVC.eventBus = bus
 	KnowledgeSVC.storage = c.Storage
+	if api, ok := knowledgeDomainSVC.(knowledgeImpl.APITableService); ok {
+		api.StartAPITableRefresh(ctx)
+	}
 	return KnowledgeSVC, nil
 }

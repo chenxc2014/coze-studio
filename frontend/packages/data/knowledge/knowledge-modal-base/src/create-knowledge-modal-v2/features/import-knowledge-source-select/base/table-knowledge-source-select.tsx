@@ -17,6 +17,7 @@
 import { type ImportKnowledgeSourceSelectModuleProps } from '../module';
 import { TableLocal } from '../../import-knowledge-source/table-local';
 import { TableCustom } from '../../import-knowledge-source/table-custom';
+import { TableAPI } from '../../import-knowledge-source/table-api';
 import { SourceSelect } from '../../../components/source-select';
 
 export const TableKnowledgeSourceSelect = (
@@ -32,6 +33,7 @@ export const TableKnowledgeSourceSelect = (
     >
       <TableLocal />
       <TableCustom />
+      <TableAPI />
     </SourceSelect>
   );
 };

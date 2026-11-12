@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="cede84c338d12b6463d4969a69bfb7380fc619166c18b71add1d55b0eb3e8cbd"><title>Coze Studio 开发验证环境 · 部署与运维</title>
+<meta name="source-sha256" content="5f2ac78952d1ea53b96a3ff906fbfe0b1a52696260e22206661c2e03e1de4f3a"><title>Coze Studio 开发验证环境 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -47,8 +47,9 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 <a class="button" href="部署说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
 <div class="summary" aria-label="验收时容量快照">
 <div class="metric"><span>运行环境</span><strong>linux166</strong><small>Coze Studio · v0.5.1</small></div>
-<div class="metric"><span>系统分区可用</span><strong>67.7 GiB</strong><small>2026-11-10 验收快照</small></div>
-<div class="metric"><span>/home 分区可用</span><strong>111.7 GiB</strong><small>容量以服务器实际检查为准</small></div></div><article id="content"><h2 id="_1">版本与范围</h2>
+<div class="metric"><span>系统分区可用</span><strong>67.7 GiB</strong><small>2026-11-12 验收快照</small></div>
+<div class="metric"><span>/home 分区可用</span><strong>111.7 GiB</strong><small>容量以服务器实际检查为准</small></div></div><article id="content"><p>2026-11-12 后续功能更新：<a href="API表格导入使用与运维说明.md">API 表格导入使用与运维说明</a>（另有同名 HTML），支持示例 API、四步导入、自动更新和智能体检索。服务器已扩容至 16 逻辑 CPU、约 20.35 GiB 内存；下文保留首次安装时的资源与范围记录，当前运行镜像和容量以专项说明及实时检查为准。</p>
+<h2 id="_1">版本与范围</h2>
 <ul>
 <li>上游：https://github.com/coze-dev/coze-studio</li>
 <li>基线：<code>v0.5.1</code>，提交 <code>72cecff858a5a18662c5d9d1a4764c53ebc98317</code>。</li>
@@ -178,7 +179,7 @@ systemctl list-timers 'coze-*'
 <pre><code class="language-bash">systemctl start coze-backup.service
 journalctl -u coze-backup.service -n 20 --no-pager
 </code></pre>
-<p>该备份不包含 MinIO 中的上传文件、全部服务配置及完整向量索引，也不是异机容灾。正式投入使用前，应安排对象数据和受限配置文件的异机备份与恢复演练，避免在同一分区保留无限全量副本。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-10 · 无外部资源依赖</span></footer></main></div>
+<p>该备份不包含 MinIO 中的上传文件、全部服务配置及完整向量索引，也不是异机容灾。正式投入使用前，应安排对象数据和受限配置文件的异机备份与恢复演练，避免在同一分区保留无限全量副本。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-12 · 无外部资源依赖</span></footer></main></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
 const toast=document.getElementById('toast');let toastTimer;
 function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}

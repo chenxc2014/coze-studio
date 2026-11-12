@@ -65,6 +65,7 @@ import (
 
 func NewKnowledgeSVC(config *KnowledgeSVCConfig) (Knowledge, eventbus.ConsumerHandler) {
 	svc := &knowledgeSVC{
+		apiDB:               config.DB,
 		knowledgeRepo:       repository.NewKnowledgeDAO(config.DB),
 		documentRepo:        repository.NewKnowledgeDocumentDAO(config.DB),
 		sliceRepo:           repository.NewKnowledgeDocumentSliceDAO(config.DB),
@@ -101,6 +102,7 @@ type KnowledgeSVCConfig struct {
 }
 
 type knowledgeSVC struct {
+	apiDB         *gorm.DB
 	knowledgeRepo repository.KnowledgeRepo
 	documentRepo  repository.KnowledgeDocumentRepo
 	sliceRepo     repository.KnowledgeDocumentSliceRepo
@@ -314,6 +316,9 @@ func (k *knowledgeSVC) checkRequest(request *CreateDocumentRequest) error {
 }
 
 func (k *knowledgeSVC) CreateDocument(ctx context.Context, request *CreateDocumentRequest) (response *CreateDocumentResponse, err error) {
+	if err = k.bindAPIPreparations(ctx, request); err != nil {
+		return nil, err
+	}
 	if err = k.checkRequest(request); err != nil {
 		return nil, errorx.New(errno.ErrKnowledgeInvalidParamCode, errorx.KV("msg", err.Error()))
 	}
@@ -1254,6 +1259,7 @@ func (k *knowledgeSVC) fromModelDocument(ctx context.Context, document *model.Kn
 		Status:           entity.DocumentStatus(document.Status),
 		ParsingStrategy:  document.ParseRule.ParsingStrategy,
 		ChunkingStrategy: document.ParseRule.ChunkingStrategy,
+		APISource:        document.ParseRule.APISource,
 	}
 	if document.TableInfo != nil {
 		documentEntity.TableInfo = *document.TableInfo

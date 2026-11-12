@@ -377,7 +377,7 @@
       "pull_policy": "never"
     },
     "coze-server": {
-      "image": "coze-local/server:plugins-ec78c0f3a369",
+      "image": "coze-local/server:api-table-b840e42461a2",
       "restart": "unless-stopped",
       "container_name": "coze-server",
       "env_file": [
@@ -435,7 +435,7 @@
       "volumes": [
         "/home/coze/src/coze-studio/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,z",
         "/home/coze/src/coze-studio/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro,z",
-        "/home/coze/releases/web-agent-ea214b060c09:/usr/share/nginx/html:ro,z",
+        "/home/coze/releases/web-agent-api-357eb04d970b:/usr/share/nginx/html:ro,z",
         "/home/coze/src/coze-studio/backend/conf/admin/app-base-path.js:/etc/nginx/coze-app-base-path.js:ro,z"
       ],
       "depends_on": [

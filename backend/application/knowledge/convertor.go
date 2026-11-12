@@ -295,11 +295,16 @@ func convertDocument2Model(documentEntity *entity.Document) *dataset.DocumentInf
 		ChunkStrategy:         chunkStrategy,
 		ParsingStrategy:       parseStrategy,
 	}
+	if documentEntity.APISource != nil {
+		docInfo.WebURL = ptr.Of(documentEntity.APISource.URL)
+	}
 	return docInfo
 }
 
 func convertDocumentSource2Entity(sourceType dataset.DocumentSource) entity.DocumentSource {
 	switch sourceType {
+	case dataset.DocumentSourceAPITable:
+		return entity.DocumentSourceAPI
 	case dataset.DocumentSource_Custom:
 		return entity.DocumentSourceCustom
 	case dataset.DocumentSource_Document:
@@ -311,6 +316,8 @@ func convertDocumentSource2Entity(sourceType dataset.DocumentSource) entity.Docu
 
 func convertDocumentSource2Model(sourceType entity.DocumentSource) dataset.DocumentSource {
 	switch sourceType {
+	case entity.DocumentSourceAPI:
+		return dataset.DocumentSourceAPITable
 	case entity.DocumentSourceCustom:
 		return dataset.DocumentSource_Custom
 	case entity.DocumentSourceLocal:

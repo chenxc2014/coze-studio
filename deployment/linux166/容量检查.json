@@ -1,15 +1,15 @@
 {
-  "time": "2026-11-10T08:49:00.250936+00:00",
+  "time": "2026-11-12T03:10:24.434436+00:00",
   "filesystems": {
     "/": {
       "total_GiB": 69.94,
-      "free_GiB": 67.66,
+      "free_GiB": 67.61,
       "used_percent": 3.3
     },
     "/home": {
       "total_GiB": 121.07,
-      "free_GiB": 111.74,
-      "used_percent": 7.7
+      "free_GiB": 91.33,
+      "used_percent": 24.6
     }
   },
   "warnings": []

@@ -40,6 +40,7 @@ type Document struct {
 	Source           DocumentSource       // document source
 	ParsingStrategy  *ParsingStrategy     // parsing strategy
 	ChunkingStrategy *ChunkingStrategy    // segmentation strategy
+	APISource        *APISource           // API 表格的来源与更新状态
 
 	TableInfo TableInfo
 	IsAppend  bool // Whether to append to the table

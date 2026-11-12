@@ -199,6 +199,9 @@ func (k *knowledgeSVC) indexDocument(ctx context.Context, event *entity.Event) (
 
 	// Finalize document indexing
 	err = k.finalizeDocumentIndexing(ctx, event.Document.KnowledgeID, event.Document.ID)
+	if err == nil && doc.APISource != nil {
+		err = k.finishAPITable(ctx, doc.ID)
+	}
 	return
 }
 

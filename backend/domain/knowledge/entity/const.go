@@ -56,5 +56,6 @@ type DocumentSource int64
 
 const (
 	DocumentSourceLocal  DocumentSource = 0 // local file upload
+	DocumentSourceAPI    DocumentSource = 1 // HTTPS JSON 表格
 	DocumentSourceCustom DocumentSource = 2 // custom text
 )

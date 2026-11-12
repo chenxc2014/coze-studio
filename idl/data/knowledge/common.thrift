@@ -48,6 +48,7 @@ enum DocumentStatus {
 
 enum DocumentSource {
     Document = 0 // local file upload
+    Web      = 1 // HTTPS JSON 表格 API
     Custom   = 2 // custom type
 }
 
