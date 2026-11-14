@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"regexp"
 	"strconv"
 	"sync"
@@ -54,6 +55,11 @@ import (
 func (k *knowledgeSVC) Retrieve(ctx context.Context, request *RetrieveRequest) (response *RetrieveResponse, err error) {
 	if request == nil {
 		return nil, errorx.New(errno.ErrKnowledgeInvalidParamCode, errorx.KV("msg", "request is nil"))
+	}
+	for _, id := range request.KnowledgeIDs {
+		if err := systemresource.CheckActive(ctx, systemresource.Knowledge, id); err != nil {
+			return nil, err
+		}
 	}
 	if len(request.Query) == 0 {
 		return &knowledgeModel.RetrieveResponse{}, nil

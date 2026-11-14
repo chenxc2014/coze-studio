@@ -49,8 +49,39 @@ export const WorkspaceSubMenu = () => {
       dataTestId: 'navigation_workspace_library',
     },
     {
-      icon: <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="8" /><path d="M12 7v5l3 2M6 2 3 5m15-3 3 3" /></svg>,
-      activeIcon: <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="8" /><path d="M12 7v5l3 2M6 2 3 5m15-3 3 3" /></svg>,
+      icon: <IconCozKnowledge />,
+      activeIcon: <IconCozKnowledgeFill />,
+      title: () => '资源库-系统',
+      path: SpaceSubModuleEnum.SYSTEM_LIBRARY,
+      dataTestId: 'navigation_workspace_system_library',
+    },
+    {
+      icon: (
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        >
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 7v5l3 2M6 2 3 5m15-3 3 3" />
+        </svg>
+      ),
+      activeIcon: (
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 7v5l3 2M6 2 3 5m15-3 3 3" />
+        </svg>
+      ),
       title: () => I18n.t('coze_sidebar_task_center', {}, '任务中心'),
       path: SpaceSubModuleEnum.TASKS,
       dataTestId: 'navigation_workspace_tasks',

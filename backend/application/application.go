@@ -35,6 +35,7 @@ import (
 	"github.com/coze-dev/coze-studio/backend/application/search"
 	"github.com/coze-dev/coze-studio/backend/application/shortcutcmd"
 	"github.com/coze-dev/coze-studio/backend/application/singleagent"
+	"github.com/coze-dev/coze-studio/backend/application/systemlibrary"
 	"github.com/coze-dev/coze-studio/backend/application/template"
 	"github.com/coze-dev/coze-studio/backend/application/upload"
 	"github.com/coze-dev/coze-studio/backend/application/user"
@@ -166,6 +167,7 @@ func Init(ctx context.Context) (err error) {
 	crossupload.SetDefaultSVC(uploadImpl.InitDomainService(basicServices.uploadSVC.UploadSVC))
 
 	crossapp.SetDefaultSVC(appImpl.InitDomainService(complexServices.appSVC.DomainSVC))
+	systemlibrary.Init(infra.DB)
 	primaryServices.workflowSVC.InitTaskCenter(ctx, infra.DB)
 
 	return nil

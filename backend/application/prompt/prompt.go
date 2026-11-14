@@ -18,6 +18,9 @@ package prompt
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
+	"strings"
 
 	"github.com/coze-dev/coze-studio/backend/api/model/playground"
 	"github.com/coze-dev/coze-studio/backend/api/model/resource/common"
@@ -41,6 +44,11 @@ type PromptApplicationService struct {
 var PromptSVC = &PromptApplicationService{}
 
 func (p *PromptApplicationService) UpsertPromptResource(ctx context.Context, req *playground.UpsertPromptResourceRequest) (resp *playground.UpsertPromptResourceResponse, err error) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Prompt, req.Prompt.GetID(), *uid); e != nil {
+			return nil, e
+		}
+	}
 	session := ctxutil.GetUserSessionFromCtx(ctx)
 	if session == nil {
 		return nil, errorx.New(errno.ErrPromptPermissionCode, errorx.KV("msg", "no session data provided"))
@@ -107,10 +115,31 @@ func (p *PromptApplicationService) GetPromptResourceInfo(ctx context.Context, re
 	if err != nil {
 		return nil, err
 	}
-	if promptInfo.CreatorID != *uid {
+	shared, e := systemresource.Published(ctx, systemresource.Prompt, promptInfo.ID)
+	if e != nil {
+		return nil, e
+	}
+	if promptInfo.CreatorID != *uid && !shared {
 		return nil, errorx.New(errno.ErrPromptPermissionCode, errorx.KV("msg", "no permission"))
 	}
 
+	if shared {
+		p, e := systemresource.Default().Lookup(ctx, systemresource.Prompt, promptInfo.ID)
+		if e != nil {
+			return nil, e
+		}
+		if p != nil {
+			var item systemresource.Resource
+			if e = json.Unmarshal([]byte(p.MetadataJSON), &item); e != nil {
+				return nil, e
+			}
+			copy := *promptInfo
+			promptInfo = &copy
+			promptInfo.Name = item.Name
+			promptInfo.Description = item.Description
+			promptInfo.PromptText = item.Content
+		}
+	}
 	return &playground.GetPromptResourceInfoResponse{
 		Data: promptInfoDo2To(promptInfo),
 		Code: 0,
@@ -130,6 +159,38 @@ func (p *PromptApplicationService) GetOfficialPromptResourceList(ctx context.Con
 		return nil, err
 	}
 
+	visible := promptList[:0]
+	for _, item := range promptList {
+		if e := systemresource.CheckActive(ctx, systemresource.Prompt, item.ID); e == nil {
+			visible = append(visible, item)
+		}
+	}
+	promptList = visible
+	ids, e := systemresource.IDs(ctx, systemresource.Prompt)
+	if e != nil {
+		return nil, e
+	}
+	seen := map[int64]bool{}
+	for _, item := range promptList {
+		seen[item.ID] = true
+	}
+	for _, id := range ids {
+		if seen[id] {
+			continue
+		}
+		p, e := systemresource.Default().Lookup(ctx, systemresource.Prompt, id)
+		if e != nil {
+			return nil, e
+		}
+		var item systemresource.Resource
+		if e = json.Unmarshal([]byte(p.MetadataJSON), &item); e != nil {
+			return nil, e
+		}
+		if c.GetKeyword() != "" && !strings.Contains(strings.ToLower(item.Name+item.Description+item.Content), strings.ToLower(c.GetKeyword())) {
+			continue
+		}
+		promptList = append(promptList, &entity.PromptResource{ID: id, Name: item.Name, Description: item.Description, PromptText: item.Content, Status: 1})
+	}
 	return &playground.GetOfficialPromptResourceListResponse{
 		PromptResourceList: slices.Transform(promptList, func(p *entity.PromptResource) *playground.PromptResource {
 			return promptInfoDo2To(p)
@@ -139,6 +200,11 @@ func (p *PromptApplicationService) GetOfficialPromptResourceList(ctx context.Con
 }
 
 func (p *PromptApplicationService) DeletePromptResource(ctx context.Context, req *playground.DeletePromptResourceRequest) (resp *playground.DeletePromptResourceResponse, err error) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Prompt, req.GetPromptResourceID(), *uid); e != nil {
+			return nil, e
+		}
+	}
 	uid := ctxutil.GetUIDFromCtx(ctx)
 	if uid == nil {
 		return nil, errorx.New(errno.ErrPromptPermissionCode, errorx.KV("msg", "no session data provided"))

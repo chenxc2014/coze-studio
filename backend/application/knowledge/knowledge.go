@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"sort"
 	"strconv"
 	"time"
@@ -43,7 +44,6 @@ import (
 	"github.com/coze-dev/coze-studio/backend/infra/storage"
 	"github.com/coze-dev/coze-studio/backend/pkg/errorx"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/conv"
-	"github.com/coze-dev/coze-studio/backend/pkg/lang/maps"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/ptr"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/slices"
 	"github.com/coze-dev/coze-studio/backend/pkg/logs"
@@ -253,47 +253,7 @@ func (k *KnowledgeApplicationService) CreateKnowledge(ctx context.Context, req *
 }
 
 func (k *KnowledgeApplicationService) DatasetDetail(ctx context.Context, req *dataset.DatasetDetailRequest) (*dataset.DatasetDetailResponse, error) {
-	var err error
-	var datasetIDs []int64
-
-	uid := ctxutil.GetUIDFromCtx(ctx)
-	if uid == nil {
-		return nil, errorx.New(errno.ErrKnowledgePermissionCode, errorx.KV("msg", "session required"))
-	}
-
-	err = k.checkPermission(ctx, uid, ptr.Of(req.SpaceID), nil, nil, nil)
-	if err != nil {
-		return dataset.NewDatasetDetailResponse(), err
-	}
-
-	datasetIDs, err = slices.TransformWithErrorCheck(req.GetDatasetIDs(), func(s string) (int64, error) {
-		id, err := strconv.ParseInt(s, 10, 64)
-		return id, err
-	})
-	if err != nil {
-		logs.CtxErrorf(ctx, "convert string ids failed, err: %v", err)
-		return dataset.NewDatasetDetailResponse(), err
-	}
-
-	domainResp, err := k.DomainSVC.ListKnowledge(ctx, &service.ListKnowledgeRequest{
-		IDs:     datasetIDs,
-		SpaceID: &req.SpaceID,
-		AppID:   &req.ProjectID,
-	})
-	if err != nil {
-		logs.CtxErrorf(ctx, "get knowledge failed, err: %v", err)
-		return dataset.NewDatasetDetailResponse(), err
-	}
-	knowledgeMap, err := batchConvertKnowledgeEntity2Model(ctx, domainResp.KnowledgeList)
-	if err != nil {
-		logs.CtxErrorf(ctx, "batch convert knowledge entity failed, err: %v", err)
-		return dataset.NewDatasetDetailResponse(), err
-	}
-	response := dataset.NewDatasetDetailResponse()
-	response.DatasetDetails = maps.TransformKey(knowledgeMap, func(key int64) string {
-		return strconv.FormatInt(key, 10)
-	})
-	return response, nil
+	return k.datasetDetailWithShared(ctx, req)
 }
 
 func (k *KnowledgeApplicationService) ListKnowledge(ctx context.Context, req *dataset.ListDatasetRequest) (*dataset.ListDatasetResponse, error) {
@@ -329,7 +289,7 @@ func (k *KnowledgeApplicationService) ListKnowledge(ctx context.Context, req *da
 		return dataset.NewListDatasetResponse(), err
 	}
 
-	if req.GetSpaceID() != 0 {
+	if req.GetSpaceID() != 0 && req.GetSpaceID() != systemresource.PublicSpaceID {
 		err = k.checkPermission(ctx, uid, ptr.Of(req.SpaceID), nil, nil, nil)
 		if err != nil {
 			return dataset.NewListDatasetResponse(), err
@@ -354,6 +314,31 @@ func (k *KnowledgeApplicationService) ListKnowledge(ctx context.Context, req *da
 		request.OrderType = ptr.Of(model.OrderTypeAsc)
 	}
 
+	if req.GetSpaceID() == systemresource.PublicSpaceID {
+		allowed, e := systemresource.IDs(ctx, systemresource.Knowledge)
+		if e != nil {
+			return nil, e
+		}
+		if len(request.IDs) > 0 {
+			set := map[int64]bool{}
+			for _, id := range allowed {
+				set[id] = true
+			}
+			filtered := []int64{}
+			for _, id := range request.IDs {
+				if set[id] {
+					filtered = append(filtered, id)
+				}
+			}
+			allowed = filtered
+		}
+		if len(allowed) == 0 {
+			return dataset.NewListDatasetResponse(), nil
+		}
+		request.IDs = allowed
+		request.SpaceID = nil
+		request.AppID = nil
+	}
 	domainResp, err := k.DomainSVC.ListKnowledge(ctx, request)
 	if err != nil {
 		logs.CtxErrorf(ctx, "mget knowledge failed, err: %v", err)
@@ -427,6 +412,9 @@ func (k *KnowledgeApplicationService) CreateDocument(ctx context.Context, req *d
 
 	uid, err := getUID(ctx, fromOpenAPI)
 	if err != nil {
+		return nil, err
+	}
+	if err = systemresource.ProtectWrite(ctx, systemresource.Knowledge, req.GetDatasetID(), *uid); err != nil {
 		return nil, err
 	}
 	listResp, err := k.DomainSVC.ListKnowledge(ctx, &service.ListKnowledgeRequest{IDs: []int64{req.GetDatasetID()}})
@@ -548,10 +536,20 @@ func (k *KnowledgeApplicationService) ListDocument(ctx context.Context, req *dat
 	resp.Total = int32(listResp.Total)
 	resp.DocumentInfos = make([]*dataset.DocumentInfo, 0)
 	for i := range documents {
-		if documents[i].CreatorID != *uid {
+		shared, e := systemresource.Published(ctx, systemresource.Knowledge, documents[i].KnowledgeID)
+		if e != nil {
+			return nil, e
+		}
+		if documents[i].CreatorID != *uid && !shared {
 			return dataset.NewListDocumentResponse(), errorx.New(errno.ErrKnowledgePermissionCode, errorx.KV("msg", "permission denied"))
 		}
-		resp.DocumentInfos = append(resp.DocumentInfos, convertDocument2Model(documents[i]))
+		visible := documents[i]
+		if shared && visible.CreatorID != *uid {
+			copy := *visible
+			copy.APISource = nil
+			visible = &copy
+		}
+		resp.DocumentInfos = append(resp.DocumentInfos, convertDocument2Model(visible))
 	}
 	return resp, nil
 }
@@ -626,6 +624,12 @@ func (k *KnowledgeApplicationService) UpdateDocument(ctx context.Context, req *d
 }
 
 func (k *KnowledgeApplicationService) checkPermission(ctx context.Context, uid *int64, spaceID *int64, documentIDs []int64, knowledgeID *int64, sliceIDs []int64) error {
+	if uid == nil {
+		return fmt.Errorf("请先登录平台")
+	}
+	if err := protectKnowledgeWrite(ctx, *uid, knowledgeID, documentIDs, sliceIDs); err != nil {
+		return err
+	}
 
 	rd := []*permission.ResourceIdentifier{}
 
@@ -693,7 +697,7 @@ func (k *KnowledgeApplicationService) GetDocumentProgress(ctx context.Context, r
 		logs.CtxErrorf(ctx, "convert string ids failed, err: %v", err)
 		return dataset.NewGetDocumentProgressResponse(), err
 	}
-	err = k.checkPermission(ctx, uid, nil, docIDs, nil, nil)
+	err = k.checkReadPermission(ctx, uid, nil, docIDs, nil, nil)
 	if err != nil {
 		return dataset.NewGetDocumentProgressResponse(), err
 	}
@@ -958,7 +962,7 @@ func (k *KnowledgeApplicationService) ListSlice(ctx context.Context, req *datase
 	}
 
 	if req.DatasetID != nil {
-		err := k.checkPermission(ctx, uid, nil, nil, ptr.Of(*req.DatasetID), nil)
+		err := k.checkReadPermission(ctx, uid, nil, nil, ptr.Of(*req.DatasetID), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -1120,7 +1124,7 @@ func (k *KnowledgeApplicationService) GetDocumentTableInfo(ctx context.Context, 
 		return nil, errorx.New(errno.ErrKnowledgePermissionCode, errorx.KV("msg", "session required"))
 	}
 	if req.GetDocumentID() > 0 {
-		err := k.checkPermission(ctx, uid, nil, []int64{req.GetDocumentID()}, nil, nil)
+		err := k.checkReadPermission(ctx, uid, nil, []int64{req.GetDocumentID()}, nil, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -1381,7 +1385,7 @@ func (k *KnowledgeApplicationService) ListPhoto(ctx context.Context, req *datase
 		return nil, errorx.New(errno.ErrKnowledgePermissionCode, errorx.KV("msg", "session required"))
 	}
 
-	err := k.checkPermission(ctx, uid, nil, nil, ptr.Of(req.GetDatasetID()), nil)
+	err := k.checkReadPermission(ctx, uid, nil, nil, ptr.Of(req.GetDatasetID()), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1463,7 +1467,7 @@ func (k *KnowledgeApplicationService) PhotoDetail(ctx context.Context, req *data
 		return nil, errorx.New(errno.ErrKnowledgePermissionCode, errorx.KV("msg", "session required"))
 	}
 
-	err := k.checkPermission(ctx, uid, nil, nil, ptr.Of(req.GetDatasetID()), nil)
+	err := k.checkReadPermission(ctx, uid, nil, nil, ptr.Of(req.GetDatasetID()), nil)
 	if err != nil {
 		return nil, err
 	}

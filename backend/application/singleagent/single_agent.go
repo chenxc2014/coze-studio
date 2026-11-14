@@ -19,6 +19,7 @@ package singleagent
 import (
 	"context"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"strconv"
 	"time"
 
@@ -264,6 +265,22 @@ func (s *SingleAgentApplicationService) BindDatabase(ctx context.Context, req *t
 	}
 
 	draftDatabase := draftRes.Databases[0]
+	shared, e := systemresource.Published(ctx, systemresource.Database, draftDatabase.ID)
+	if e != nil {
+		return nil, e
+	}
+	uid := ctxutil.GetUIDFromCtx(ctx)
+	if uid == nil {
+		return nil, fmt.Errorf("请先登录平台")
+	}
+	if !shared && draftDatabase.CreatorID != *uid {
+		return nil, fmt.Errorf("数据库不属于当前用户，且未发布为系统资源")
+	}
+	if shared {
+		copy := *draftDatabase
+		draftDatabase = &copy
+		draftDatabase.RwMode = table.BotTableRWMode_ReadOnly
+	}
 
 	fields := make([]*bot_common.FieldItem, 0, len(draftDatabase.FieldList))
 	for _, field := range draftDatabase.FieldList {

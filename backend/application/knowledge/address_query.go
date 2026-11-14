@@ -15,7 +15,7 @@ func (k *KnowledgeApplicationService) QueryAddress(ctx context.Context, req *ser
 	if uid == nil || req == nil {
 		return nil, &AddressPermissionError{}
 	}
-	if err := k.checkPermission(ctx, uid, nil, []int64{req.DocumentID}, nil, nil); err != nil {
+	if err := k.checkReadPermission(ctx, uid, nil, []int64{req.DocumentID}, nil, nil); err != nil {
 		return nil, &AddressPermissionError{}
 	}
 	return k.DomainSVC.QueryAddress(ctx, req)

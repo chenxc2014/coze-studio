@@ -221,6 +221,12 @@ const WorkflowFilter = forwardRef<
         });
       }
       tempList.push({
+        title: '资源库-系统',
+        icon: <IconCozKnowledgeFill className={s['tool-tag-list-cell-icon']} />,
+        testId: 'workflow.modal.search.option.system',
+        category: WorkflowCategory.System,
+      });
+      tempList.push({
         title: I18n.t('workflow_add_example'),
         icon: <IconCozKnowledgeFill className={s['tool-tag-list-cell-icon']} />,
         testId: 'workflow.modal.search.option.example',

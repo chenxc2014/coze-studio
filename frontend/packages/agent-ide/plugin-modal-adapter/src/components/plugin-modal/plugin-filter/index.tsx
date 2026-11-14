@@ -94,23 +94,39 @@ export const PluginFilter: React.FC<PluginFilterProps> = ({
         </div>
       ) : null}
 
-      {isShowStorePlugin ? (
+      {
         <>
           <UICompositionModalSider.Divider />
 
           <div className={s['tool-content-area']}>
             <div
+              data-testid="plugin.modal.filter.option.system"
               className={classNames(s['tool-tag-list-cell'], {
-                [s.active]: type === defaultId,
+                [s.active]: type === PluginFilterType.System,
               })}
-              onClick={() => onChangeAfterDiff(defaultId)}
+              onClick={() => onChangeAfterDiff(PluginFilterType.System)}
             >
               <IconCozDesktopFill className={s['tool-tag-list-cell-icon']} />
-              {I18n.t('explore_tools')}
+              资源库-系统
             </div>
           </div>
 
-          {enableSaaSPlugin ? (
+          {isShowStorePlugin ? (
+            <div className={s['tool-content-area']}>
+              <div
+                data-testid="plugin.modal.filter.option.search"
+                className={classNames(s['tool-tag-list-cell'], {
+                  [s.active]: type === defaultId,
+                })}
+                onClick={() => onChangeAfterDiff(defaultId)}
+              >
+                <IconCozDesktopFill className={s['tool-tag-list-cell-icon']} />
+                搜索工具
+              </div>
+            </div>
+          ) : null}
+
+          {enableSaaSPlugin && isShowStorePlugin ? (
             <div className={s['tool-content-area']}>
               <div
                 className={classNames(s['tool-tag-list-cell'], {
@@ -124,7 +140,7 @@ export const PluginFilter: React.FC<PluginFilterProps> = ({
             </div>
           ) : null}
         </>
-      ) : null}
+      }
     </div>
   );
 };

@@ -90,6 +90,7 @@ func (p *pluginServiceImpl) MGetVersionTools(ctx context.Context, versionTools [
 }
 
 func (p *pluginServiceImpl) ListPluginProducts(ctx context.Context, req *dto.ListPluginProductsRequest) (resp *dto.ListPluginProductsResponse, err error) {
+	// 搜索工具保留原有第三方目录，系统发布插件由独立选择器提供。
 	plugins := slices.Transform(pluginConf.GetAllPluginProducts(), func(p *pluginConf.PluginInfo) *entity.PluginInfo {
 		return entity.NewPluginInfo(p.Info)
 	})

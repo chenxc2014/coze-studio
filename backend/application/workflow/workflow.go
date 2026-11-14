@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"runtime/debug"
 	"strconv"
 	"strings"
@@ -308,6 +309,11 @@ func (w *ApplicationService) CreateWorkflow(ctx context.Context, req *workflow.C
 func (w *ApplicationService) SaveWorkflow(ctx context.Context, req *workflow.SaveWorkflowRequest) (
 	_ *workflow.SaveWorkflowResponse, err error,
 ) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Workflow, mustParseInt64(req.GetWorkflowID()), *uid); e != nil {
+			return nil, e
+		}
+	}
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			err = safego.NewPanicErr(panicErr, debug.Stack())
@@ -334,6 +340,11 @@ func (w *ApplicationService) SaveWorkflow(ctx context.Context, req *workflow.Sav
 func (w *ApplicationService) UpdateWorkflowMeta(ctx context.Context, req *workflow.UpdateWorkflowMetaRequest) (
 	_ *workflow.UpdateWorkflowMetaResponse, err error,
 ) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Workflow, mustParseInt64(req.GetWorkflowID()), *uid); e != nil {
+			return nil, e
+		}
+	}
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			err = safego.NewPanicErr(panicErr, debug.Stack())
@@ -376,6 +387,11 @@ func (w *ApplicationService) UpdateWorkflowMeta(ctx context.Context, req *workfl
 func (w *ApplicationService) DeleteWorkflow(ctx context.Context, req *workflow.DeleteWorkflowRequest) (
 	_ *workflow.DeleteWorkflowResponse, err error,
 ) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Workflow, mustParseInt64(req.GetWorkflowID()), *uid); e != nil {
+			return nil, e
+		}
+	}
 	_, err = w.BatchDeleteWorkflow(ctx, &workflow.BatchDeleteWorkflowRequest{
 		WorkflowIDList: []string{req.GetWorkflowID()},
 		SpaceID:        req.SpaceID,
@@ -394,6 +410,17 @@ func (w *ApplicationService) DeleteWorkflow(ctx context.Context, req *workflow.D
 }
 
 func (w *ApplicationService) deleteWorkflowResource(ctx context.Context, policy *vo.DeletePolicy) error {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		ids := policy.IDs
+		if policy.ID != nil {
+			ids = append(ids, *policy.ID)
+		}
+		for _, id := range ids {
+			if e := systemresource.ProtectWrite(ctx, systemresource.Workflow, id, *uid); e != nil {
+				return e
+			}
+		}
+	}
 	ids, err := GetWorkflowDomainSVC().Delete(ctx, policy)
 	if err != nil {
 		return err
@@ -530,6 +557,9 @@ func (w *ApplicationService) GetCanvasInfo(ctx context.Context, req *workflow.Ge
 }
 
 func (w *ApplicationService) TestRun(ctx context.Context, req *workflow.WorkFlowTestRunRequest) (_ *workflow.WorkFlowTestRunResponse, err error) {
+	if e := w.checkReadableWorkflows(ctx, []int64{mustParseInt64(req.GetWorkflowID())}); e != nil {
+		return nil, e
+	}
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			err = safego.NewPanicErr(panicErr, debug.Stack())
@@ -2161,6 +2191,11 @@ func (w *ApplicationService) QueryWorkflowNodeTypes(ctx context.Context, req *wo
 func (w *ApplicationService) PublishWorkflow(ctx context.Context, req *workflow.PublishWorkflowRequest) (
 	_ *workflow.PublishWorkflowResponse, err error,
 ) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Workflow, mustParseInt64(req.GetWorkflowID()), *uid); e != nil {
+			return nil, e
+		}
+	}
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			err = safego.NewPanicErr(panicErr, debug.Stack())
@@ -2219,7 +2254,7 @@ func (w *ApplicationService) ListWorkflow(ctx context.Context, req *workflow.Get
 		return nil, fmt.Errorf("the number of page or size must be greater than 0, and the size must be greater than 0 and less than 100")
 	}
 
-	if err := checkUserSpace(ctx, ctxutil.MustGetUIDFromCtx(ctx), mustParseInt64(req.GetSpaceID())); err != nil {
+	if err := checkUserSpace(ctx, ctxutil.MustGetUIDFromCtx(ctx), mustParseInt64(req.GetSpaceID())); err != nil && req.GetSpaceID() != strconv.FormatInt(systemresource.PublicSpaceID, 10) {
 		return nil, err
 	}
 
@@ -2273,6 +2308,20 @@ func (w *ApplicationService) ListWorkflow(ctx context.Context, req *workflow.Get
 	}
 	option.SpaceID = ptr.Of(spaceID)
 	option.DescByUpdate = true
+	if spaceID == systemresource.PublicSpaceID {
+		ids, e := systemresource.IDs(ctx, systemresource.Workflow)
+		if e != nil {
+			return nil, e
+		}
+		if len(ids) == 0 {
+			return &workflow.GetWorkFlowListResponse{Data: &workflow.WorkFlowListData{WorkflowList: []*workflow.Workflow{}, AuthList: []*workflow.ResourceAuthInfo{}}}, nil
+		}
+		option.IDs = ids
+		option.SpaceID = nil
+		option.AppID = nil
+		option.LibOnly = false
+		qType = workflowModel.FromLatestVersion
+	}
 
 	wfs, total, err := GetWorkflowDomainSVC().MGet(ctx, &vo.MGetPolicy{
 		MetaQuery: option,
@@ -2290,6 +2339,11 @@ func (w *ApplicationService) ListWorkflow(ctx context.Context, req *workflow.Get
 		},
 	}
 
+	if spaceID == systemresource.PublicSpaceID {
+		if e := w.usePublishedSystemWorkflows(ctx, wfs); e != nil {
+			return nil, e
+		}
+	}
 	wf2CreatorID := make(map[int64]string)
 	workflowList := make([]*workflow.Workflow, 0, len(wfs))
 	for _, w := range wfs {
@@ -2352,7 +2406,7 @@ func (w *ApplicationService) ListWorkflow(ctx context.Context, req *workflow.Get
 		auth := &workflow.ResourceAuthInfo{
 			WorkflowID: strconv.FormatInt(w.ID, 10),
 			UserID:     strconv.FormatInt(w.CreatorID, 10),
-			Auth:       &workflow.ResourceActionAuth{CanEdit: true, CanDelete: true, CanCopy: true},
+			Auth:       &workflow.ResourceActionAuth{CanEdit: spaceID != systemresource.PublicSpaceID, CanDelete: spaceID != systemresource.PublicSpaceID, CanCopy: spaceID != systemresource.PublicSpaceID},
 		}
 		workflowList = append(workflowList, ww)
 		response.Data.AuthList = append(response.Data.AuthList, auth)
@@ -2389,10 +2443,6 @@ func (w *ApplicationService) GetWorkflowDetail(ctx context.Context, req *workflo
 		}
 	}()
 
-	if err := checkUserSpace(ctx, ctxutil.MustGetUIDFromCtx(ctx), mustParseInt64(req.GetSpaceID())); err != nil {
-		return nil, err
-	}
-
 	ids, err := slices.TransformWithErrorCheck(req.GetWorkflowIds(), func(s string) (int64, error) {
 		wid, err := strconv.ParseInt(s, 10, 64)
 		if err != nil {
@@ -2404,6 +2454,9 @@ func (w *ApplicationService) GetWorkflowDetail(ctx context.Context, req *workflo
 		return nil, err
 	}
 
+	if e := w.checkReadableWorkflows(ctx, ids); e != nil {
+		return nil, e
+	}
 	if len(ids) == 0 {
 		return &vo.WorkflowDetailDataList{}, nil
 	}
@@ -2424,6 +2477,9 @@ func (w *ApplicationService) GetWorkflowDetail(ctx context.Context, req *workflo
 	}
 	inputs := make(map[string]any)
 	outputs := make(map[string]any)
+	if e := w.usePublishedSystemWorkflows(ctx, wfs); e != nil {
+		return nil, e
+	}
 	for _, wf := range wfs {
 		wfIDStr := strconv.FormatInt(wf.ID, 10)
 		wd := &workflow.WorkflowDetailData{
@@ -2485,10 +2541,6 @@ func (w *ApplicationService) GetWorkflowDetailInfo(ctx context.Context, req *wor
 		}
 	}()
 
-	if err := checkUserSpace(ctx, ctxutil.MustGetUIDFromCtx(ctx), mustParseInt64(req.GetSpaceID())); err != nil {
-		return nil, err
-	}
-
 	var (
 		draftIDs   []int64
 		versionIDs []int64
@@ -2508,6 +2560,9 @@ func (w *ApplicationService) GetWorkflowDetailInfo(ctx context.Context, req *wor
 		}
 	}
 
+	if e := w.checkReadableWorkflows(ctx, append(append([]int64{}, draftIDs...), versionIDs...)); e != nil {
+		return nil, e
+	}
 	if len(draftIDs)+len(versionIDs) == 0 {
 		return &vo.WorkflowDetailInfoDataList{}, nil
 	}
@@ -2546,6 +2601,9 @@ func (w *ApplicationService) GetWorkflowDetailInfo(ctx context.Context, req *wor
 	}
 	inputs := make(map[string]any)
 	outputs := make(map[string]any)
+	if e := w.usePublishedSystemWorkflows(ctx, wfs); e != nil {
+		return nil, e
+	}
 	for _, wf := range wfs {
 		wfIDStr := strconv.FormatInt(wf.ID, 10)
 		wd := &workflow.WorkflowDetailInfoData{

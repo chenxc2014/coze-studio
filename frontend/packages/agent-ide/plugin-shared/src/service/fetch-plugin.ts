@@ -33,7 +33,10 @@ import { ProductApi, PluginDevelopApi } from '@coze-arch/bot-api';
 
 import { type RequestServiceResp } from '../types/plugin-modal-types';
 import { type AuthMode } from '../types/auth-mode';
-import { DEFAULT_PAGE_SIZE } from '../constants/plugin-modal-constants';
+import {
+  DEFAULT_PAGE_SIZE,
+  PluginFilterType,
+} from '../constants/plugin-modal-constants';
 
 type ProductMetaInfo = public_api.ProductMetaInfo;
 type PluginExtraInfo = public_api.PluginExtraInfo;
@@ -305,10 +308,39 @@ async function getPluginFromProject(
   };
 }
 
+async function getSystemPlugins(
+  search: string,
+  page: number,
+): Promise<RequestServiceResp<PluginContentListItem>> {
+  const base = /^\/agent(?:\/|$)/.test(window.location.pathname)
+    ? '/agent'
+    : '';
+  const response = await fetch(
+    `${base}/api/system-library/plugins?${new URLSearchParams({ q: search || '', page: String(page || 1) })}`,
+    { credentials: 'same-origin' },
+  );
+  const result: {
+    code: number;
+    message?: string;
+    data?: { products?: ProductInfo[]; total?: number; has_more?: boolean };
+  } = await response.json();
+  if (!response.ok || result.code !== 0)
+    throw new Error(result.message || '无法读取系统插件');
+  return {
+    list: (result.data?.products || []).map(item =>
+      formatPluginProductInfo(item, page),
+    ),
+    total: result.data?.total || 0,
+    hasMore: result.data?.has_more || false,
+  };
+}
+
 // @ts-expect-error -- linter-disable-autofix
 export const fetchPlugin = (queryParams, commParams) => {
   const { isMine, isTeam, isFavorite, isProject } = commParams;
-  console.log('[div] params:', queryParams, commParams);
+  if (queryParams.type === PluginFilterType.System) {
+    return getSystemPlugins(queryParams.search, commParams.nextPage);
+  }
   if (isMine || isTeam) {
     return getPluginFromMinOrTeam(queryParams, commParams);
   } else if (isFavorite) {

@@ -28,4 +28,5 @@ export enum PluginFilterType {
   Project = 'project',
   Local = 'local',
   Coze = 'coze',
+  System = 'system',
 }

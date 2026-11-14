@@ -133,7 +133,10 @@ const WorkflowModalContent: FC<WorkFlowModalModeProps> = props => {
             : modalState.status;
       }
       updateWorkflowPageParam({
-        space_id: context.spaceId,
+        space_id:
+          modalState.workflowCategory === WorkflowCategory.System
+            ? '999999'
+            : context.spaceId,
         flow_mode: modalState.listFlowMode,
         name: modalState.query,
         order_by: modalState.isSpaceWorkflow ? context.orderBy : undefined,
@@ -372,7 +375,7 @@ const WorkflowModalContent: FC<WorkFlowModalModeProps> = props => {
                     }
                     workflowNodes={
                       isTypeWorkflow(item)
-                        ? workflowNodesMap[item.workflow_id || ''] ?? []
+                        ? (workflowNodesMap[item.workflow_id || ''] ?? [])
                         : []
                     }
                     handleDeleteWorkflow={handleDelete}

@@ -115,7 +115,7 @@ export const useSelectDatabaseModal = ({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [category, setCategory] = useState<'library' | 'project'>(
+  const [category, setCategory] = useState<'library' | 'project' | 'system'>(
     projectID ? 'project' : 'library',
   );
 
@@ -151,7 +151,7 @@ export const useSelectDatabaseModal = ({
     const res = await MemoryApi.ListDatabase({
       ...(category === 'project' ? { project_id: projectID } : {}),
       bot_id: enterFrom === 'bot' ? botId : '0',
-      space_id: spaceId,
+      space_id: category === 'system' ? '999999' : spaceId,
       table_type:
         enterFrom === 'bot' ? TableType.DraftTable : TableType.OnlineTable,
       table_name: key_word,
@@ -550,6 +550,11 @@ export const useSelectDatabaseModal = ({
                   setCategory('library');
                 }}
                 selected={category === 'library'}
+              />
+              <SiderCategory
+                label="资源库-系统"
+                selected={category === 'system'}
+                onClick={() => setCategory('system')}
               />
               {projectID ? (
                 <SiderCategory

@@ -19,6 +19,7 @@ package memory
 import (
 	"context"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 
 	"github.com/coze-dev/coze-studio/backend/api/model/base"
 	"github.com/coze-dev/coze-studio/backend/api/model/data/database/table"
@@ -63,6 +64,12 @@ func (d *DatabaseApplicationService) GetModeConfig(ctx context.Context, req *kno
 }
 
 func (d *DatabaseApplicationService) ListDatabase(ctx context.Context, req *table.ListDatabaseRequest) (*table.ListDatabaseResponse, error) {
+	if req.GetSpaceID() == systemresource.PublicSpaceID {
+		if ctxutil.GetUIDFromCtx(ctx) == nil {
+			return nil, fmt.Errorf("请先登录平台")
+		}
+		return d.listSystemDatabases(ctx, req)
+	}
 	uid := ctxutil.GetUIDFromCtx(ctx)
 	if uid == nil {
 		return nil, errorx.New(errno.ErrMemoryPermissionCode, errorx.KV("msg", "session required"))
@@ -132,8 +139,17 @@ func (d *DatabaseApplicationService) GetDatabaseByID(ctx context.Context, req *t
 		return nil, fmt.Errorf("database %d not found", req.GetID())
 	}
 
-	if res.Databases[0].CreatorID != *uid {
+	shared, e := systemresource.Published(ctx, systemresource.Database, res.Databases[0].ID)
+	if e != nil {
+		return nil, e
+	}
+	if res.Databases[0].CreatorID != *uid && !shared {
 		return nil, errorx.New(errno.ErrMemoryPermissionCode, errorx.KV("msg", "creator id is invalid"))
+	}
+	if shared {
+		copy := *res.Databases[0]
+		copy.RwMode = table.BotTableRWMode_ReadOnly
+		res.Databases[0] = &copy
 	}
 
 	return ConvertDatabaseRes(res.Databases[0]), nil
@@ -255,7 +271,7 @@ func (d *DatabaseApplicationService) ListDatabaseRecords(ctx context.Context, re
 	if req.GetBotID() > 0 {
 		tableType = table.TableType_DraftTable
 	}
-	err := d.ValidateAccess(ctx, req.DatabaseID, tableType)
+	err := d.ValidateReadAccess(ctx, req.DatabaseID, tableType)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +400,11 @@ func (d *DatabaseApplicationService) GetOnlineDatabaseId(ctx context.Context, re
 		return nil, fmt.Errorf("database %d not found", req.ID)
 	}
 
-	if res.Databases[0].CreatorID != *uid {
+	shared, e := systemresource.Published(ctx, systemresource.Database, res.Databases[0].ID)
+	if e != nil {
+		return nil, e
+	}
+	if res.Databases[0].CreatorID != *uid && !shared {
 		return nil, errorx.New(errno.ErrMemoryPermissionCode, errorx.KV("msg", "creator id is invalid"))
 	}
 
@@ -589,7 +609,14 @@ func (d *DatabaseApplicationService) GetBotDatabase(ctx context.Context, req *ta
 		return nil, err
 	}
 	for _, db := range resp.Databases {
-		if db.CreatorID != *uid {
+		shared, e := systemresource.Published(ctx, systemresource.Database, db.ID)
+		if e != nil {
+			return nil, e
+		}
+		if shared {
+			db.RwMode = table.BotTableRWMode_ReadOnly
+		}
+		if db.CreatorID != *uid && !shared {
 			return nil, errorx.New(errno.ErrMemoryPermissionCode, errorx.KV("msg", "creator id is invalid"))
 		}
 	}
@@ -803,6 +830,11 @@ func getDatabaseID(ctx context.Context, tableType table.TableType, onlineID int6
 }
 
 func (d *DatabaseApplicationService) ValidateAccess(ctx context.Context, databaseID int64, tableType table.TableType) error {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if err := systemresource.ProtectWrite(ctx, systemresource.Database, databaseID, *uid); err != nil {
+			return err
+		}
+	}
 	uid := ctxutil.GetUIDFromCtx(ctx)
 	if uid == nil {
 		return errorx.New(errno.ErrMemoryPermissionCode, errorx.KV("msg", "session uid not found"))

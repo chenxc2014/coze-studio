@@ -23,6 +23,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"math/rand"
 	"runtime/debug"
 	"strconv"
@@ -479,6 +480,9 @@ func (d databaseService) ListDatabase(ctx context.Context, req *ListDatabaseRequ
 }
 
 func (d databaseService) AddDatabaseRecord(ctx context.Context, req *AddDatabaseRecordRequest) error {
+	if err := systemresource.ProtectWrite(ctx, systemresource.Database, req.DatabaseID, req.UserID); err != nil {
+		return err
+	}
 	var tableInfo *entity2.Database
 	var err error
 
@@ -562,6 +566,9 @@ func (d databaseService) AddDatabaseRecord(ctx context.Context, req *AddDatabase
 }
 
 func (d databaseService) UpdateDatabaseRecord(ctx context.Context, req *UpdateDatabaseRecordRequest) error {
+	if err := systemresource.ProtectWrite(ctx, systemresource.Database, req.DatabaseID, req.UserID); err != nil {
+		return err
+	}
 	var tableInfo *database.Database
 	var err error
 
@@ -663,6 +670,9 @@ func (d databaseService) UpdateDatabaseRecord(ctx context.Context, req *UpdateDa
 }
 
 func (d databaseService) DeleteDatabaseRecord(ctx context.Context, req *DeleteDatabaseRecordRequest) error {
+	if err := systemresource.ProtectWrite(ctx, systemresource.Database, req.DatabaseID, req.UserID); err != nil {
+		return err
+	}
 	var tableInfo *entity2.Database
 	var err error
 
@@ -744,6 +754,15 @@ func (d databaseService) ListDatabaseRecord(ctx context.Context, req *ListDataba
 		return nil, fmt.Errorf("get table info failed: %v", err)
 	}
 
+	shared, e := systemresource.Published(ctx, systemresource.Database, req.DatabaseID)
+	if e != nil {
+		return nil, e
+	}
+	if shared {
+		copy := *tableInfo
+		tableInfo = &copy
+		tableInfo.RwMode = table.BotTableRWMode_ReadOnly
+	}
 	physicalTableName := tableInfo.ActualTableName
 	if physicalTableName == "" {
 		return nil, fmt.Errorf("physical table name is empty")
@@ -921,6 +940,30 @@ func createSecret(uid int64, fileType string) string {
 }
 
 func (d databaseService) ExecuteSQL(ctx context.Context, req *ExecuteSQLRequest) (*ExecuteSQLResponse, error) {
+	if err := systemresource.CheckActive(ctx, systemresource.Database, req.DatabaseID); err != nil {
+		return nil, err
+	}
+	shared, systemErr := systemresource.Published(ctx, systemresource.Database, req.DatabaseID)
+	if systemErr != nil {
+		return nil, systemErr
+	}
+	if shared {
+		if req.OperateType != database.OperateType_Select && req.OperateType != database.OperateType_Custom {
+			return nil, fmt.Errorf("系统数据库仅支持查询，禁止修改公共数据")
+		}
+		if req.OperateType == database.OperateType_Custom {
+			if req.SQL == nil {
+				return nil, fmt.Errorf("查询语句不能为空")
+			}
+			operation, e := sqlparser.New().GetSQLOperation(*req.SQL)
+			if e != nil {
+				return nil, e
+			}
+			if operation != sqlparsercontract.OperationTypeSelect {
+				return nil, fmt.Errorf("系统数据库仅支持 SELECT 查询")
+			}
+		}
+	}
 	var tableInfo *entity2.Database
 	var err error
 
@@ -934,12 +977,22 @@ func (d databaseService) ExecuteSQL(ctx context.Context, req *ExecuteSQLRequest)
 		return nil, fmt.Errorf("get table info failed: %v", err)
 	}
 
+	if shared && req.OperateType == database.OperateType_Custom {
+		if e := validateSystemSelect(*req.SQL, tableInfo.TableName); e != nil {
+			return nil, e
+		}
+	}
 	if tableInfo.RwMode == table.BotTableRWMode_ReadOnly &&
 		(req.OperateType == database.OperateType_Insert || req.OperateType == database.OperateType_Update ||
 			req.OperateType == database.OperateType_Delete) {
 		return nil, errorx.New(errno.ErrMemoryDatabaseCannotAddData)
 	}
 
+	if shared {
+		copy := *tableInfo
+		tableInfo = &copy
+		tableInfo.RwMode = table.BotTableRWMode_ReadOnly
+	}
 	physicalTableName := tableInfo.ActualTableName
 	if physicalTableName == "" {
 		return nil, fmt.Errorf("physical table name is empty")
@@ -1651,6 +1704,15 @@ func (d databaseService) PublishDatabase(ctx context.Context, req *PublishDataba
 
 	results := make([]*bot_common.Database, 0, len(onlineDatabaseResp.Databases))
 	for _, online := range onlineDatabaseResp.Databases {
+		shared, e := systemresource.Published(ctx, systemresource.Database, online.ID)
+		if e != nil {
+			return nil, e
+		}
+		if shared {
+			copy := *online
+			online = &copy
+			online.RwMode = table.BotTableRWMode_ReadOnly
+		}
 		fields := make([]*bot_common.FieldItem, 0, len(online.FieldList))
 		for _, field := range online.FieldList {
 			fields = append(fields, &bot_common.FieldItem{

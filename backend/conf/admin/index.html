@@ -126,7 +126,7 @@
         }
 
         .has-submenu.expanded .submenu {
-            max-height: 200px;
+            max-height: 480px;
         }
 
         .submenu-item {
@@ -410,6 +410,7 @@
     <script src="./app-base-path.js"></script>
     <link rel="stylesheet" href="./account-management.css?v=2">
     <link rel="stylesheet" href="./plugin-credentials.css?v=2">
+    <link rel="stylesheet" href="./system-library.css?v=1">
 </head>
 <body>
     <div class="admin-container">
@@ -451,6 +452,9 @@
                         </li>
                         <li class="submenu-item">
                             <a href="#" class="submenu-link" data-page="account-management"><span class="submenu-icon">👥</span>账号管理</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#" class="submenu-link" data-page="system-library"><span class="submenu-icon">▧</span>系统资源发布</a>
                         </li>
                         <li class="submenu-item">
                             <a href="#" class="submenu-link" data-page="plugin-credentials"><span class="submenu-icon">⚙</span>插件授权配置</a>
@@ -957,6 +961,7 @@
                 'model-management': { title: t('page.model.title'), desc: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), desc: t('page.knowledge.desc') },
                 'account-management': { title: '账号管理', desc: '统一维护平台账号与管理员身份' },
+                'system-library': { title: '系统资源发布', desc: '发布全平台共享的系统资源' },
                 'plugin-credentials': { title: '插件授权配置', desc: '统一维护常用插件的平台共用授权' },
             };
             const meta = map[hash] || { title: t('page.default.title'), desc: t('page.default.desc') };
@@ -1039,6 +1044,7 @@
                 'model-management': { title: t('page.model.title'), description: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') },
                 'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' },
+                'system-library': { title: '系统资源发布', description: '发布全平台共享的系统资源' },
                 'plugin-credentials': { title: '插件授权配置', description: '统一维护常用插件的平台共用授权' }
             };
 
@@ -1199,6 +1205,7 @@
                 'model-management': { title: t('page.model.title'), description: t('page.model.desc') },
                 'knowledge-config': { title: t('page.knowledge.title'), description: t('page.knowledge.desc') },
                 'account-management': { title: '账号管理', description: '统一维护平台账号与管理员身份' },
+                'system-library': { title: '系统资源发布', description: '发布全平台共享的系统资源' },
                 'plugin-credentials': { title: '插件授权配置', description: '统一维护常用插件的平台共用授权' }
             };
             
@@ -1231,6 +1238,7 @@
 
         // 显示页面内容
         function showPageContent(pageName, title) {
+            if (pageName === 'system-library') { window.renderSystemLibrary(document.getElementById('pageContent')); return; }
             if (pageName === 'plugin-credentials') {
                 window.loadPluginCredentialsPage();
                 return;
@@ -3493,5 +3501,6 @@
     </script>
     <script src="./account-management.js?v=2"></script>
     <script src="./plugin-credentials.js?v=1"></script>
+    <script src="./system-library.js?v=2"></script>
 </body>
 </html>

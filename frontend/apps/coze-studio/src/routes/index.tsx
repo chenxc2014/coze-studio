@@ -38,6 +38,7 @@ import {
   ProjectIDEPublish,
   Library,
   TaskCenter,
+  SystemLibrary,
   PluginLayout,
   PluginToolPage,
   PluginPage,
@@ -49,257 +50,269 @@ import {
 } from './async-components';
 
 export const router: ReturnType<typeof createBrowserRouter> =
-  createBrowserRouter([
-    // Document routing
-    {
-      path: '/open/docs/*',
-      Component: Redirect,
-      loader: () => ({
-        hasSider: false,
-        requireAuth: false,
-      }),
-    },
-    {
-      path: '/docs/*',
-      Component: Redirect,
-      loader: () => ({
-        hasSider: false,
-        requireAuth: false,
-      }),
-    },
-    {
-      path: '/information/auth/success',
-      Component: Redirect,
-      loader: () => ({
-        hasSider: false,
-        requireAuth: false,
-      }),
-    },
-    // main application route
-    {
-      path: '/',
-      Component: Layout,
-      errorElement: <GlobalError />,
-      children: [
-        {
-          index: true,
-          element: <Navigate to="/space" replace />,
-        },
-        // login page routing
-        {
-          path: 'sign',
-          Component: LoginPage,
-          errorElement: <GlobalError />,
-          loader: () => ({
-            hasSider: false,
-            requireAuth: false,
-          }),
-        },
+  createBrowserRouter(
+    [
+      // Document routing
+      {
+        path: '/open/docs/*',
+        Component: Redirect,
+        loader: () => ({
+          hasSider: false,
+          requireAuth: false,
+        }),
+      },
+      {
+        path: '/docs/*',
+        Component: Redirect,
+        loader: () => ({
+          hasSider: false,
+          requireAuth: false,
+        }),
+      },
+      {
+        path: '/information/auth/success',
+        Component: Redirect,
+        loader: () => ({
+          hasSider: false,
+          requireAuth: false,
+        }),
+      },
+      // main application route
+      {
+        path: '/',
+        Component: Layout,
+        errorElement: <GlobalError />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/space" replace />,
+          },
+          // login page routing
+          {
+            path: 'sign',
+            Component: LoginPage,
+            errorElement: <GlobalError />,
+            loader: () => ({
+              hasSider: false,
+              requireAuth: false,
+            }),
+          },
 
-        // Workspace Routing
-        {
-          path: 'space',
-          Component: SpaceLayout,
-          loader: () => ({
-            hasSider: true,
-            requireAuth: true,
-            subMenu: spaceSubMenu,
-            menuKey: BaseEnum.Space,
-          }),
-          children: [
-            {
-              path: ':space_id',
-              Component: SpaceIdLayout,
-              children: [
-                {
-                  index: true,
-                  element: <Navigate to="develop" replace />,
-                },
+          // Workspace Routing
+          {
+            path: 'space',
+            Component: SpaceLayout,
+            loader: () => ({
+              hasSider: true,
+              requireAuth: true,
+              subMenu: spaceSubMenu,
+              menuKey: BaseEnum.Space,
+            }),
+            children: [
+              {
+                path: ':space_id',
+                Component: SpaceIdLayout,
+                children: [
+                  {
+                    index: true,
+                    element: <Navigate to="develop" replace />,
+                  },
 
-                // Project Development
-                {
-                  path: 'develop',
-                  Component: Develop,
-                  loader: () => ({
-                    subMenuKey: SpaceSubModuleEnum.DEVELOP,
-                  }),
-                },
+                  // Project Development
+                  {
+                    path: 'develop',
+                    Component: Develop,
+                    loader: () => ({
+                      subMenuKey: SpaceSubModuleEnum.DEVELOP,
+                    }),
+                  },
 
-                // Agent IDE
-                {
-                  path: 'bot/:bot_id',
-                  Component: AgentIDELayout,
-                  children: [
-                    {
-                      index: true,
-                      Component: AgentIDE,
-                    },
-                    {
-                      path: 'publish',
-                      children: [
-                        {
-                          index: true,
-                          Component: AgentPublishPage,
-                          loader: () => ({
-                            hasSider: false,
-                            requireBotEditorInit: false,
-                            pageName: 'publish',
-                          }),
-                        },
-                      ],
-                    },
-                  ],
-                  loader: () => ({
-                    hasSider: false,
-                    showMobileTips: true,
-                    requireBotEditorInit: true,
-                    pageName: 'bot',
-                  }),
-                },
+                  // Agent IDE
+                  {
+                    path: 'bot/:bot_id',
+                    Component: AgentIDELayout,
+                    children: [
+                      {
+                        index: true,
+                        Component: AgentIDE,
+                      },
+                      {
+                        path: 'publish',
+                        children: [
+                          {
+                            index: true,
+                            Component: AgentPublishPage,
+                            loader: () => ({
+                              hasSider: false,
+                              requireBotEditorInit: false,
+                              pageName: 'publish',
+                            }),
+                          },
+                        ],
+                      },
+                    ],
+                    loader: () => ({
+                      hasSider: false,
+                      showMobileTips: true,
+                      requireBotEditorInit: true,
+                      pageName: 'bot',
+                    }),
+                  },
 
-                // Project IDE
-                {
-                  path: 'project-ide/:project_id/publish',
-                  loader: () => ({
-                    hasSider: false,
-                  }),
-                  Component: ProjectIDEPublish,
-                },
-                {
-                  path: 'project-ide/:project_id/*',
-                  Component: ProjectIDE,
-                  loader: () => ({
-                    hasSider: false,
-                  }),
-                },
+                  // Project IDE
+                  {
+                    path: 'project-ide/:project_id/publish',
+                    loader: () => ({
+                      hasSider: false,
+                    }),
+                    Component: ProjectIDEPublish,
+                  },
+                  {
+                    path: 'project-ide/:project_id/*',
+                    Component: ProjectIDE,
+                    loader: () => ({
+                      hasSider: false,
+                    }),
+                  },
 
-                // resource library
-                {
-                  path: 'library',
-                  Component: Library,
-                  loader: () => ({
-                    subMenuKey: SpaceSubModuleEnum.LIBRARY,
-                  }),
-                },
+                  // resource library
+                  {
+                    path: 'library',
+                    Component: Library,
+                    loader: () => ({
+                      subMenuKey: SpaceSubModuleEnum.LIBRARY,
+                    }),
+                  },
 
-                // 任务中心
-                {
-                  path: 'tasks',
-                  Component: TaskCenter,
-                  loader: () => ({ subMenuKey: SpaceSubModuleEnum.TASKS }),
-                },
+                  // 全平台共享的只读系统资源目录
+                  {
+                    path: 'system-library',
+                    Component: SystemLibrary,
+                    loader: () => ({
+                      subMenuKey: SpaceSubModuleEnum.SYSTEM_LIBRARY,
+                    }),
+                  },
 
-                // Knowledge Base Resources
-                {
-                  path: 'knowledge',
-                  children: [
-                    {
-                      path: ':dataset_id',
-                      element: <KnowledgePreview />,
-                    },
-                    {
-                      path: ':dataset_id/upload',
-                      element: <KnowledgeUpload />,
-                    },
-                  ],
-                  loader: () => ({
-                    pageModeByQuery: true,
-                  }),
-                },
+                  // 任务中心
+                  {
+                    path: 'tasks',
+                    Component: TaskCenter,
+                    loader: () => ({ subMenuKey: SpaceSubModuleEnum.TASKS }),
+                  },
 
-                // database resources
-                {
-                  path: 'database',
-                  children: [
-                    {
-                      path: ':table_id',
-                      element: <DatabaseDetail />,
-                    },
-                  ],
-                  loader: () => ({
-                    showMobileTips: true,
-                    pageModeByQuery: true,
-                  }),
-                },
+                  // Knowledge Base Resources
+                  {
+                    path: 'knowledge',
+                    children: [
+                      {
+                        path: ':dataset_id',
+                        element: <KnowledgePreview />,
+                      },
+                      {
+                        path: ':dataset_id/upload',
+                        element: <KnowledgeUpload />,
+                      },
+                    ],
+                    loader: () => ({
+                      pageModeByQuery: true,
+                    }),
+                  },
 
-                // plugin resources
-                {
-                  path: 'plugin/:plugin_id',
-                  Component: PluginLayout,
-                  children: [
-                    {
-                      index: true,
-                      Component: PluginPage,
-                    },
-                    {
-                      path: 'tool/:tool_id',
-                      children: [
-                        {
-                          index: true,
-                          Component: PluginToolPage,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+                  // database resources
+                  {
+                    path: 'database',
+                    children: [
+                      {
+                        path: ':table_id',
+                        element: <DatabaseDetail />,
+                      },
+                    ],
+                    loader: () => ({
+                      showMobileTips: true,
+                      pageModeByQuery: true,
+                    }),
+                  },
 
-        // workflow routing
-        {
-          path: 'work_flow',
-          Component: WorkflowPage,
-          loader: () => ({
-            hasSider: false,
-            requireAuth: true,
-          }),
-        },
+                  // plugin resources
+                  {
+                    path: 'plugin/:plugin_id',
+                    Component: PluginLayout,
+                    children: [
+                      {
+                        index: true,
+                        Component: PluginPage,
+                      },
+                      {
+                        path: 'tool/:tool_id',
+                        children: [
+                          {
+                            index: true,
+                            Component: PluginToolPage,
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
 
-        // search
-        {
-          path: 'search/:word',
-          Component: SearchPage,
-          loader: () => ({
-            hasSider: true,
-            requireAuth: true,
-          }),
-        },
+          // workflow routing
+          {
+            path: 'work_flow',
+            Component: WorkflowPage,
+            loader: () => ({
+              hasSider: false,
+              requireAuth: true,
+            }),
+          },
 
-        // explore
-        {
-          path: 'explore',
-          Component: null,
-          loader: () => ({
-            hasSider: true,
-            requireAuth: true,
-            subMenu: exploreSubMenu,
-            menuKey: BaseEnum.Explore,
-          }),
-          children: [
-            {
-              index: true,
-              element: <Navigate to="plugin" replace />,
-            },
-            // plugin store
-            {
-              path: 'plugin',
-              element: <ExplorePluginPage />,
-              loader: () => ({
-                type: 'plugin',
-              }),
-            },
-            // template
-            {
-              path: 'template',
-              element: <ExploreTemplatePage />,
-              loader: () => ({
-                type: 'template',
-              }),
-            },
-          ],
-        },
-      ],
-    },
-  ], { basename: getAppBasePath() || '/' });
+          // search
+          {
+            path: 'search/:word',
+            Component: SearchPage,
+            loader: () => ({
+              hasSider: true,
+              requireAuth: true,
+            }),
+          },
+
+          // explore
+          {
+            path: 'explore',
+            Component: null,
+            loader: () => ({
+              hasSider: true,
+              requireAuth: true,
+              subMenu: exploreSubMenu,
+              menuKey: BaseEnum.Explore,
+            }),
+            children: [
+              {
+                index: true,
+                element: <Navigate to="plugin" replace />,
+              },
+              // plugin store
+              {
+                path: 'plugin',
+                element: <ExplorePluginPage />,
+                loader: () => ({
+                  type: 'plugin',
+                }),
+              },
+              // template
+              {
+                path: 'template',
+                element: <ExploreTemplatePage />,
+                loader: () => ({
+                  type: 'template',
+                }),
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    { basename: getAppBasePath() || '/' },
+  );

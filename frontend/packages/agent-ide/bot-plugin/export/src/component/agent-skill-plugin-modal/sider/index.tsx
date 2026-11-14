@@ -21,7 +21,11 @@ import { UISearch } from '@coze-studio/components';
 import { I18n } from '@coze-arch/i18n';
 import { useSpaceStore } from '@coze-arch/bot-studio-store';
 import { UIButton, UICompositionModalSider } from '@coze-arch/bot-semi';
-import { From, type PluginQuery } from '@coze-agent-ide/plugin-shared';
+import {
+  From,
+  PluginFilterType,
+  type PluginQuery,
+} from '@coze-agent-ide/plugin-shared';
 import { PluginFilter } from '@coze-agent-ide/plugin-modal-adapter';
 
 import { CreateFormPluginModal } from '../../bot_edit';
@@ -96,7 +100,7 @@ export const PluginModalSider: FC<PluginModalSiderProp> = ({
             placeholder={I18n.t('Search')}
             data-testid="plugin.modal.search"
           />
-          {hideCreateBtn ? null : (
+          {hideCreateBtn || query.type === PluginFilterType.System ? null : (
             <UIButton
               data-testid="plugin.modal.create.plugin"
               className={s.addbtn}

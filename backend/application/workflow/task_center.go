@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"strconv"
 	"strings"
 
@@ -50,7 +51,11 @@ func (w *ApplicationService) TaskWorkflows(ctx context.Context, actor, space int
 		LatestVersion string
 		AppID         *int64
 	}{}
-	q := w.taskDB.WithContext(ctx).Table("workflow_meta").Select("id,name,latest_version,app_id").Where("space_id = ? AND mode = 0 AND latest_version <> '' AND deleted_at IS NULL", space)
+	sharedIDs, err := systemresource.IDs(ctx, systemresource.Workflow)
+	if err != nil {
+		return nil, err
+	}
+	q := w.taskDB.WithContext(ctx).Table("workflow_meta").Select("id,name,latest_version,app_id").Where("(space_id = ? OR id IN ?) AND mode = 0 AND latest_version <> '' AND deleted_at IS NULL", space, sharedIDs)
 	if query != "" {
 		q = q.Where("name LIKE ?", "%"+query+"%")
 	}
@@ -59,6 +64,11 @@ func (w *ApplicationService) TaskWorkflows(ctx context.Context, actor, space int
 	}
 	result := make([]*taskcenter.Workflow, 0, len(rows))
 	for _, row := range rows {
+		if publication, e := systemresource.Default().Lookup(ctx, systemresource.Workflow, row.ID); e != nil {
+			return nil, e
+		} else if publication != nil && publication.Status == "published" {
+			row.LatestVersion = publication.Version
+		}
 		result = append(result, &taskcenter.Workflow{ID: row.ID, Name: row.Name, Version: row.LatestVersion, AppID: row.AppID})
 	}
 	return result, nil
@@ -68,8 +78,13 @@ func (r *taskRunner) Resolve(ctx context.Context, actor, space, id int64, versio
 	if e := r.service.TaskSpaceAccess(ctx, actor, space); e != nil {
 		return nil, e
 	}
+	publication, e := systemresource.Default().Lookup(ctx, systemresource.Workflow, id)
+	if e != nil {
+		return nil, e
+	}
+	shared := publication != nil && publication.Status == "published"
 	meta, e := r.service.DomainSVC.Get(ctx, &vo.GetPolicy{ID: id, MetaOnly: true})
-	if e != nil || meta == nil || meta.Meta == nil || meta.SpaceID != space {
+	if e != nil || meta == nil || meta.Meta == nil || (meta.SpaceID != space && !shared) {
 		return nil, &taskcenter.Error{Status: 404, Message: "工作流不存在或不在当前空间"}
 	}
 	if int(meta.Mode) != 0 {
@@ -80,6 +95,19 @@ func (r *taskRunner) Resolve(ctx context.Context, actor, space, id int64, versio
 	}
 	if version == "" {
 		version = *meta.LatestPublishedVersion
+		if shared {
+			version = publication.Version
+		}
+	}
+	if shared && version != publication.Version {
+		var approved int64
+		e = systemresource.Default().DB.WithContext(ctx).Model(&systemresource.Release{}).Where("kind = ? AND resource_id = ? AND status = ? AND version = ?", systemresource.Workflow, id, "published", version).Count(&approved).Error
+		if e != nil {
+			return nil, e
+		}
+		if approved == 0 {
+			return nil, &taskcenter.Error{Status: 400, Message: "该版本尚未发布为系统资源"}
+		}
 	}
 	if len(version) > 128 {
 		return nil, &taskcenter.Error{Status: 400, Message: "版本不正确"}
@@ -119,7 +147,11 @@ func (r *taskRunner) Resolve(ctx context.Context, actor, space, id int64, versio
 		seen[field.Name] = true
 	}
 	versions := []string{}
-	if e = r.db.WithContext(ctx).Table("workflow_version").Where("workflow_id = ? AND deleted_at IS NULL", id).Order("created_at DESC,id DESC").Limit(100).Pluck("version", &versions).Error; e != nil {
+	versionQuery := r.db.WithContext(ctx).Table("workflow_version").Where("workflow_id = ? AND deleted_at IS NULL", id).Order("created_at DESC,id DESC").Limit(100)
+	if shared {
+		versionQuery = systemresource.Default().DB.WithContext(ctx).Model(&systemresource.Release{}).Where("kind = ? AND resource_id = ? AND status = ?", systemresource.Workflow, id, "published").Group("version").Order("MAX(created_at) DESC").Limit(100)
+	}
+	if e = versionQuery.Pluck("version", &versions).Error; e != nil {
 		return nil, e
 	}
 	return &taskcenter.Workflow{ID: id, Name: meta.Name, Version: version, AppID: meta.AppID, Fields: fields, Versions: versions}, nil
@@ -133,13 +165,18 @@ func (r *taskRunner) Execute(ctx context.Context, task *taskcenter.Task, input m
 		}
 	}()
 	// 每条执行独立初始化用户上下文，避免后台不同创建者的身份互相覆盖。
+	ctx = systemresource.PinVersion(ctx)
 	ctx = ctxcache.Init(ctx)
 	ctxcache.Store(ctx, consts.SessionDataKeyInCtx, &userEntity.Session{UserID: task.OwnerID, Locale: "zh-CN"})
 	if err = r.service.TaskSpaceAccess(ctx, task.OwnerID, task.SpaceID); err != nil {
 		return result, err
 	}
 	meta, err := r.service.DomainSVC.Get(ctx, &vo.GetPolicy{ID: task.WorkflowID, MetaOnly: true})
-	if err != nil || meta == nil || meta.SpaceID != task.SpaceID {
+	shared, lookupErr := systemresource.Published(ctx, systemresource.Workflow, task.WorkflowID)
+	if lookupErr != nil {
+		return result, lookupErr
+	}
+	if err != nil || meta == nil || (meta.SpaceID != task.SpaceID && !shared) {
 		return result, fmt.Errorf("工作流已删除或访问权限已变更")
 	}
 	exe, _, err := r.service.DomainSVC.SyncExecute(ctx, model.ExecuteConfig{ID: task.WorkflowID, From: model.FromSpecificVersion, Version: task.Version, Operator: task.OwnerID, Mode: model.ExecuteModeRelease, TaskType: model.TaskTypeBackground, SyncPattern: model.SyncPatternSync, InputFailFast: true, Cancellable: true, ConnectorID: consts.CozeConnectorID, ConnectorUID: strconv.FormatInt(task.OwnerID, 10), BizType: model.BizTypeWorkflow}, input)

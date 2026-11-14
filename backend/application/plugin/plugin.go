@@ -18,6 +18,7 @@ package plugin
 
 import (
 	"context"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"strconv"
 	"strings"
 	"time"
@@ -192,7 +193,12 @@ func (p *PluginApplicationService) buildProductMetaInfo(ctx context.Context, plu
 	}
 
 	return &productAPI.ProductMetaInfo{
-		ID:          plugin.GetRefProductID(),
+		ID: func() int64 {
+			if id := plugin.GetRefProductID(); id != 0 {
+				return id
+			}
+			return plugin.ID
+		}(),
 		EntityID:    plugin.ID,
 		EntityType:  productCommon.ProductEntityType_Plugin,
 		IconURL:     iconURL,
@@ -240,6 +246,11 @@ func (p *PluginApplicationService) buildPluginProductExtraInfo(ctx context.Conte
 		}
 
 		example := plugin.GetToolExample(ctx, tl.GetName())
+		if shared, e := systemresource.Published(ctx, systemresource.Plugin, plugin.ID); e != nil {
+			return nil, e
+		} else if shared {
+			example = nil
+		}
 		if example != nil {
 			toolInfo.Example = &productAPI.PluginToolExample{
 				ReqExample:  example.RequestExample,
@@ -275,6 +286,9 @@ func (p *PluginApplicationService) buildPluginProductExtraInfo(ctx context.Conte
 }
 
 func (p *PluginApplicationService) PublicGetProductDetail(ctx context.Context, req *productAPI.GetProductDetailRequest) (resp *productAPI.GetProductDetailResponse, err error) {
+	if e := systemresource.CheckActive(ctx, systemresource.Plugin, req.GetEntityID()); e != nil {
+		return nil, e
+	}
 	plugin, exist, err := p.pluginRepo.GetOnlinePlugin(ctx, req.GetEntityID())
 	if err != nil {
 		return nil, errorx.Wrapf(err, "GetOnlinePlugin failed, pluginID=%d", req.GetEntityID())
@@ -303,6 +317,11 @@ func (p *PluginApplicationService) PublicGetProductDetail(ctx context.Context, r
 }
 
 func (p *PluginApplicationService) validateDraftPluginAccess(ctx context.Context, pluginID int64) (plugin *entity.PluginInfo, err error) {
+	if uid := ctxutil.GetUIDFromCtx(ctx); uid != nil {
+		if e := systemresource.ProtectWrite(ctx, systemresource.Plugin, pluginID, *uid); e != nil {
+			return nil, e
+		}
+	}
 	uid := ctxutil.GetUIDFromCtx(ctx)
 	if uid == nil {
 		return nil, errorx.New(errno.ErrPluginPermissionCode, errorx.KV(errno.PluginMsgKey, "session is required"))

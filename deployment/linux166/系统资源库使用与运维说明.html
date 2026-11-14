@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="1998270ceec6ca61605e5c5860ae14b2fc1b153331911c67e08bb0ee323b7e91"><title>系统资源库使用与运维说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">功能与共享方式</a></li>
+<li><a href="#_2">管理员开发与发布</a></li>
+<li><a href="#_3">更新、下架与已有引用</a></li>
+<li><a href="#_4">数据库与执行权限</a></li>
+<li><a href="#_5">数据表与部署</a></li>
+<li><a href="#_6">备份、回退与故障排查</a></li>
+<li><a href="#_7">本次验收结果</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：系统资源库使用与运维说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>系统资源库使用与运维说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="系统资源库使用与运维说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-14。适用于本仓库的 Coze Studio 定制版本。</p>
+<p>平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。普通用户进入工作空间左侧的“资源库-系统”；管理员进入 <code>/agent/admin/#system-library</code> 的“系统资源发布”。</p>
+<h2 id="_1">功能与共享方式</h2>
+<p>系统资源库只展示平台提供、经维护者预览调试确认可直接使用、无需厂商额外授权的插件、工作流、提示词、知识库、数据库。普通用户可以搜索、按类型筛选、分页和查看使用说明，不提供创建、编辑、删除系统原件的入口。系统资源使用原资源 ID 共享引用，不为每个用户复制一份。</p>
+<p>添加插件窗口同时保留两个独立入口：“搜索工具”提供原有第三方工具；“资源库-系统”只提供平台发布的系统插件。二者使用不同接口与数据来源，系统目录不再自动读入第三方工具。即使管理员已为高德地图等工具配置共用密钥，这些工具仍属于“搜索工具”，不因此成为免额外授权的系统资源。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>使用方式</th>
+<th>更新行为与限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>插件</td>
+<td>智能体或工作流的插件选择窗口选择独立的“资源库-系统”入口</td>
+<td>平台开发、完成调试并发布的工具，无需用户另行申请 API Key 或 OAuth 授权</td>
+</tr>
+<tr>
+<td>工作流</td>
+<td>工作流选择窗口选择“资源库-系统”，也可用于任务中心</td>
+<td>普通引用执行管理员当前公开版本；任务中心保留任务创建时固定的已公开版本</td>
+</tr>
+<tr>
+<td>提示词</td>
+<td>提示词库中选择“资源库-系统”，或从详情复制内容</td>
+<td>公开发布时的内容快照；可修改自己编辑器中的内容，不能修改系统原件</td>
+</tr>
+<tr>
+<td>知识库</td>
+<td>添加知识库窗口切换“资源库-系统”</td>
+<td>引用同一个知识库，查询源数据的最新可用内容，普通用户不能上传、改切片或删除原件</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td>添加数据库窗口切换“资源库-系统”</td>
+<td>同一张公共表只读查询，不能修改表结构或数据；SQL 限制为当前授权逻辑表的 SELECT</td>
+</tr>
+</tbody>
+</table>
+<p>所有已发布系统资源对平台上的所有登录用户、所有空间和项目开放。用户自己的资源仍保留原有权限，不会因为新增此模块自动公开。原有未发布的工作流示例模板继续沿用原模板流程，不自动成为可执行的系统资源。</p>
+<h2 id="_2">管理员开发与发布</h2>
+<ol>
+<li>使用管理员账号在自己的资源库开发、维护资源。应用或项目内部的资源应先移入资源库，防止删除应用时级联删除系统资源原件。</li>
+<li>工作流先保存并发布一个有效版本；插件先完成工具调试和原生插件发布，认证类型必须为无需认证。知识库须已有文档且全部处理完成，数据库先准备好公共查询数据。工作流依赖的插件、子工作流、知识库或数据库须先发布为系统资源。</li>
+<li>打开后台“系统资源发布”，选择类型，粘贴资源 ID 或详情页地址，点击“读取并预览”。详情地址仅在浏览器提取 ID，不由服务端访问该地址。</li>
+<li>核对资源名称、版本和使用说明。同时确认“资源及数据可向全平台用户公开共享”和“已完成预览调试、资源及全部依赖可直接使用且无需厂商额外授权”，两项均勾选后才允许发布。</li>
+<li>普通用户刷新“资源库-系统”或相应资源选择窗口即可使用。不会移动原件，也不会自动修改已有智能体的绑定。</li>
+</ol>
+<p>发布源限当前管理员本人维护、位于资源库的资源；平台原生内置资源另行识别。普通账号即使直接调用后台发布接口也无权发布。发布与下架带修订号检查，并发操作冲突后需要刷新重试。</p>
+<p>原搜索工具目录中的插件不能直接发布为系统资源。自建插件若声明 API Key、服务令牌、OAuth 等认证方式，服务端同样拒绝发布。维护者须验证实际可用性及全部运行依赖；静态认证类型检查不能代替对任意 HTTP 接口、脚本业务逻辑、网络和平台模型配置的真实调试。</p>
+<p>发布知识库、数据库意味着其中数据向全平台用户开放查询，请在确认前完成数据范围核对。目录元数据不包含插件凭据、数据库连接串和请求默认值；共享知识库文档列表不向非所有者返回 API 数据源地址。</p>
+<h2 id="_3">更新、下架与已有引用</h2>
+<p>维护完成后在后台重新预览并更新发布。工作流的源草稿保存不会直接公开给其他用户；先原生发布版本，再更新系统资源发布记录。提示词同样需要重新发布才更新公开内容快照。</p>
+<p>知识库和数据库共享源数据，源数据变化会影响后续查询。插件按原生已发布工具执行，变更参数前应核对已有引用。工作流的输入输出结构、数据库字段等变更也应先验证兼容性。</p>
+<p>下架保留源资源和发布历史，普通目录隐藏该资源，旧共享引用在读取或执行时不再具有公共授权。用户已插入自己编辑器的提示词文本属于自己的内容，不会远程撤回。重新发布可以恢复共享。</p>
+<p>源所有者仍为管理员时，可以在下架期间调试插件原件。普通共享调用只执行已发布工具，不会使用管理员尚未发布的插件草稿。</p>
+<p>系统原件的维护还要求源所有者仍具有管理员身份。账号降为普通用户后，不能继续维护其已发布的系统原件；恢复管理员或实施经过审查的资源归属迁移后再维护。</p>
+<h2 id="_4">数据库与执行权限</h2>
+<p>公共数据库在选择列表、绑定智能体和查询阶段均按只读处理。服务端拒绝公共表的新增、更新和删除；工作流 SQL 查询逐个检查语法树中的表名，拒绝跨表、跨库、写入、多语句、文件导出、加锁、会话变量及不支持的函数。公共数据查询不会再按引用者的用户 ID 隔离，以便所有用户读取已明确公开的数据。</p>
+<p>系统资源由平台统一提供运行能力，不要求使用者为资源另行申请厂商授权。平台已有的模型、Embedding、网络等服务配置仍由运维维护。需要厂商授权的第三方工具继续在“搜索工具”中选择和配置，不混入系统目录。调整目录来源不删除第三方插件、不清除已有密钥，也不更改用户已有智能体的工具绑定。</p>
+<h2 id="_5">数据表与部署</h2>
+<p>新增独立表 <code>system_resource_publications</code> 和 <code>system_resource_releases</code>，分别保存当前公开状态与修订历史。源资源仍保存在原有领域数据表，不复制知识数据或数据库记录。</p>
+<p>迁移脚本为 <code>deployment/linux166/scripts/system-library-schema.sql</code>。发布前先执行两条 <code>CREATE TABLE IF NOT EXISTS</code>；应用启动仅检查表是否存在，不自动执行 DDL。没有完成迁移时，发布接口不应作为可用服务开放。</p>
+<p>发布产物、构建缓存、备份继续使用 <code>/home/coze</code>。部署前运行 <code>/home/coze/ops/capacity.py --guard</code>；根分区至少保留 15 GiB，<code>/home</code> 至少保留 25 GiB，并遵循现有使用率守卫。服务重建前确认知识库消息队列及任务中心没有正在运行的作业。</p>
+<p>单项公开元数据最大 512 KiB；登记最多 5000 项；当前元数据与修订历史合计上限 256 MiB。配额只约束系统资源元数据，不代表知识库、数据库、模型、日志和 Docker 镜像总空间。历史不自动删除，达到配额时由管理员按保留要求先归档。</p>
+<p>必须保留现有 <code>/agent/</code> 路径适配、Nginx 启动配置、插件凭据密钥只读挂载和 Embedding 工作进程配置。新增模块不要求更换向量模型、维度或重建已有知识索引。</p>
+<h2 id="_6">备份、回退与故障排查</h2>
+<p>沿用 <code>/home/coze/ops/backup.py</code> 的元数据库与插件凭据密钥配对备份。部署另备份 Compose 和本次涉及的后台静态文件。回退到旧镜像、旧前端目录及旧后台文件时保留新增发布表，不用旧数据库覆盖部署后产生的用户数据。</p>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>检查位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>后台不能预览资源</td>
+<td>类型与 ID 是否正确、当前管理员是否为源所有者、资源是否位于资源库、插件或工作流是否完成原生发布</td>
+</tr>
+<tr>
+<td>普通目录看不到资源</td>
+<td>是否已发布为系统资源，是否被下架，类型与搜索条件是否正确</td>
+</tr>
+<tr>
+<td>共享工作流没有更新</td>
+<td>是否先发布源工作流新版本并更新系统发布记录；任务中心是否固定旧版本</td>
+</tr>
+<tr>
+<td>系统插件调用失败</td>
+<td>先检查平台服务、工具入参和维护者调试记录；如依赖额外厂商授权，应下架并修正资源，不让普通用户补授权</td>
+</tr>
+<tr>
+<td>数据库查询被拒绝</td>
+<td>是否使用当前逻辑表的只读查询，是否包含跨表、写入或不支持的函数</td>
+</tr>
+<tr>
+<td>发布提示修订冲突</td>
+<td>刷新并重新预览，避免覆盖另一个维护操作</td>
+</tr>
+<tr>
+<td>发布提示容量不足</td>
+<td>核对元数据大小、登记数量、历史配额及磁盘容量；先归档，不盲目删除业务数据</td>
+</tr>
+</tbody>
+</table>
+<p>专项验收结果见同目录的 <code>系统资源库验收.json</code>，部署及运行核对见 <code>系统资源库运行核对.json</code>。验收仅使用合成资源与临时账号，不将客户已有知识库发布为系统资源。完整仓库测试与所有第三方服务联调不包含在专项验收范围内。</p>
+<h2 id="_7">本次验收结果</h2>
+<p>2026-11-14 已按独立双入口及无需额外授权的定义调整并部署，71 项跨账号 API 与页面检查通过。专项验收包括五类资源发布、两个普通用户跨空间选择、四个智能体引用同一公共数据库、实际工作流执行、更新修订、任务中心固定版本、只读接口拦截、下架历史、发布准入、两个插件选择入口、系统插件实际绑定及数据来源分离。原有厂商授权配置摘要核对一致。具体执行结果与时间见专项验收 JSON。数据库 SQL 隔离、目录筛选分页、工作流依赖检查单元测试，以及前后端构建和文档布局核对均通过。</p>
+<p>平台原有 6 个本地提示词保留在系统目录。原有 18 个第三方插件保留在“搜索工具”，不占用系统资源数量。系统插件、工作流、知识库、数据库由平台后续开发、完成调试并明确发布后展示；不放入未经验证的示例占位资源。合成验收资源和临时账号在验收结束后清理。</p>
+<p>11 个容器运行正常，两份既有知识数据分别保留 19,946 行和 9,000 行，均处理完成。双 Embedding 工作进程及插件凭据只读挂载保持正常。运行核对时根分区剩余约 67 GiB，<code>/home</code> 剩余约 82 GiB，精确数值及时间见运行核对记录。原客户账号会话已过期，本次未重新登录该真实账号，因此原地址查询未作登录态 API 复测；已独立核对原知识数据完整性。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-14 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

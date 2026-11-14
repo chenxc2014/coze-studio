@@ -50,6 +50,11 @@ type executableImpl struct {
 }
 
 func (i *impl) SyncExecute(ctx context.Context, config workflowModel.ExecuteConfig, input map[string]any) (*entity.WorkflowExecution, vo.TerminatePlan, error) {
+	if shared, e := systemWorkflowConfig(ctx, config); e != nil {
+		return nil, "", e
+	} else {
+		config = shared
+	}
 	var (
 		err      error
 		wfEntity *entity.Workflow
@@ -206,6 +211,11 @@ func (i *impl) SyncExecute(ctx context.Context, config workflowModel.ExecuteConf
 // Intermediate results are not emitted on the fly.
 // The caller is expected to poll the execution status using the GetExecution method and the returned execution ID.
 func (i *impl) AsyncExecute(ctx context.Context, config workflowModel.ExecuteConfig, input map[string]any) (int64, error) {
+	if shared, e := systemWorkflowConfig(ctx, config); e != nil {
+		return 0, e
+	} else {
+		config = shared
+	}
 	var (
 		err      error
 		wfEntity *entity.Workflow
@@ -348,6 +358,11 @@ func (i *impl) handleHistory(ctx context.Context, config *workflowModel.ExecuteC
 }
 
 func (i *impl) AsyncExecuteNode(ctx context.Context, nodeID string, config workflowModel.ExecuteConfig, input map[string]any) (int64, error) {
+	if shared, e := systemWorkflowConfig(ctx, config); e != nil {
+		return 0, e
+	} else {
+		config = shared
+	}
 	var (
 		err      error
 		wfEntity *entity.Workflow
@@ -449,6 +464,11 @@ func (i *impl) AsyncExecuteNode(ctx context.Context, nodeID string, config workf
 // StreamExecute executes the specified workflow, returning a stream of execution events.
 // The caller is expected to receive from the returned stream immediately.
 func (i *impl) StreamExecute(ctx context.Context, config workflowModel.ExecuteConfig, input map[string]any) (*schema.StreamReader[*entity.Message], error) {
+	if shared, e := systemWorkflowConfig(ctx, config); e != nil {
+		return nil, e
+	} else {
+		config = shared
+	}
 	var (
 		err      error
 		wfEntity *entity.Workflow

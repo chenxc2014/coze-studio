@@ -21,6 +21,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
+	userentity "github.com/coze-dev/coze-studio/backend/domain/user/entity"
+	"github.com/coze-dev/coze-studio/backend/pkg/ctxcache"
+	platformconsts "github.com/coze-dev/coze-studio/backend/types/consts"
 
 	"net/http"
 	"strconv"
@@ -43,6 +47,28 @@ import (
 )
 
 func (p *pluginServiceImpl) ExecuteTool(ctx context.Context, req *model.ExecuteToolRequest, opts ...model.ExecuteToolOpt) (resp *model.ExecuteToolResponse, err error) {
+	publication, err := systemresource.Default().Lookup(ctx, systemresource.Plugin, req.PluginID)
+	if err != nil {
+		return nil, err
+	}
+	if publication != nil {
+		maintainer := false
+		if session, ok := ctxcache.Get[*userentity.Session](ctx, platformconsts.SessionDataKeyInCtx); ok && session != nil && session.UserID == publication.SourceOwnerID && req.ExecDraftTool && req.ExecScene == consts.ExecSceneOfToolDebug {
+			maintainer, err = systemresource.Default().IsAdmin(ctx, session.UserID)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if !maintainer {
+			if publication.Status != "published" {
+				return nil, fmt.Errorf("系统插件已下架，请联系管理员")
+			}
+			// 共享调用只读取已发布工具，不执行源所有者尚未发布的草稿。
+			copy := *req
+			copy.ExecDraftTool = false
+			req = &copy
+		}
+	}
 	opt := &model.ExecuteToolOption{}
 	for _, fn := range opts {
 		fn(opt)

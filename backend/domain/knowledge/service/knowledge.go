@@ -23,6 +23,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/coze-dev/coze-studio/backend/domain/systemresource"
 	"io"
 	"math/rand"
 	"net/http"
@@ -316,6 +317,15 @@ func (k *knowledgeSVC) checkRequest(request *CreateDocumentRequest) error {
 }
 
 func (k *knowledgeSVC) CreateDocument(ctx context.Context, request *CreateDocumentRequest) (response *CreateDocumentResponse, err error) {
+	if request != nil {
+		for _, document := range request.Documents {
+			if document != nil {
+				if e := systemresource.ProtectWrite(ctx, systemresource.Knowledge, document.KnowledgeID, document.CreatorID); e != nil {
+					return nil, e
+				}
+			}
+		}
+	}
 	if err = k.bindAPIPreparations(ctx, request); err != nil {
 		return nil, err
 	}

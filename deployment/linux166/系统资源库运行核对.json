@@ -1,0 +1,151 @@
+{
+  "checked_at": "2026-11-14T23:12:36.342631+08:00",
+  "release": {
+    "image": "coze-local/server:system-library-5bb882912c64",
+    "base_image": "coze-local/server:system-library-c4a82efba654",
+    "binary_sha256": "5bb882912c6462f98a99d7d8e155c26204607491540590f4c13031c7e3f1e2da",
+    "web_release": "/home/coze/releases/web-agent-system-4b6dc30b10c6",
+    "web_index_sha256": "4b6dc30b10c651f088fa9da0216e2efa28e7caf796b9f59832ce62b9497478c7",
+    "deployed_at": "2026-11-14 23:06:49 +0800",
+    "backup_path": "/home/coze/backups/system-library-20261114-230642",
+    "schema_sha256": "eb54bb8c6bff291f1e75da27a511f9930e479d35edfed9bfdbcdca561807f95d"
+  },
+  "knowledge": [
+    {
+      "document_id": "7706726398408261632",
+      "completed_rows": 19946,
+      "failed_rows": 0,
+      "original_rows_preserved": true
+    },
+    {
+      "document_id": "7707166715007729664",
+      "completed_rows": 9000,
+      "failed_rows": 0,
+      "original_rows_preserved": true
+    }
+  ],
+  "containers": [
+    {
+      "name": "coze-web",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-server",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-milvus",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-mysql",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-elasticsearch",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-minio",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-etcd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-redis",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqadmin",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-nsqlookupd",
+      "status": "running",
+      "health": "healthy"
+    }
+  ],
+  "embedding_config_and_readonly_plugin_key_preserved": true,
+  "embedding_workers": [
+    {
+      "unit": "coze-embedding-worker@0",
+      "active": true,
+      "enabled": true,
+      "allowed_cpus": "0-7"
+    },
+    {
+      "unit": "coze-embedding-worker@1",
+      "active": true,
+      "enabled": true,
+      "allowed_cpus": "12-19"
+    }
+  ],
+  "embedding_resource_group": "CPUQuotaPerSecUSec=16s\nMemoryHigh=8589934592\nMemoryMax=10737418240",
+  "public_http": {
+    "/": 200,
+    "sign": 200,
+    "admin/": 200,
+    "admin/app-base-path.js": 200,
+    "admin/system-library.js": 200,
+    "admin/system-library.css": 200
+  },
+  "temporary_accounts_publications_and_active_sources_cleaned": true,
+  "original_address_query": {
+    "verified": false,
+    "reason": "原账号现有会话已过期，未重新登录或修改真实账号；原始数据完整性已另外核对"
+  },
+  "system_catalog": {
+    "publishing_ready": true,
+    "counts": {
+      "all": 6,
+      "database": 0,
+      "knowledge": 0,
+      "plugin": 0,
+      "prompt": 6,
+      "workflow": 0
+    },
+    "customer_resources_published": false,
+    "third_party_marketplace_auto_included": false
+  },
+  "search_tools": {
+    "preserved": true,
+    "third_party_plugins": 18,
+    "amap_and_tianyancha_present": true
+  },
+  "system_plugin_selector": {
+    "independent_source": true,
+    "no_third_party_plugins": true
+  },
+  "disk": {
+    "time": "2026-11-14T15:12:46.053630+00:00",
+    "filesystems": {
+      "/": {
+        "total_GiB": 69.94,
+        "free_GiB": 67.42,
+        "used_percent": 3.6
+      },
+      "/home": {
+        "total_GiB": 121.07,
+        "free_GiB": 82.25,
+        "used_percent": 32.1
+      }
+    },
+    "warnings": []
+  }
+}

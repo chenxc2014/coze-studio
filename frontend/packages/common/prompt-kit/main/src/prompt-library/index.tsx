@@ -41,7 +41,7 @@ import '@coze-common/prompt-kit-base/shared/css';
 import styles from './index.module.less';
 
 const getTabLabelMap = (isPersonal: boolean) => ({
-  Recommended: I18n.t('prompt_resource_recommended'),
+  Recommended: '资源库-系统',
   Team: isPersonal
     ? I18n.t('prompt_resource_personal')
     : I18n.t('prompt_resource_team'),

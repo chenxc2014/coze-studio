@@ -77,6 +77,7 @@ export enum WorkflowCategory {
    * repository workflow
    */
   Library = 'library',
+  System = 'system',
   /**
    * official example
    */

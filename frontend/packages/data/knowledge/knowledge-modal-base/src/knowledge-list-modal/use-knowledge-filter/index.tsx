@@ -202,7 +202,7 @@ const useKnowledgeFilter = ({
   headerClassName,
   scene = Scene.PAGE,
   onClickAddKnowledge,
-  canCreate,
+  canCreate: providedCanCreate,
   defaultType,
   knowledgeTypeConfigList = [
     FilterKnowledgeType.ALL,
@@ -214,6 +214,28 @@ const useKnowledgeFilter = ({
   beforeCreate,
   createKnowledgeModal,
 }: DatasetFilterProps) => {
+  const [systemSource, setSystemSource] = useState(false);
+  const canCreate = providedCanCreate && !systemSource;
+  const renderSystemSource = () =>
+    scene === Scene.MODAL ? (
+      <div
+        className="flex gap-[8px] mb-[12px]"
+        data-testid="knowledge-system-source"
+      >
+        <UIButton
+          onClick={() => setSystemSource(false)}
+          theme={systemSource ? 'borderless' : 'solid'}
+        >
+          资源库
+        </UIButton>
+        <UIButton
+          onClick={() => setSystemSource(true)}
+          theme={systemSource ? 'solid' : 'borderless'}
+        >
+          资源库-系统
+        </UIButton>
+      </div>
+    ) : null;
   const uniqKnowledgeTypeConfigList = uniq(knowledgeTypeConfigList);
   const [currentKnowledgeType, setCurrentKnowledgeType] = useState(
     defaultType || defaultKnowledgeTypeFallback(uniqKnowledgeTypeConfigList),
@@ -247,7 +269,7 @@ const useKnowledgeFilter = ({
         }
         return getDatasetList(
           {
-            space_id: id || '',
+            space_id: systemSource ? '999999' : id || '',
             query,
             search_type: searchType,
             scope_type: isPersonal ? DatasetScopeType.ScopeSelf : scopeType,
@@ -259,7 +281,7 @@ const useKnowledgeFilter = ({
                     [FilterKnowledgeType.TEXT]: FormatType.Text,
                     [FilterKnowledgeType.IMAGE]: FormatType.Image,
                   }[currentKnowledgeType],
-            projectID,
+            projectID: systemSource ? undefined : projectID,
           },
           newData?.nextPageIndex,
         );
@@ -278,7 +300,7 @@ const useKnowledgeFilter = ({
           });
         },
         target: containerRef,
-        reloadDeps: [query, searchType, scopeType, projectID],
+        reloadDeps: [query, searchType, scopeType, projectID, systemSource],
       },
     );
 
@@ -353,21 +375,20 @@ const useKnowledgeFilter = ({
   };
 
   const renderSearch = useMemo(
-    () => () =>
-      (
-        <Input
-          autoFocus
-          key="query-input"
-          placeholder={I18n.t('db2_014')}
-          onChange={debounce(handleQueryChange, 500)}
-        />
-      ),
+    () => () => (
+      <Input
+        autoFocus
+        key="query-input"
+        placeholder={I18n.t('db2_014')}
+        onChange={debounce(handleQueryChange, 500)}
+      />
+    ),
     [],
   );
 
   const renderCreateBtn = useMemo(
     () => () =>
-      (
+      canCreate ? (
         <UIButton
           theme="solid"
           onClick={handleAdd}
@@ -375,77 +396,76 @@ const useKnowledgeFilter = ({
         >
           {I18n.t('datasets_create_btn')}
         </UIButton>
-      ),
-    [handleAdd],
+      ) : null,
+    [handleAdd, canCreate],
   );
 
   const renderFilters = useMemo(
-    () => () =>
-      (
-        <>
-          <div className={styles['file-type-tab']}>
-            {uniqKnowledgeTypeConfigList.reduce<ReactNode[]>(
-              (
-                accumulator: ReactNode[],
-                currentValue: FilterKnowledgeType,
-                currentIndex: number,
-              ) => {
-                const reactNode = renderKnowledgeTypeConfigNode(currentValue);
-                if (currentIndex !== 0) {
-                  return accumulator.concat([
-                    <Divider layout="vertical" margin="12px" />,
-                    reactNode,
-                  ]);
-                }
-                return accumulator.concat([reactNode]);
-              },
-              [],
-            )}
-          </div>
-
-          <div className={'flex'}>
-            {uniq(showFilters).map((filterType: DatasetFilterType) => {
-              if (filterType === 'scope-type') {
-                return !isPersonal ? (
-                  <UISelect
-                    label={I18n.t('Creator')}
-                    showClear={false}
-                    value={scopeType}
-                    optionList={scopeOptions}
-                    onChange={v => {
-                      setScopeType(v as DatasetScopeType);
-                    }}
-                  />
-                ) : null;
-              } else if (filterType === 'search-type') {
-                return (
-                  <UISelect
-                    data-testid={
-                      BotE2e.BotKnowledgeSelectListModalCreateDateSelect
-                    }
-                    label={I18n.t('Sort')}
-                    showClear={false}
-                    value={searchType}
-                    optionList={[
-                      {
-                        label: I18n.t('Create_time'),
-                        value: OrderField.CreateTime,
-                      },
-                      {
-                        label: I18n.t('Update_time'),
-                        value: OrderField.UpdateTime,
-                      },
-                    ]}
-                    onChange={v => {
-                      handleSearchTypeChange(v as OrderField);
-                    }}
-                  />
-                );
+    () => () => (
+      <>
+        <div className={styles['file-type-tab']}>
+          {uniqKnowledgeTypeConfigList.reduce<ReactNode[]>(
+            (
+              accumulator: ReactNode[],
+              currentValue: FilterKnowledgeType,
+              currentIndex: number,
+            ) => {
+              const reactNode = renderKnowledgeTypeConfigNode(currentValue);
+              if (currentIndex !== 0) {
+                return accumulator.concat([
+                  <Divider layout="vertical" margin="12px" />,
+                  reactNode,
+                ]);
               }
-            })}
-          </div>
-        </>
-      ),
+              return accumulator.concat([reactNode]);
+            },
+            [],
+          )}
+        </div>
+
+        <div className={'flex'}>
+          {uniq(showFilters).map((filterType: DatasetFilterType) => {
+            if (filterType === 'scope-type') {
+              return !isPersonal ? (
+                <UISelect
+                  label={I18n.t('Creator')}
+                  showClear={false}
+                  value={scopeType}
+                  optionList={scopeOptions}
+                  onChange={v => {
+                    setScopeType(v as DatasetScopeType);
+                  }}
+                />
+              ) : null;
+            } else if (filterType === 'search-type') {
+              return (
+                <UISelect
+                  data-testid={
+                    BotE2e.BotKnowledgeSelectListModalCreateDateSelect
+                  }
+                  label={I18n.t('Sort')}
+                  showClear={false}
+                  value={searchType}
+                  optionList={[
+                    {
+                      label: I18n.t('Create_time'),
+                      value: OrderField.CreateTime,
+                    },
+                    {
+                      label: I18n.t('Update_time'),
+                      value: OrderField.UpdateTime,
+                    },
+                  ]}
+                  onChange={v => {
+                    handleSearchTypeChange(v as OrderField);
+                  }}
+                />
+              );
+            }
+          })}
+        </div>
+      </>
+    ),
     [
       headerClassName,
       handleSearchTypeChange,
@@ -532,6 +552,7 @@ const useKnowledgeFilter = ({
   const renderContentFilter = () => (
     <Spin spinning={loading} wrapperClassName={styles.spin}>
       <div className={cs(styles.container, DATA_REFACTOR_CLASS_NAME)}>
+        {renderSystemSource()}
         {!hideHeader && showFilters?.length ? (
           <div
             className={cs(
@@ -626,7 +647,17 @@ const useKnowledgeFilter = ({
     </Spin>
   );
 
-  return { renderContentFilter, renderSearch, renderCreateBtn, renderFilters };
+  return {
+    renderContentFilter,
+    renderSearch,
+    renderCreateBtn,
+    renderFilters: () => (
+      <>
+        {renderSystemSource()}
+        {renderFilters()}
+      </>
+    ),
+  };
 };
 
 export { useKnowledgeFilter };
