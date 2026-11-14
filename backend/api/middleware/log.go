@@ -61,7 +61,7 @@ func AccessLogMW() app.HandlerFunc {
 		case status >= http.StatusBadRequest:
 			logs.CtxWarnf(c, "%s", baseLog)
 		default:
-			if strings.HasPrefix(path, "/api/admin/plugins") || strings.HasPrefix(path, "/api/knowledge/table-api/") {
+			if strings.HasPrefix(path, "/api/admin/plugins") || strings.HasPrefix(path, "/api/knowledge/table-api/") || strings.HasPrefix(path, "/api/task-center/") {
 				// 插件授权请求含真实凭据，访问日志仅保留路径、状态与耗时。
 				logs.CtxInfof(c, "%s", baseLog)
 				return

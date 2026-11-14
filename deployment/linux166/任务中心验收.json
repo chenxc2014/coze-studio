@@ -1,0 +1,204 @@
+{
+  "checked_at": "2026-11-14 19:44:00 +0800",
+  "success": true,
+  "checks": [
+    "无模型调用的回显工作流已发布",
+    "匿名不能访问任务中心",
+    "其他空间成员不能读取任务列表",
+    "跨站写操作被拒绝",
+    "工作空间导航显示任务中心",
+    "批量与异步两个页签均可见",
+    "模板由已发布工作流参数生成",
+    "CSV 预览保留大整数精度",
+    "浏览器创建的批量任务真实执行三行",
+    "工作流结束节点保留整数精度",
+    "结果详情不被浏览器改写精度",
+    "CSV 导出包含结果并保护公式单元格",
+    "异步配置创建时不会直接执行",
+    "异步任务使用固定旧版本而非新发布版本",
+    "真实工作流执行请求可安全重复提交",
+    "异步任务保存多次独立执行记录",
+    "异步历史超过二十条后可分页读取旧记录",
+    "浏览器可翻阅异步任务旧记录",
+    "页面无水平溢出",
+    "任务页面没有脚本错误",
+    "资源和接口保留 agent 前缀",
+    "其他空间不能读取任务详情",
+    "后台拒绝无效 CSV 类型",
+    "正式 API 支持取消排队或执行中的任务"
+  ],
+  "temporary_accounts_and_tasks_cleaned": true,
+  "real_models_or_plugins_called": false,
+  "screenshots": [
+    "task-center-batch-empty.png",
+    "task-center-create-preview.png",
+    "task-center-batch-results.png",
+    "task-center-async-history.png",
+    "task-center-compact.png"
+  ],
+  "runtime": {
+    "checked_at": "2026-11-14T19:44:39.944445+08:00",
+    "knowledge": [
+      {
+        "document_id": "7706726398408261632",
+        "complete_rows": 19946,
+        "failed_rows": 0,
+        "original_rows_preserved": true
+      },
+      {
+        "document_id": "7707166715007729664",
+        "complete_rows": 9000,
+        "failed_rows": 0,
+        "original_rows_preserved": true
+      }
+    ],
+    "release": {
+      "image": "coze-local/server:task-center-b9de847f1bcc",
+      "base_image": "coze-local/server:embedding-pool-eb05c7baed18",
+      "binary_sha256": "b9de847f1bcc1e796c6773f96b3212d944fb7abc502d7fc903f8ec3ea58c7066",
+      "web_release": "/home/coze/releases/web-agent-tasks-231ed961fcdc",
+      "web_index_sha256": "231ed961fcdc5ed67553da4e120017f1efe82c6d77cd016b011676f6ebd713e2",
+      "deployed_at": "2026-11-14 19:27:49 +0800",
+      "backup_path": "/home/coze/backups/task-center-20261114-192742",
+      "schema_sha256": "eb35da46522f3cae55b3e44198295c2d5eb2ef1b348de9580da216ef40fc15c5",
+      "layout_updated_at": "2026-11-14 19:43:11 +0800"
+    },
+    "containers": [
+      {
+        "name": "coze-web",
+        "status": "running",
+        "health": null
+      },
+      {
+        "name": "coze-server",
+        "status": "running",
+        "health": null
+      },
+      {
+        "name": "coze-milvus",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-mysql",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-elasticsearch",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-minio",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-etcd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-redis",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-nsqd",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "name": "coze-nsqadmin",
+        "status": "running",
+        "health": null
+      },
+      {
+        "name": "coze-nsqlookupd",
+        "status": "running",
+        "health": "healthy"
+      }
+    ],
+    "embedding_config_and_readonly_plugin_key_preserved": true,
+    "embedding_workers": [
+      {
+        "unit": "coze-embedding-worker@0",
+        "active": true,
+        "enabled": true,
+        "allowed_cpus": "0-7"
+      },
+      {
+        "unit": "coze-embedding-worker@1",
+        "active": true,
+        "enabled": true,
+        "allowed_cpus": "12-19"
+      }
+    ],
+    "embedding_resource_group": "CPUQuotaPerSecUSec=16s\nMemoryHigh=8589934592\nMemoryMax=10737418240",
+    "public_http": {
+      "/": 200,
+      "sign": 200,
+      "admin/": 200,
+      "admin/app-base-path.js": 200
+    },
+    "temporary_resources_cleaned": true,
+    "taskcenter_rows": {
+      "taskcenter_tasks": 0,
+      "taskcenter_runs": 0,
+      "taskcenter_items": 0
+    },
+    "disk": {
+      "time": "2026-11-14T11:44:46.805818+00:00",
+      "filesystems": {
+        "/": {
+          "total_GiB": 69.94,
+          "free_GiB": 67.43,
+          "used_percent": 3.6
+        },
+        "/home": {
+          "total_GiB": 121.07,
+          "free_GiB": 85.57,
+          "used_percent": 29.3
+        }
+      },
+      "warnings": []
+    }
+  },
+  "isolated_queue_acceptance": {
+    "checks": [
+      "逐行执行，部分失败状态与统计正确",
+      "同空间其他创建者不能重试",
+      "不同空间不能读取任务",
+      "只重试失败行且保留原始行号",
+      "已成功的行未重复运行",
+      "创建请求具备幂等性",
+      "异步执行重复提交不重复创建",
+      "异步结果固定使用任务版本",
+      "幂等键不能复用于不同参数",
+      "取消停止新行且完成进度统计",
+      "已进入故障注入点",
+      "进程强制退出后继续排队行并标记未确认行",
+      "未确认执行不自动重放",
+      "中断行可由用户明确重试",
+      "全局执行并发不超过八条",
+      "结果 CSV 可以导出",
+      "临时任务及其执行记录可以清理"
+    ],
+    "crash_recovery_tested": true,
+    "isolated_database": true,
+    "maximum_observed_concurrency": 8,
+    "passed": true
+  },
+  "validation_scope": {
+    "backend_taskcenter_unit_tests": "passed",
+    "workflow_bridge_and_handler_compilation": "passed",
+    "frontend_scoped_strict_typescript": "passed",
+    "frontend_production_build": "passed_with_existing_browserslist_and_module_warnings",
+    "prettier_repository_configuration": "applied",
+    "eslint_scoped": "timed_out_after_90_seconds_not_counted_as_passed",
+    "full_repository_lint_and_tests": "not_run",
+    "live_acceptance_checks": 24,
+    "isolated_queue_checks": 17
+  }
+}

@@ -105,6 +105,7 @@ func startHttpServer() {
 	router.RegisterKnowledgeAddress(s)
 	router.RegisterKnowledgeAPITable(s)
 	router.RegisterPluginCredentials(s)
+	router.RegisterTaskCenter(s)
 	s.Spin()
 }
 

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="03b8256ba2826ea2b6ef662fd50e41cde635736cd2f1ca16c1d3e37463255a7a"><title>任务中心使用与运维说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">功能范围</a></li>
+<li><a href="#_2">使用批量任务</a></li>
+<li><a href="#_3">使用异步任务</a></li>
+<li><a href="#_4">状态、取消与重试</a></li>
+<li><a href="#_5">权限与容量限制</a></li>
+<li><a href="#_6">调度方式与数据表</a></li>
+<li><a href="#_7">日常检查与回退</a></li>
+<li><a href="#_8">验证记录</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：任务中心使用与运维说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>任务中心使用与运维说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="任务中心使用与运维说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-14。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<p>本次在 Coze Studio 中新增“任务中心”，同时提供批量任务和异步任务两个页签。入口位于工作空间左侧导航，地址为 <code>/agent/space/{space_id}/tasks</code>。本文适用于本仓库的定制版本。</p>
+<h2 id="_1">功能范围</h2>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>批量任务</th>
+<th>异步任务</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务对象</td>
+<td>当前空间资源库或应用中已发布的普通工作流</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>输入</td>
+<td>上传 CSV，每行参数执行一次工作流</td>
+<td>填写表单或 JSON，每次提交执行一次</td>
+</tr>
+<tr>
+<td>执行版本</td>
+<td>创建时固定，发布新版本不改变原任务</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>后台执行</td>
+<td>提交后执行，关闭页面继续运行</td>
+<td>创建配置后手动提交，可反复执行</td>
+</tr>
+<tr>
+<td>结果</td>
+<td>逐行详情、原生工作流日志、CSV 导出</td>
+<td>每次执行独立记录、历史分页、CSV 导出</td>
+</tr>
+<tr>
+<td>操作</td>
+<td>取消、重试未成功项、删除整个任务</td>
+<td>同左，另有“执行任务”</td>
+</tr>
+</tbody>
+</table>
+<p>本次实现采用现有工作流引擎，提供本地可用的任务中心。没有新增云版的“异步任务工作流节点”，没有新增定时执行、回调通知或面向外部调用的任务中心 PAT API。平台原有工作流开放 API 不受此模块替代。</p>
+<h2 id="_2">使用批量任务</h2>
+<ol>
+<li>在资源库或应用中准备普通工作流，配置开始节点输入参数，发布一个版本。应用内工作流还需要满足原生引擎对应用发布渠道和版本的要求；仅保存草稿不可使用。</li>
+<li>打开任务中心的“批量任务”，点击“创建批量任务”，填写名称、选择工作流及固定版本。</li>
+<li>下载 CSV 模板。保留模板参数名称，将数据填入对应列，每行对应一次执行。文本中含逗号、换行或引号时，按标准 CSV 规则转义。</li>
+<li>上传文件。服务端检查编码、列名、必填项、参数类型、行数和文件大小；通过后显示前五行预览。</li>
+<li>选择并行执行数及单条最长运行时间，确认后点击“创建并执行”。模型及插件的实际调用可能产生相应费用。</li>
+<li>在详情中查看进度、逐行结果或错误。执行结束后可导出 CSV，也可重试未成功项。</li>
+</ol>
+<p>支持 UTF-8（含 BOM）和 GB18030 编码。整数使用 64 位有符号整数，布尔值填 <code>true</code> 或 <code>false</code>，对象与数组使用 JSON。预览、输入存储及结果原文显示保留大整数，不通过浏览器数值重新序列化。</p>
+<p>模板中可选参数列可省略；缺少必填列、未知列、重复列、空数据行或无效参数会被拒绝。没有输入参数的工作流应使用异步任务。</p>
+<p>CSV 示例，列名必须与实际工作流参数一致：</p>
+<pre><code class="language-csv">address,limit
+浣东街道康福路98号,10
+&quot;鹿城区藤桥镇,上戍社区&quot;,20
+</code></pre>
+<h2 id="_3">使用异步任务</h2>
+<ol>
+<li>在“异步任务”页签创建任务，选择已发布的工作流及固定版本。</li>
+<li>创建只保存任务配置，不立即运行。</li>
+<li>点击“执行任务”，按工作流参数填写表单，或切换到 JSON 模式，然后提交后台执行。</li>
+<li>关闭页面不会取消执行。再次打开详情，可查看执行状态和结果。</li>
+<li>同一任务可反复提交，不同提交产生不同执行记录；详情中可按每组 20 条翻阅历史。</li>
+</ol>
+<p>异步指页面提交后由服务器后台处理，不要求浏览器持续连接。工作流自身节点的超时、权限和模型、插件配置仍然生效。需要人工交互的中断工作流，应在原工作流编辑器中处理，任务中心不会代替人工回答或自动恢复交互。</p>
+<h2 id="_4">状态、取消与重试</h2>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未执行</td>
+<td>异步任务配置尚未提交过参数</td>
+</tr>
+<tr>
+<td>排队中 / 执行中</td>
+<td>等待后台调度或正在运行</td>
+</tr>
+<tr>
+<td>已完成</td>
+<td>本次所有行成功</td>
+</tr>
+<tr>
+<td>部分失败 / 失败</td>
+<td>存在失败行，可查看具体错误</td>
+</tr>
+<tr>
+<td>取消中 / 已取消</td>
+<td>停止领取新行，并请求取消正在运行的行</td>
+</tr>
+<tr>
+<td>已中断</td>
+<td>执行结果无法确认，需要核对后手动处理</td>
+</tr>
+</tbody>
+</table>
+<p>取消不能撤销已经完成的第三方操作。重试会创建新执行记录，只复制失败、已中断或已取消的行，保留原行号，成功行不会再次执行。涉及写入、支付、发送等外部副作用时，先核对实际结果再重试。</p>
+<p>服务器重启后，尚未开始的行继续排队；重启时正在执行且结果未确认的行标为已中断，不自动重复执行。请求使用唯一标识去重，相同标识和参数重复提交返回原记录；同一标识改用不同参数会被拒绝。</p>
+<h2 id="_5">权限与容量限制</h2>
+<p>空间成员可查看所属空间的任务和结果。只有任务创建者可以执行、取消、重试和删除；其他空间成员不能访问。共享空间中的任务输入、输出应按空间成员可见的信息准备。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>当前限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单个 CSV</td>
+<td>最多 1000 行、2 MiB</td>
+</tr>
+<tr>
+<td>单条输入 / 输出</td>
+<td>16 KiB / 32 KiB</td>
+</tr>
+<tr>
+<td>单任务并行行数</td>
+<td>批量 1～4 条，异步 1 条</td>
+</tr>
+<tr>
+<td>全平台后台调度</td>
+<td>同时最多 2 次执行记录，总计最多 8 条工作流调用</td>
+</tr>
+<tr>
+<td>单条运行超时</td>
+<td>接口允许 10～86400 秒，页面提供 10 分钟、1 小时、6 小时、24 小时</td>
+</tr>
+<tr>
+<td>每账号活跃执行</td>
+<td>最多 10 次排队、执行中或取消中的执行记录</td>
+</tr>
+<tr>
+<td>每账号任务数</td>
+<td>最多 200 个</td>
+</tr>
+<tr>
+<td>每账号任务数据</td>
+<td>输入、输出及错误信息计入 256 MiB 应用配额，排队时预留输出额度</td>
+</tr>
+</tbody>
+</table>
+<p>上述配额控制的是应用计量的数据，不等于 MySQL 表、索引或备份的物理磁盘上限。任务中心以数据库保存输入和结果，不额外长期保存上传的 CSV。删除已经结束的整个任务可释放该任务数据；不会自动清理用户历史。超大结果建议由工作流写入文件并返回链接。原生工作流引擎的执行日志仍由其现有机制维护，不计入上述任务表配额。</p>
+<h2 id="_6">调度方式与数据表</h2>
+<p>后台调度运行在 Go 应用进程中，使用受控 goroutine 并发及 MySQL 持久化队列，约每秒检查队列。它不是 crontab，不需要新增系统定时任务。</p>
+<p>使用 MySQL 命名锁选出唯一调度者，锁名按数据库隔离。数据库连接丢失后停止领取并取消本调度者的执行；行和执行记录带调度者标识，旧调度者不能覆盖新调度者的结果。应用层执行前重新校验创建者空间权限和工作流归属。</p>
+<p>新增的三张表为 <code>taskcenter_tasks</code>、<code>taskcenter_runs</code>、<code>taskcenter_items</code>，分别保存任务配置、执行记录和逐行结果。迁移脚本位于 <code>deployment/linux166/scripts/task-center-schema.sql</code>，只创建独立表，不修改原有知识库、账号和工作流表。应用启动不自动执行 DDL；缺表时仅任务中心返回“尚未初始化”。</p>
+<p>首次部署应先按现有备份流程备份数据库，再执行迁移脚本，最后部署后端及前端。重复执行 <code>CREATE TABLE IF NOT EXISTS</code> 不会升级已经存在但结构不同的表；后续结构升级必须单独编写迁移。</p>
+<h2 id="_7">日常检查与回退</h2>
+<p>166 的模型、构建、发布版本和备份继续放在 <code>/home/coze</code>。部署前使用容量守卫，要求系统分区至少剩余 15 GiB、<code>/home</code> 至少剩余 25 GiB，且使用率不高于 80%。运维脚本及包含运行配置的备份仅供服务器管理员读取。</p>
+<pre><code class="language-bash">python3 /home/coze/ops/capacity.py --guard
+/home/coze/ops/compose.sh ps
+docker logs --since 10m coze-server
+</code></pre>
+<p>任务不启动时，依次检查：用户是否有空间权限；任务选择的版本是否存在；三张表是否齐全；应用是否记录调度者失去数据库访问的错误；数据库是否有正在运行的长任务。日志不记录任务中心 HTTP 请求正文，避免 CSV 参数进入接口访问日志；工作流节点自身的日志继续遵循原有行为。</p>
+<p>新前端使用独立发布目录，后端使用独立镜像；部署时保留原 Compose 备份和元数据备份。回退应用时使用本次部署生成的 Compose 备份恢复后端镜像和前端挂载，然后仅重建 <code>coze-server</code>、<code>coze-web</code>。先处理仍在运行的任务，避免发布期间产生结果未确认的中断行。</p>
+<p>回退应用版本时保留新增任务表及用户数据，不自动删除表，不用旧数据库备份覆盖部署后产生的数据。回退到不含任务中心的版本后，这些任务不会继续被旧应用调度；重新启用新版本时按上述恢复规则处理。</p>
+<h2 id="_8">验证记录</h2>
+<p>功能验收汇总见同目录 <code>任务中心验收.json</code>，包括真实平台回显工作流、两个页签的浏览器操作及清理结果。调度器另外在独立临时 MySQL 数据库验收了取消、请求去重、失败项重试、最多 8 条并发、强制终止后的恢复和不自动重放未确认行；临时库已删除。临时回显工作流不调用模型和插件。</p>
+<p>后端新增 CSV 与状态汇总单元测试、工作流桥接与接口包编译检查、前端定向严格 TypeScript 检查和生产构建均通过。新增页面已使用仓库 Prettier 配置格式化。定向 ESLint 检查在 90 秒限制内未完成，未计为通过；未执行全仓库 lint 或全仓库测试。功能验收通过不代表这些静态检查已经完成。</p>
+<p>官方功能参考：<a href="https://docs.coze.cn/guides_batch_run_workflow">工作流批量执行</a>、<a href="https://docs.coze.cn/guides_execute_workflow_asynchronously">异步执行工作流</a>。本地实现的范围以上文和仓库源码为准。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-14 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

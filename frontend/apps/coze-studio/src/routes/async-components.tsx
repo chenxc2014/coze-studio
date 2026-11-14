@@ -52,6 +52,7 @@ export const Develop = lazy(() => import('../pages/develop'));
 
 // resource library page
 export const Library = lazy(() => import('../pages/library'));
+export const TaskCenter = lazy(() => import('../pages/task-center'));
 
 // Agent IDE Layout Component
 export const AgentIDELayout = lazy(

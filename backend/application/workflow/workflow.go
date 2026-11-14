@@ -26,6 +26,8 @@ import (
 	"sync"
 	"time"
 
+	"gorm.io/gorm"
+
 	"github.com/cloudwego/eino/schema"
 	xmaps "golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
@@ -52,6 +54,7 @@ import (
 	"github.com/coze-dev/coze-studio/backend/domain/permission"
 	"github.com/coze-dev/coze-studio/backend/domain/plugin/dto"
 	search "github.com/coze-dev/coze-studio/backend/domain/search/entity"
+	"github.com/coze-dev/coze-studio/backend/domain/taskcenter"
 	domainWorkflow "github.com/coze-dev/coze-studio/backend/domain/workflow"
 	"github.com/coze-dev/coze-studio/backend/domain/workflow/entity"
 	"github.com/coze-dev/coze-studio/backend/domain/workflow/entity/vo"
@@ -74,6 +77,8 @@ import (
 )
 
 type ApplicationService struct {
+	TaskCenter  *taskcenter.Service
+	taskDB      *gorm.DB
 	DomainSVC   domainWorkflow.Service
 	ImageX      imagex.ImageX // we set Imagex here, because Imagex is used as a proxy to get auth token, there is no actual correlation with the workflow domain.
 	TosClient   storage.Storage
