@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
-<meta name="source-sha256" content="1998270ceec6ca61605e5c5860ae14b2fc1b153331911c67e08bb0ee323b7e91"><title>系统资源库使用与运维说明 · 部署与运维</title>
+<meta name="source-sha256" content="573dabcb14c68c97d1d0f8522bfc61c53877c4160239e9121817b2b2a6f2e379"><title>系统资源库使用与运维说明 · 部署与运维</title>
 <style>
 :root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -39,7 +39,7 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 <p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
 <div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
 <a class="button" href="系统资源库使用与运维说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
-<article id="content"><p>更新日期：2026-11-14。适用于本仓库的 Coze Studio 定制版本。</p>
+<article id="content"><p>更新日期：2026-11-15。适用于本仓库的 Coze Studio 定制版本。</p>
 <p>平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。普通用户进入工作空间左侧的“资源库-系统”；管理员进入 <code>/agent/admin/#system-library</code> 的“系统资源发布”。</p>
 <h2 id="_1">功能与共享方式</h2>
 <p>系统资源库只展示平台提供、经维护者预览调试确认可直接使用、无需厂商额外授权的插件、工作流、提示词、知识库、数据库。普通用户可以搜索、按类型筛选、分页和查看使用说明，不提供创建、编辑、删除系统原件的入口。系统资源使用原资源 ID 共享引用，不为每个用户复制一份。</p>
@@ -149,9 +149,10 @@ article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--li
 </table>
 <p>专项验收结果见同目录的 <code>系统资源库验收.json</code>，部署及运行核对见 <code>系统资源库运行核对.json</code>。验收仅使用合成资源与临时账号，不将客户已有知识库发布为系统资源。完整仓库测试与所有第三方服务联调不包含在专项验收范围内。</p>
 <h2 id="_7">本次验收结果</h2>
+<p>2026-11-15 新增平台自有“医疗机构联网查询”插件，提供公开网页搜索和指定网址读取，无需用户额外申请厂商授权。系统目录现为 7 个资源（1 个正式插件、6 个内置提示词）；原有 18 个第三方插件仍保留在“搜索工具”。普通用户在添加插件窗口选择“资源库-系统”即可使用。详细范围、限制及最新验收记录见 <a href="联网查询插件使用与运维说明.md">联网查询插件使用与运维说明</a>。以下 2026-11-14 数据保留为初次系统资源库上线时的历史记录。</p>
 <p>2026-11-14 已按独立双入口及无需额外授权的定义调整并部署，71 项跨账号 API 与页面检查通过。专项验收包括五类资源发布、两个普通用户跨空间选择、四个智能体引用同一公共数据库、实际工作流执行、更新修订、任务中心固定版本、只读接口拦截、下架历史、发布准入、两个插件选择入口、系统插件实际绑定及数据来源分离。原有厂商授权配置摘要核对一致。具体执行结果与时间见专项验收 JSON。数据库 SQL 隔离、目录筛选分页、工作流依赖检查单元测试，以及前后端构建和文档布局核对均通过。</p>
 <p>平台原有 6 个本地提示词保留在系统目录。原有 18 个第三方插件保留在“搜索工具”，不占用系统资源数量。系统插件、工作流、知识库、数据库由平台后续开发、完成调试并明确发布后展示；不放入未经验证的示例占位资源。合成验收资源和临时账号在验收结束后清理。</p>
-<p>11 个容器运行正常，两份既有知识数据分别保留 19,946 行和 9,000 行，均处理完成。双 Embedding 工作进程及插件凭据只读挂载保持正常。运行核对时根分区剩余约 67 GiB，<code>/home</code> 剩余约 82 GiB，精确数值及时间见运行核对记录。原客户账号会话已过期，本次未重新登录该真实账号，因此原地址查询未作登录态 API 复测；已独立核对原知识数据完整性。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-14 · 无外部资源依赖</span></footer></main></div>
+<p>11 个容器运行正常，两份既有知识数据分别保留 19,946 行和 9,000 行，均处理完成。双 Embedding 工作进程及插件凭据只读挂载保持正常。运行核对时根分区剩余约 67 GiB，<code>/home</code> 剩余约 82 GiB，精确数值及时间见运行核对记录。原客户账号会话已过期，本次未重新登录该真实账号，因此原地址查询未作登录态 API 复测；已独立核对原知识数据完整性。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-15 · 无外部资源依赖</span></footer></main></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
 const toast=document.getElementById('toast');let toastTimer;
 function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}

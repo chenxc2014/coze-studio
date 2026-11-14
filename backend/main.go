@@ -34,6 +34,7 @@ import (
 	"github.com/coze-dev/coze-studio/backend/api/middleware"
 	"github.com/coze-dev/coze-studio/backend/api/router"
 	"github.com/coze-dev/coze-studio/backend/application"
+	publicweb "github.com/coze-dev/coze-studio/backend/application/webquery"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/conv"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/ternary"
 	"github.com/coze-dev/coze-studio/backend/pkg/logs"
@@ -53,6 +54,9 @@ func main() {
 
 	if err := application.Init(ctx); err != nil {
 		panic("InitializeInfra failed, err=" + err.Error())
+	}
+	if err := publicweb.Start(ctx); err != nil {
+		logs.Errorf("平台联网查询服务未就绪：%v", err)
 	}
 
 	startHttpServer()

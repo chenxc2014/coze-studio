@@ -1,0 +1,177 @@
+{
+  "checked_at": "2026-11-15T00:42:18.978183+08:00",
+  "release": {
+    "base_image": "coze-local/server:web-query-8fd1059d76a3",
+    "image": "coze-local/server:web-query-de2baeec8a3d",
+    "binary_sha256": "de2baeec8a3de156d035aa39026d9bedb531d54c4000249f2fc23f8a68e142d2",
+    "deployed_at": "2026-11-15 00:40:11 +0800",
+    "backup_path": "/home/coze/backups/web-query-20261115-004004",
+    "loopback_service_healthy": true,
+    "public_port_added": false
+  },
+  "plugin": {
+    "plugin_id": "7708064533507473408",
+    "source_owner_id": "7706461117710598144",
+    "source_space_id": "7706461117727375360",
+    "name": "医疗机构联网查询",
+    "auth": "none",
+    "tools": {
+      "read_public_webpage": "7708064533700411392",
+      "search_medical_web": "7708064533696217088"
+    },
+    "registered_at": "2026-11-15 00:27:26 +0800",
+    "native_debug": {
+      "search_status": "partial",
+      "search_results": 6,
+      "read_status": "ok",
+      "read_chars": 1344
+    },
+    "version": "v1.0.0",
+    "published_at": "2026-11-15 00:27:28 +0800",
+    "catalog_counts": {
+      "all": 7,
+      "database": 0,
+      "knowledge": 0,
+      "plugin": 1,
+      "prompt": 6,
+      "workflow": 0
+    },
+    "existing_vendor_credentials_preserved": true
+  },
+  "knowledge": [
+    {
+      "document_id": "7706726398408261632",
+      "completed_rows": 19946,
+      "failed_rows": 0,
+      "original_rows_preserved": true
+    },
+    {
+      "document_id": "7707166715007729664",
+      "completed_rows": 9000,
+      "failed_rows": 0,
+      "original_rows_preserved": true
+    }
+  ],
+  "containers": [
+    {
+      "name": "coze-server",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-web",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-milvus",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-mysql",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-elasticsearch",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-minio",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-etcd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-redis",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqadmin",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-nsqlookupd",
+      "status": "running",
+      "health": "healthy"
+    }
+  ],
+  "loopback_health": {
+    "service": "platform-public-web",
+    "status": "ok",
+    "vendor_credentials_required": false
+  },
+  "public_port_added": false,
+  "embedding_config_and_readonly_plugin_key_preserved": true,
+  "embedding_workers": [
+    {
+      "unit": "coze-embedding-worker@0",
+      "active": true,
+      "enabled": true,
+      "allowed_cpus": "0-7"
+    },
+    {
+      "unit": "coze-embedding-worker@1",
+      "active": true,
+      "enabled": true,
+      "allowed_cpus": "12-19"
+    }
+  ],
+  "embedding_resource_group": "CPUQuotaPerSecUSec=16s\nMemoryHigh=8589934592\nMemoryMax=10737418240",
+  "public_http": {
+    "/": 200,
+    "sign": 200,
+    "admin/": 200,
+    "admin/app-base-path.js": 200,
+    "admin/system-library.js": 200,
+    "admin/system-library.css": 200
+  },
+  "web_index_sha256": "4b6dc30b10c651f088fa9da0216e2efa28e7caf796b9f59832ce62b9497478c7",
+  "temporary_accounts_and_active_agents_cleaned": true,
+  "publication_revision": 1,
+  "disk": {
+    "time": "2026-11-14T16:42:27.023824+00:00",
+    "filesystems": {
+      "/": {
+        "total_GiB": 69.94,
+        "free_GiB": 67.43,
+        "used_percent": 3.6
+      },
+      "/home": {
+        "total_GiB": 121.07,
+        "free_GiB": 81.08,
+        "used_percent": 33.0
+      }
+    },
+    "warnings": []
+  },
+  "system_catalog": {
+    "all": 7,
+    "database": 0,
+    "knowledge": 0,
+    "plugin": 1,
+    "prompt": 6,
+    "workflow": 0
+  },
+  "search_tools": {
+    "third_party_plugins": 18,
+    "independent_of_system_plugin": true
+  },
+  "system_plugin_selector": {
+    "plugins": 1,
+    "published_plugin_present": true
+  }
+}

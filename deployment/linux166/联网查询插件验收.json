@@ -1,0 +1,136 @@
+{
+  "checked_at": "2026-11-15 00:42:02 +0800",
+  "success": true,
+  "checks": [
+    "普通用户 consumer 可查询系统插件",
+    "普通用户 consumer 可从独立选择器使用插件",
+    "原搜索工具保留且未混入系统插件 consumer",
+    "普通用户 other 可查询系统插件",
+    "普通用户 other 可从独立选择器使用插件",
+    "原搜索工具保留且未混入系统插件 other",
+    "普通用户不能删除系统插件原件",
+    "普通用户不能进入后台发布",
+    "用户输入云元数据地址被拦截",
+    "验证码来源返回受限状态而不伪造正文",
+    "资源库系统页面显示正式联网查询插件",
+    "添加插件保留搜索工具及系统资源双入口",
+    "系统联网插件提供两个可直接选择的工具",
+    "普通用户通过页面实际绑定系统插件原ID",
+    "选择过程无页面脚本错误",
+    "普通用户的独立智能体可共享引用同一插件 consumer",
+    "普通用户的独立智能体可共享引用同一插件 other",
+    "智能体实际调用 search_medical_web",
+    "搜索后的回答遵循智能体指定JSON格式且有来源",
+    "智能体实际调用 read_public_webpage",
+    "读取后的回答按智能体要求提供要点与来源"
+  ],
+  "plugin": {
+    "plugin_id": "7708064533507473408",
+    "source_owner_id": "7706461117710598144",
+    "source_space_id": "7706461117727375360",
+    "name": "医疗机构联网查询",
+    "auth": "none",
+    "tools": {
+      "read_public_webpage": "7708064533700411392",
+      "search_medical_web": "7708064533696217088"
+    },
+    "registered_at": "2026-11-15 00:27:26 +0800",
+    "native_debug": {
+      "search_status": "partial",
+      "search_results": 6,
+      "read_status": "ok",
+      "read_chars": 1344
+    },
+    "version": "v1.0.0",
+    "published_at": "2026-11-15 00:27:28 +0800",
+    "catalog_counts": {
+      "all": 7,
+      "database": 0,
+      "knowledge": 0,
+      "plugin": 1,
+      "prompt": 6,
+      "workflow": 0
+    },
+    "existing_vendor_credentials_preserved": true
+  },
+  "real_model": "平台现有DeepSeek，model_id=100002",
+  "real_model_requests": 2,
+  "vendor_search_api_or_credentials_used": false,
+  "existing_vendor_credentials_preserved": true,
+  "temporary_resources_cleaned": true,
+  "fixture_marker": "ac730085f687",
+  "agent_cases": [
+    {
+      "tool": "search_medical_web",
+      "duration_seconds": 13.62,
+      "http_status": 200,
+      "message_types": [
+        "ack",
+        "answer",
+        "follow_up",
+        "function_call",
+        "tool_response",
+        "verbose"
+      ],
+      "automatic_tool_call": true,
+      "tool_response_received": true,
+      "answer": "{\n  \"名称\": \"诸暨市第五人民医院\",\n  \"官网\": \"https://zjs5y.zhuji.gov.cn/\",\n  \"地址\": \"诸暨市浣东街道康福路98号（精神专科医院院区，邮编311801）\",\n  \"联系电话\": \"0575-87271190\",\n  \"最新公告\": \"只能核实到正文与发布日期的最新一条公告是《诸暨市心理健康服务中心LED显示屏项目采购招标公告》，发布于2026-11-04；官网首页还显示，2026-11-12和2026-11-13有更新条目，但没有显示完整标题，正文页也无法读取，所以这里不改写它们。\",\n  \"来源\": [\n    \"https://zjs5y.zhuji.gov.cn/\",\n    \"https://zjs5y.zhuji.gov.cn/col/col2502/index.html\",\n    \"https://zjs5y.zhuji.gov.cn/art/2026/11/4/art_2503_945.html\"\n  ]\n}"
+    },
+    {
+      "tool": "read_public_webpage",
+      "duration_seconds": 4.06,
+      "http_status": 200,
+      "message_types": [
+        "ack",
+        "answer",
+        "follow_up",
+        "function_call",
+        "tool_response",
+        "verbose"
+      ],
+      "automatic_tool_call": true,
+      "tool_response_received": true,
+      "answer": "- 国家医疗保障局官方网站，首页设有时政要闻、医保新闻、机构设置、政策法规、信息公开、统计数据、机关党建、互动交流等栏目。\n- 政策法规栏目近期发布2026年版药品目录（含商业健康保险创新药品目录）、按病组和病种分值付费3.0版分组方案、长期护理保险支付管理指导意见等文件。\n- 网站还提供统计数据（如2026年1-9月基本医保统筹基金和生育保险主要指标、2025年全国医疗保障事业发展统计公报）、通知公告与曝光台、公共服务及互动交流等内容。\n\n来源：https://www.nhsa.gov.cn/"
+    }
+  ],
+  "screenshots": [
+    "medical-web-catalog.png",
+    "medical-web-selector.png"
+  ],
+  "national_search_cases": [
+    {
+      "query": "四川大学华西医院",
+      "region": "四川省成都市",
+      "status": "ok",
+      "results": 5,
+      "readable_pages": 1,
+      "domains": [
+        "www.wchscu.cn",
+        "www.cd120.com",
+        "baike.baidu.com",
+        "www.cd120.com",
+        "www.xjyzw.cn"
+      ],
+      "duration_seconds": 1.11
+    },
+    {
+      "query": "深圳市人民医院",
+      "region": "广东省深圳市",
+      "status": "ok",
+      "results": 5,
+      "readable_pages": 1,
+      "domains": [
+        "www.sz.gov.cn",
+        "wjw.sz.gov.cn",
+        "www.szhospital.com",
+        "www.szhospital.com",
+        "baike.baidu.com"
+      ],
+      "duration_seconds": 0.53
+    }
+  ],
+  "stream_checker_regression_tests": 3,
+  "public_web_unit_tests": 8,
+  "pre_fix_real_model_requests": 2,
+  "real_model_requests_total_including_reproduction": 4
+}
