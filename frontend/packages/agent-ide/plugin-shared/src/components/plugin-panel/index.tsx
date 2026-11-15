@@ -385,6 +385,15 @@ export const PluginPanel: React.FC<PluginPanelProps> = ({
                 {/* condition */}
 
                 {addonBefore}
+                {productInfo?.category?.name ? (
+                  <Tag
+                    color="primary"
+                    size="mini"
+                    data-testid="plugin.market.category-tag"
+                  >
+                    {productInfo.category.name}
+                  </Tag>
+                ) : null}
                 {productInfo?.plugin_type === ProductPluginType.LocalPlugin ? (
                   <Tag
                     color="cyan"

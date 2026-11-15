@@ -22,6 +22,8 @@ import { useSpaceStore } from '@coze-arch/bot-studio-store';
 import { UICompositionModalSider } from '@coze-arch/bot-semi';
 import { IconMyTools, IconTeamTools } from '@coze-arch/bot-icons';
 import { type Int64, SpaceType } from '@coze-arch/bot-api/developer_api';
+import { ProductApi } from '@coze-arch/bot-api';
+import { ProductEntityType } from '@coze-arch/bot-api/product_api';
 import {
   PluginFilterType,
   From,
@@ -29,6 +31,7 @@ import {
 } from '@coze-agent-ide/plugin-shared';
 
 import s from './plugin-filter.module.less';
+import { CategoryIcon } from './category-icon';
 
 export interface PluginFilterProps {
   isSearching: boolean;
@@ -49,6 +52,32 @@ export const PluginFilter: React.FC<PluginFilterProps> = ({
 }) => {
   const spaceType = useSpaceStore(store => store.space.space_type);
   const defaultId = getDefaultPluginCategory().id;
+  const isMarketCategory = type === defaultId || /^\d+$/.test(String(type));
+  const {
+    data: categories = [],
+    loading: categoriesLoading,
+    error: categoriesError,
+    refresh: reloadCategories,
+  } = useRequest(
+    async () => {
+      const result = await ProductApi.PublicGetProductCategoryList({
+        entity_type: ProductEntityType.Plugin,
+      });
+      if (result.code && result.code !== 0) throw new Error('无法读取工具分类');
+      return (result.data?.categories || [])
+        .filter(category => category.id && category.name)
+        .map(category => ({
+          id: String(category.id),
+          name: category.name || '',
+          count: category.count || 0,
+        }));
+    },
+    { ready: isShowStorePlugin },
+  );
+  const categoryTotal = categories.reduce(
+    (total, category) => total + (category.count || 0),
+    0,
+  );
 
   const { data: enableSaaSPlugin } = useRequest(async () => {
     const res = await explore.PublicGetMarketPluginConfig({});
@@ -113,16 +142,82 @@ export const PluginFilter: React.FC<PluginFilterProps> = ({
 
           {isShowStorePlugin ? (
             <div className={s['tool-content-area']}>
-              <div
+              <button
+                type="button"
                 data-testid="plugin.modal.filter.option.search"
-                className={classNames(s['tool-tag-list-cell'], {
-                  [s.active]: type === defaultId,
-                })}
+                className={classNames(
+                  s['tool-tag-list-cell'],
+                  s['market-button'],
+                  {
+                    [s.active]: isMarketCategory,
+                  },
+                )}
+                aria-expanded={isMarketCategory}
                 onClick={() => onChangeAfterDiff(defaultId)}
               >
                 <IconCozDesktopFill className={s['tool-tag-list-cell-icon']} />
                 搜索工具
-              </div>
+              </button>
+              {isMarketCategory ? (
+                <div
+                  className={s['market-categories']}
+                  role="group"
+                  aria-label="搜索工具分类"
+                  aria-busy={categoriesLoading}
+                  data-testid="plugin.market.categories"
+                >
+                  <button
+                    type="button"
+                    data-testid="plugin.market.category.all"
+                    aria-pressed={type === defaultId}
+                    className={classNames(s['category-button'], {
+                      [s['category-active']]: type === defaultId,
+                    })}
+                    onClick={() => onChangeAfterDiff(defaultId)}
+                  >
+                    <CategoryIcon id="all" className={s['category-icon']} />
+                    <span>全部</span>
+                    {!categoriesLoading && !categoriesError ? (
+                      <span className={s['category-count']}>
+                        {categoryTotal}
+                      </span>
+                    ) : null}
+                  </button>
+                  {categories.map(category => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      data-testid={`plugin.market.category.${category.id}`}
+                      aria-pressed={type === category.id}
+                      className={classNames(s['category-button'], {
+                        [s['category-active']]: type === category.id,
+                      })}
+                      onClick={() => onChangeAfterDiff(category.id)}
+                    >
+                      <CategoryIcon
+                        id={category.id}
+                        className={s['category-icon']}
+                      />
+                      <span>{category.name}</span>
+                      <span className={s['category-count']}>
+                        {category.count}
+                      </span>
+                    </button>
+                  ))}
+                  {categoriesLoading ? (
+                    <div className={s['category-message']}>正在加载分类…</div>
+                  ) : null}
+                  {categoriesError ? (
+                    <button
+                      type="button"
+                      className={s['category-retry']}
+                      onClick={reloadCategories}
+                    >
+                      分类加载失败，点击重试
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           ) : null}
 

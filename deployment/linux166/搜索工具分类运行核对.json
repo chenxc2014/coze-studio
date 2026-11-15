@@ -1,0 +1,159 @@
+{
+  "checked_at": "2026-11-15T22:37:51.552106+08:00",
+  "release": {
+    "base_image": "coze-local/server:plugin-categories-a8a0d00f1876",
+    "image": "coze-local/server:plugin-categories-e07e69038fef",
+    "binary_sha256": "e07e69038fef90fad8360923b5a43491c22f8b3e3073222ae56380cc27ba4c17",
+    "web_release": "/home/coze/releases/web-agent-categories-437665137d0d",
+    "web_index_sha256": "437665137d0d74d14cceb3fb4c42d0ed9980de70352da97577b3589f24a95ebe",
+    "previous_web_volume": "/home/coze/releases/web-agent-categories-437665137d0d:/usr/share/nginx/html:ro,z",
+    "deployed_at": "2026-11-15 22:36:06 +0800",
+    "backup_path": "/home/coze/backups/plugin-categories-20261115-223600"
+  },
+  "knowledge": [
+    {
+      "document_id": "7706726398408261632",
+      "completed_rows": 19946,
+      "failed_rows": 0,
+      "original_rows_preserved": true
+    },
+    {
+      "document_id": "7707166715007729664",
+      "completed_rows": 9000,
+      "failed_rows": 0,
+      "original_rows_preserved": true
+    }
+  ],
+  "containers": [
+    {
+      "name": "coze-server",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-web",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-milvus",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-mysql",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-elasticsearch",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-minio",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-etcd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-redis",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqadmin",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-nsqlookupd",
+      "status": "running",
+      "health": "healthy"
+    }
+  ],
+  "embedding_config_and_readonly_plugin_key_preserved": true,
+  "embedding_workers_active_and_enabled": true,
+  "web_query_health": {
+    "service": "platform-public-web",
+    "status": "ok",
+    "vendor_credentials_required": false
+  },
+  "public_http": {
+    "/": 200,
+    "sign": 200,
+    "admin/": 200,
+    "admin/system-library.js": 200
+  },
+  "temporary_accounts_and_active_agents_cleaned": true,
+  "disk": {
+    "time": "2026-11-15T14:37:57.789095+00:00",
+    "filesystems": {
+      "/": {
+        "total_GiB": 69.94,
+        "free_GiB": 67.42,
+        "used_percent": 3.6
+      },
+      "/home": {
+        "total_GiB": 121.07,
+        "free_GiB": 79.87,
+        "used_percent": 34.0
+      }
+    },
+    "warnings": []
+  },
+  "categories": [
+    {
+      "id": "1001",
+      "name": "网页搜索",
+      "count": 1
+    },
+    {
+      "id": "1002",
+      "name": "新闻阅读",
+      "count": 1
+    },
+    {
+      "id": "1003",
+      "name": "便利生活",
+      "count": 2
+    },
+    {
+      "id": "1004",
+      "name": "图像",
+      "count": 2
+    },
+    {
+      "id": "1005",
+      "name": "效率办公",
+      "count": 9
+    },
+    {
+      "id": "1006",
+      "name": "科学与教育",
+      "count": 2
+    },
+    {
+      "id": "1007",
+      "name": "金融与商业",
+      "count": 1
+    }
+  ],
+  "system_resources": {
+    "all": 7,
+    "database": 0,
+    "knowledge": 0,
+    "plugin": 1,
+    "prompt": 6,
+    "workflow": 0
+  }
+}

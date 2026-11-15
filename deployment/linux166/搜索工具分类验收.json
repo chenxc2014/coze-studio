@@ -1,0 +1,90 @@
+{
+  "checked_at": "2026-11-15 22:37:03 +0800",
+  "success": true,
+  "checks": [
+    "分类只显示有工具的七类，数量合计18",
+    "全部保留18个原工具，无遗漏重复",
+    "网页搜索的工具归类与统计一致",
+    "新闻阅读的工具归类与统计一致",
+    "便利生活的工具归类与统计一致",
+    "图像的工具归类与统计一致",
+    "效率办公的工具归类与统计一致",
+    "科学与教育的工具归类与统计一致",
+    "金融与商业的工具归类与统计一致",
+    "分类分页结果不重复且总数正确",
+    "分类与名称搜索取交集",
+    "英文搜索忽略大小写",
+    "未知分类返回空列表",
+    "独立系统插件仍可查询且不混入搜索分类",
+    "分类加载失败时保留全部入口并提供重试",
+    "点击重试可以恢复分类列表",
+    "点击新闻分类只显示搜狐热闻及分类标签",
+    "分类内搜索飞书显示8个匹配工具",
+    "切换分类保留关键词并正确显示空结果",
+    "搜索结果切回全部不会残留上一分类限制",
+    "分类按钮支持键盘选择",
+    "切换系统资源仍展示独立插件且隐藏搜索分类",
+    "分类筛选后仍能把原工具绑定到智能体",
+    "页面操作无脚本错误"
+  ],
+  "categories": {
+    "1001": {
+      "name": "网页搜索",
+      "count": 1
+    },
+    "1002": {
+      "name": "新闻阅读",
+      "count": 1
+    },
+    "1003": {
+      "name": "便利生活",
+      "count": 2
+    },
+    "1004": {
+      "name": "图像",
+      "count": 2
+    },
+    "1005": {
+      "name": "效率办公",
+      "count": 9
+    },
+    "1006": {
+      "name": "科学与教育",
+      "count": 2
+    },
+    "1007": {
+      "name": "金融与商业",
+      "count": 1
+    }
+  },
+  "existing_vendor_credentials_preserved": true,
+  "real_models_or_vendor_services_called": false,
+  "temporary_resources_cleaned": true,
+  "fixture_marker": "092c01bdbc08",
+  "screenshots": [
+    "plugin-categories-all.png",
+    "plugin-categories-news.png"
+  ],
+  "pagination_stability": {
+    "rounds": 8,
+    "requests": 24,
+    "stable_order": true,
+    "duplicates_or_missing": false
+  },
+  "backend_checks": {
+    "category_regressions": 3,
+    "existing_saas_list_regression": true,
+    "server_build_passed": true
+  },
+  "frontend_checks": {
+    "full_build_passed": true,
+    "new_type_diagnostics": 0,
+    "preexisting_adapter_context_diagnostics": 10,
+    "shared_package_diagnostics": 0
+  },
+  "html_checks": {
+    "tables": 2,
+    "data_rows": 15,
+    "desktop_and_mobile_verified": true
+  }
+}

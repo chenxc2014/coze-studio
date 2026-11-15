@@ -128,8 +128,9 @@ func (p *PluginApplicationService) PublicGetProductList(ctx context.Context, req
 		return nil, errorx.Wrapf(err, "ListPluginProducts failed")
 	}
 
-	products := make([]*productAPI.ProductInfo, 0, len(res.Plugins))
-	for _, pl := range res.Plugins {
+	plugins, total, hasMore := filterMarketPlugins(res.Plugins, req.GetCategoryID(), req.GetKeyword(), req.GetPageNum(), req.GetPageSize())
+	products := make([]*productAPI.ProductInfo, 0, len(plugins))
+	for _, pl := range plugins {
 		tls, err := p.toolRepo.GetPluginAllOnlineTools(ctx, pl.ID)
 		if err != nil {
 			return nil, errorx.Wrapf(err, "GetPluginAllOnlineTools failed, pluginID=%d", pl.ID)
@@ -139,25 +140,17 @@ func (p *PluginApplicationService) PublicGetProductList(ctx context.Context, req
 		if err != nil {
 			return nil, err
 		}
+		category := entity.MarketPluginCategory(pl.ID)
+		pi.MetaInfo.Category = &productAPI.ProductCategory{ID: category.ID, Name: category.Name}
 
 		products = append(products, pi)
-	}
-
-	if req.GetKeyword() != "" {
-		filterProducts := make([]*productAPI.ProductInfo, 0, len(products))
-		for _, _p := range products {
-			if strings.Contains(strings.ToLower(_p.MetaInfo.Name), strings.ToLower(req.GetKeyword())) {
-				filterProducts = append(filterProducts, _p)
-			}
-		}
-		products = filterProducts
 	}
 
 	resp = &productAPI.GetProductListResponse{
 		Data: &productAPI.GetProductListData{
 			Products: products,
-			HasMore:  false, // Finish at one time
-			Total:    int32(res.Total),
+			HasMore:  hasMore,
+			Total:    total,
 		},
 	}
 

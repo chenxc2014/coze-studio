@@ -176,7 +176,7 @@ async function getPluginFromMarket(
       entity_type: isCoze
         ? ProductEntityType.SaasPlugin
         : ProductEntityType.Plugin,
-      category_id: type === 'recommend' || IS_OPEN_SOURCE ? undefined : type,
+      category_id: /^\d+$/.test(type) ? type : undefined,
       sort_type: orderByPublic,
       page_num: nextPage,
       page_size: 20,

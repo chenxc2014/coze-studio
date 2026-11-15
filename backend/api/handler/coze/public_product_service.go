@@ -367,14 +367,17 @@ func PublicGetProductCategoryList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	var resp *product_public_api.GetProductCategoryListResponse
-	req.EntityType = product_common.ProductEntityType_SaasPlugin
 	switch req.GetEntityType() {
-	case product_common.ProductEntityType_SaasPlugin:
+	case product_common.ProductEntityType_Plugin:
+		resp, err = plugin.PluginApplicationSVC.GetMarketProductCategoryList(ctx)
+	default:
+		// 保留原有 SaaS 分类请求行为，开源搜索工具使用独立的本地分类。
+		req.EntityType = product_common.ProductEntityType_SaasPlugin
 		resp, err = plugin.PluginApplicationSVC.GetSaasProductCategoryList(ctx, &req)
-		if err != nil {
-			internalServerErrorResponse(ctx, c, err)
-			return
-		}
+	}
+	if err != nil {
+		internalServerErrorResponse(ctx, c, err)
+		return
 	}
 	c.JSON(consts.StatusOK, resp)
 }
