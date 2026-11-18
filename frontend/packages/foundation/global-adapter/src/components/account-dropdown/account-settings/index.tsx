@@ -21,6 +21,8 @@ import {
 } from '@coze-foundation/account-ui-base';
 import { I18n } from '@coze-arch/i18n';
 
+import { ApiAuthHeader, ApiIntegrationGuide } from './api-guide';
+
 export const useAccountSettings = () => {
   const tabs = [
     {
@@ -31,7 +33,23 @@ export const useAccountSettings = () => {
     {
       id: 'api-auth',
       tabName: I18n.t('settings_api_authorization'),
-      content: () => <PatBody size="small" type="primary" />,
+      content: () => (
+        <PatBody
+          size="small"
+          type="primary"
+          renderTopBodySlot={({ openAddModal }) => (
+            <ApiAuthHeader
+              onAddToken={openAddModal}
+              onOpenGuide={() => open('api-guide')}
+            />
+          )}
+        />
+      ),
+    },
+    {
+      id: 'api-guide',
+      tabName: 'API接入说明',
+      content: () => <ApiIntegrationGuide />,
     },
   ];
 

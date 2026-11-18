@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-11-18T19:15:08.056174+08:00",
+  "success": true,
+  "checks": [
+    "个人图标菜单显示API接入说明",
+    "个人菜单直接打开说明页",
+    "API授权页保留添加令牌并提供说明快捷入口",
+    "快捷入口与左侧菜单打开同一说明页",
+    "粘贴编辑地址生成字符串ID并保留中文引号换行",
+    "请求体可复制且不包含真实令牌",
+    "调用示例使用当前子路径和令牌环境变量",
+    "Bash示例离线执行能正确传递JSON参数",
+    "无效ID显示说明并保留可替换占位符",
+    "按当前接口展示大写Messages并筛选最终回答",
+    "说明包含状态查询、消息获取与连续对话",
+    "SSE示例与非流式请求区分",
+    "较小窗口可滚动到最后且页面不横向溢出",
+    "章节跳转保持弹窗及关闭按钮在视野内",
+    "章节导航在正文滚动后保持可见",
+    "说明页没有自动问答、令牌变更或粘贴网址访问",
+    "页面无脚本错误",
+    "当前账号令牌未发生变更"
+  ],
+  "live_model_requests": 0,
+  "real_token_mutations": 0,
+  "pasted_url_fetches": 0,
+  "existing_session_reused": true,
+  "real_credentials_in_examples": false,
+  "frontend_checks": {
+    "example_unit_tests": 4,
+    "full_build_passed": true,
+    "new_type_errors": 0,
+    "preexisting_type_diagnostics_in_checked_files": 0
+  },
+  "html_checks": {
+    "tables": 2,
+    "data_rows": 12,
+    "desktop_and_mobile_verified": true
+  },
+  "copy_test_used_browser_stub": true,
+  "curl_test_used_offline_stub": true,
+  "screenshots": [
+    "api-guide-avatar-menu.png",
+    "api-guide-overview.png",
+    "api-guide-request-example.png",
+    "api-guide-results.png",
+    "api-guide-compact.png"
+  ]
+}

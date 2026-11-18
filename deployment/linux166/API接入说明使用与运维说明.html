@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="59f7b138f73b9db17111516da78ca0c1a9ac2a44ab2d26da87ff3d52b0740c6a"><title>API接入说明使用与运维说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">三个进入位置</a></li>
+<li><a href="#_2">页面内容与示例生成</a></li>
+<li><a href="#_3">当前版本的调用流程</a></li>
+<li><a href="#_4">文件与维护位置</a></li>
+<li><a href="#_5">构建、发布与回退</a></li>
+<li><a href="#_6">验证范围</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：API接入说明使用与运维说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>API接入说明使用与运维说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="API接入说明使用与运维说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>更新日期：2026-11-18。适用于药销易-智能体平台当前定制版本。平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">三个进入位置</h2>
+<ol>
+<li>点击左下角个人图标，选择“API接入说明”，直接打开说明页面。</li>
+<li>在同一账号设置窗口的左侧菜单选择“API接入说明”。</li>
+<li>打开“API 授权”，在个人访问令牌管理页点击“API接入说明”快捷按钮。</li>
+</ol>
+<p>三个入口共用同一个页面。原账号设置、API 授权、添加新令牌和退出登录功能继续保留；创建令牌仍走原有对话框、权限和有效期逻辑。本次未改变令牌的认证规则。</p>
+<h2 id="_2">页面内容与示例生成</h2>
+<p>说明包括 API 发布前提、获取智能体 ID、获取平台令牌、POST 提问、非流式状态轮询、获取最终回答、SSE 流式事件、连续对话和常见问题。页面按当前部署地址生成接口前缀：正式域名下保留 <code>/agent/</code>，根路径部署不额外添加该前缀。</p>
+<p>用户可输入智能体 ID，或粘贴含 <code>/bot/数字ID</code> 的编辑地址，页面仅在本地提取 ID，不访问粘贴的网址。长整数作为字符串处理，避免精度丢失。示例问题可编辑，JSON、Bash cURL 及连续对话示例同步更新，并提供复制按钮。无效 ID 显示提示，示例保留 <code>YOUR_BOT_ID</code> 待替换。</p>
+<p>说明页不读取、回显或保存真实令牌，不使用某个真实账号的智能体作为全平台默认示例，不自动发起问答。示例使用 <code>YOUR_PLATFORM_API_TOKEN</code> 或调用方环境变量 <code>AGENT_API_TOKEN</code>。复制功能优先使用浏览器剪贴板，受限时尝试本地兼容复制；仍失败则提示手动选择文本。</p>
+<h2 id="_3">当前版本的调用流程</h2>
+<p>外部应用使用已发布 API 渠道的智能体；预览使用的草稿配置并不自动成为外部 API 配置。后续修改需要重新发布。调用令牌应由具备该智能体访问资格的所属账号创建，外部请求不传网页登录密码或模型厂商密钥。</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>接口与结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>提问</td>
+<td><code>POST /agent/v3/chat</code>；请求头 <code>Authorization: Bearer 平台令牌</code> 与 <code>Content-Type: application/json</code>；请求体包含字符串 <code>bot_id</code>、业务 <code>user_id</code>、<code>additional_messages</code> 与明确的 <code>stream</code></td>
+</tr>
+<tr>
+<td>非流式提交</td>
+<td>使用 <code>stream: false</code>；响应 <code>data.id</code> 是 <code>chat_id</code>，<code>data.conversation_id</code> 是会话 ID，先返回任务信息，并非完整回答</td>
+</tr>
+<tr>
+<td>状态查询</td>
+<td><code>GET /agent/v3/chat/retrieve?conversation_id=会话ID&amp;chat_id=任务ID</code>；检查 <code>data.status</code>，完成前合理间隔轮询并设置总超时</td>
+</tr>
+<tr>
+<td>获取回答</td>
+<td><code>GET /agent/v3/chat/message/list?conversation_id=会话ID&amp;chat_id=任务ID</code>；当前消息数组是 <strong><code>Messages</code></strong>，筛选 <code>role=assistant</code> 且 <code>type=answer</code> 的消息，读取 <code>content</code></td>
+</tr>
+<tr>
+<td>连续对话</td>
+<td>之后的 POST 增加原 <code>conversation_id</code>；同一业务用户保持其 <code>user_id</code>，不同用户分别维护会话</td>
+</tr>
+<tr>
+<td>流式接收</td>
+<td>使用 <code>stream: true</code>，按 SSE 读取回答增量或完成消息，不重复拼接，不将工具结果或推理消息当作最终回答</td>
+</tr>
+</tbody>
+</table>
+<p><code>Messages</code> 的首字母大写是当前源码中的真实 JSON 字段，不能按照官方云平台的其他版本或旧聊天说明把消息数组写作 <code>data</code>。状态查询和提交响应仍使用 <code>data</code> 保存任务信息。说明中的消息结构为删减字段后的示意，不冒充真实调用结果。</p>
+<p>HTTP 200 不一定表示业务成功，还需检查 JSON 业务码和 SSE 错误事件。<code>completed</code> 后获取消息；<code>created</code> 和 <code>in_progress</code> 尚未完成。<code>failed</code>、<code>expired</code>、<code>cancelled</code>、<code>required_action</code> 不应无限轮询，需要分别处理。</p>
+<h2 id="_4">文件与维护位置</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>frontend/packages/foundation/global-adapter/src/components/account-dropdown/index.tsx</code></td>
+<td>个人图标菜单入口</td>
+</tr>
+<tr>
+<td><code>frontend/packages/foundation/global-adapter/src/components/account-dropdown/account-settings/index.tsx</code></td>
+<td>左侧说明菜单及 API 授权页快捷入口</td>
+</tr>
+<tr>
+<td><code>frontend/packages/foundation/global-adapter/src/components/account-dropdown/account-settings/api-guide/index.tsx</code></td>
+<td>说明页面、步骤导航、示例表单、复制按钮和令牌页说明头部</td>
+</tr>
+<tr>
+<td>同目录 <code>index.module.less</code></td>
+<td>窗口内滚动阅读、代码块和输入样式</td>
+</tr>
+<tr>
+<td>同目录 <code>examples.ts</code></td>
+<td>部署前缀、编辑地址 ID 提取、JSON 与 cURL 生成</td>
+</tr>
+<tr>
+<td>同目录 <code>examples.test.ts</code></td>
+<td>根路径和子路径、长 ID、特殊字符及流式参数测试</td>
+</tr>
+</tbody>
+</table>
+<p>API 行为核对位置为 <code>backend/api/handler/coze/agent_run_service.go</code>、<code>backend/api/handler/coze/message_service.go</code>、<code>backend/application/conversation/openapi_agent_run.go</code> 和对应消息模型。以后调整响应字段或执行方式时，应同时更新说明，不能只复制官方云平台文档。</p>
+<p>本次复用 <code>PatBody.renderTopBodySlot</code> 扩展授权页，不修改共享令牌组件的认证和创建逻辑，也不增加后端接口、数据库迁移或依赖。</p>
+<h2 id="_5">构建、发布与回退</h2>
+<p>前端在 <code>/home/coze/build/subpath-source</code> 独立构建，产物发布到 <code>/home/coze/releases/web-agent-api-guide-*</code>。部署前执行 <code>/home/coze/ops/capacity.py --guard</code>，沿用根分区至少余 15 GiB、<code>/home</code> 至少余 25 GiB 及既有使用率限制。所有新增产物、缓存和备份使用 <code>/home/coze</code>。</p>
+<p>仅调整 Compose 中 <code>coze-web</code> 的静态目录挂载，再执行 <code>/home/coze/ops/compose.sh up -d --no-deps coze-web</code>。部署前保存 Compose 私有备份，检查线上前端基线；发布后核对 <code>/agent/</code> 返回新页面、无 Basic Auth 挑战，且 <code>coze-server</code> 的容器 ID 和镜像保持不变。发布记录在 <code>/home/coze/build/api-guide/release.json</code>。</p>
+<p>回退时先确认后续没有其他发布，再恢复该记录 <code>backup_path</code> 下的 <code>compose.json</code> 并重建 <code>coze-web</code>。不恢复数据库、不改令牌、不删除知识数据。后端服务及其插件凭据只读挂载、Embedding 配置、联网查询和已有 API 运行逻辑保持原状。</p>
+<h2 id="_6">验证范围</h2>
+<p>四项示例生成单元测试和定向类型检查通过，完整前端构建成功。线上验收记录见同目录 <code>API接入说明验收.json</code>，发布及服务检查见 <code>API接入说明运行核对.json</code>。</p>
+<p>页面验收复用有效登录态，仅检查菜单、说明页、示例生成、复制入口、当前路径、消息字段和滚动阅读。复制行为通过浏览器内的测试替身核对，避免读取或覆盖用户系统剪贴板；cURL 参数使用离线替身函数验证，不发起网络调用。粘贴的编辑网址也不访问。</p>
+<p>2026-11-18 已通过 18 项只读页面及参数检查。章节跳转只滚动说明正文，导航保持可见，较小窗口下标题和关闭按钮仍在视野内。当前前端目录为 <code>/home/coze/releases/web-agent-api-guide-8daedea2aa5f</code>，Compose 备份为 <code>/home/coze/backups/api-guide-20261118-191420/compose.json</code>；首次发布说明功能前的备份为 <code>/home/coze/backups/api-guide-20261118-190624/compose.json</code>。后端仍为原容器和镜像，11 个容器正常，两份原知识文档分别保持 19,946 行与 9,000 行且无失败切片，容量守卫通过。精确检查时间及容量见运行核对 JSON。</p>
+<p>本次不创建或修改真实令牌，不自动调用已发布智能体或模型，不使用厂商 API，不保存真实凭据或会话。不能将说明页验收表述为真实业务智能体 API 联调通过。账号与令牌生命周期仍按原平台功能维护。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-18 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>

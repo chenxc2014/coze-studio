@@ -1,0 +1,107 @@
+{
+  "checked_at": "2026-11-18T19:15:08.828355+08:00",
+  "release": {
+    "web_release": "/home/coze/releases/web-agent-api-guide-8daedea2aa5f",
+    "web_index_sha256": "8daedea2aa5f4f7bce0a18c1da8c9ae9a1f1d7c7c9332840651a6e9006879fb3",
+    "previous_web_index_sha256": "41a9b63b7ebb5216f1dce216873068dc6ce1200e99cf7165abd346659601a0e8",
+    "server_container_id": "236f9954cd8fa6ed652dcb7204c9889e56534c57b100f5ffeeb786e4b31e425e",
+    "server_image": "coze-local/server:plugin-categories-e07e69038fef",
+    "backend_rebuilt": false,
+    "previous_web_volume": "/home/coze/releases/web-agent-api-guide-41a9b63b7ebb:/usr/share/nginx/html:ro,z",
+    "deployed_at": "2026-11-18 19:14:22 +0800",
+    "backup_path": "/home/coze/backups/api-guide-20261118-191420",
+    "backend_container_unchanged": true
+  },
+  "knowledge": [
+    {
+      "document_id": "7706726398408261632",
+      "completed_rows": 19946,
+      "failed_rows": 0
+    },
+    {
+      "document_id": "7707166715007729664",
+      "completed_rows": 9000,
+      "failed_rows": 0
+    }
+  ],
+  "containers": [
+    {
+      "name": "coze-web",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-server",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-milvus",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-mysql",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-elasticsearch",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-minio",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-etcd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-redis",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqd",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "coze-nsqadmin",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "coze-nsqlookupd",
+      "status": "running",
+      "health": "healthy"
+    }
+  ],
+  "backend_container_and_readonly_plugin_key_preserved": true,
+  "embedding_workers_active": true,
+  "public_http": {
+    "/": 200,
+    "sign": 200,
+    "admin/": 200
+  },
+  "disk": {
+    "time": "2026-11-18T11:15:10.243223+00:00",
+    "filesystems": {
+      "/": {
+        "total_GiB": 69.94,
+        "free_GiB": 67.1,
+        "used_percent": 4.1
+      },
+      "/home": {
+        "total_GiB": 121.07,
+        "free_GiB": 79.46,
+        "used_percent": 34.4
+      }
+    },
+    "warnings": []
+  }
+}

@@ -20,7 +20,11 @@ import { GlobalLayoutAccountDropdown } from '@coze-foundation/layout';
 import { useLogout } from '@coze-foundation/account-ui-adapter';
 import { I18n } from '@coze-arch/i18n';
 import { useUserInfo } from '@coze-arch/foundation-sdk';
-import { IconCozExit, IconCozSetting } from '@coze-arch/coze-design/icons';
+import {
+  IconCozDocument,
+  IconCozExit,
+  IconCozSetting,
+} from '@coze-arch/coze-design/icons';
 import { Dropdown } from '@coze-arch/coze-design';
 
 import { UserInfoMenu } from './user-info-menu';
@@ -50,6 +54,14 @@ export const AccountDropdown = () => {
             openAccountSettings('api-auth');
           },
           dataTestId: 'layout_avatar_api-auth',
+        },
+        {
+          prefixIcon: <IconCozDocument />,
+          title: 'API接入说明',
+          onClick: () => {
+            openAccountSettings('api-guide');
+          },
+          dataTestId: 'layout_avatar_api-guide',
         },
         {
           prefixIcon: <IconCozSetting />,

@@ -1,0 +1,223 @@
+.auth-header {
+  width: 100%;
+  margin-bottom: 16px;
+}
+.auth-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.auth-actions h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+}
+.auth-header p {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--coz-fg-secondary, #606574);
+  background: var(--coz-mg-secondary, #f3f4f8);
+  border-radius: 8px;
+}
+.guide {
+  overflow: auto;
+  overscroll-behavior: contain;
+  width: 100%;
+  height: 100%;
+  max-height: 488px;
+  padding: 0 12px 28px 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--coz-fg-primary, #323747);
+  scroll-padding-top: 8px;
+}
+.guide * {
+  box-sizing: border-box;
+}
+.intro h2 {
+  margin: 4px 0 6px;
+  font-size: 22px;
+  line-height: 1.45;
+}
+.intro p {
+  margin: 6px 0 12px;
+  color: var(--coz-fg-secondary, #606574);
+}
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4d53e8;
+}
+.address {
+  padding: 10px 12px;
+  background: #f1f3ff;
+  border: 1px solid #e0e3ff;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.navigation {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 0;
+  background: var(--coz-bg-primary, #f8f9fc);
+  border-bottom: 1px solid var(--coz-stroke-primary, #e6e8f0);
+}
+.navigation button {
+  cursor: pointer;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: #4d53e8;
+  background: #f5f5ff;
+  border: 1px solid #e0e3ff;
+  border-radius: 6px;
+}
+.section {
+  padding-top: 10px;
+  margin-top: 8px;
+  border-top: 1px solid var(--coz-stroke-primary, #e6e8f0);
+}
+.section h3 {
+  margin: 10px 0;
+  font-size: 17px;
+}
+.section p {
+  margin: 10px 0;
+}
+.section ol,
+.section ul {
+  padding-left: 22px;
+}
+.section li {
+  margin: 7px 0;
+}
+.guide code {
+  padding: 2px 4px;
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  color: #3943a3;
+  background: #f1f3fa;
+  border-radius: 3px;
+  overflow-wrap: anywhere;
+}
+.note {
+  padding: 10px 12px;
+  background: #f3f5fc;
+  border-left: 3px solid #6875e8;
+  border-radius: 0 6px 6px 0;
+}
+.form {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 14px;
+  background: #f8f9fc;
+  border: 1px solid #e6e8f0;
+  border-radius: 8px;
+}
+.form label {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.form input,
+.form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  font: inherit;
+  font-weight: 400;
+  color: inherit;
+  background: white;
+  border: 1px solid #d8dce8;
+  border-radius: 6px;
+}
+.form textarea {
+  resize: vertical;
+}
+.error {
+  margin: 0;
+  color: #c33d45;
+  font-size: 12px;
+}
+.example {
+  position: relative;
+  margin: 12px 0 20px;
+  overflow: hidden;
+  border: 1px solid #dde2ee;
+  border-radius: 8px;
+}
+.example-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 12px;
+  font-size: 12px;
+  color: #5c6375;
+  background: #f3f5fa;
+}
+.example-header button {
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font: inherit;
+  color: #4d53e8;
+  background: white;
+  border: 1px solid #dce0ed;
+  border-radius: 4px;
+}
+.example pre {
+  overflow: auto;
+  margin: 0;
+  padding: 12px;
+  line-height: 1.65;
+  color: #253450;
+  background: #fbfcff;
+}
+.example pre code {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+.copy-status {
+  display: block;
+  padding: 0 12px;
+  font-size: 12px;
+  color: #5260b5;
+}
+.copy-status:empty {
+  display: none;
+}
+.section dt {
+  margin-top: 14px;
+  font-weight: 600;
+}
+.section dd {
+  margin: 4px 0 12px;
+  color: var(--coz-fg-secondary, #606574);
+}
+.guide button:focus-visible,
+.form input:focus-visible,
+.form textarea:focus-visible {
+  outline: 2px solid #6875e8;
+  outline-offset: 2px;
+}
+@media (max-width: 1000px) {
+  .guide {
+    padding-right: 4px;
+  }
+  .intro h2 {
+    font-size: 20px;
+  }
+}
