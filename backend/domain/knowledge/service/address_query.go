@@ -74,7 +74,7 @@ func getAddressColumns(info *entity.TableInfo) (addressColumns, error) {
 			cols.province = physical
 		case "市", "城市", "地级市":
 			cols.city = physical
-		case "区县", "区/县", "区（县）", "区(县)":
+		case "区", "县", "区县", "区/县", "区（县）", "区(县)":
 			cols.district = physical
 		case "地址", "详细地址", "机构地址":
 			cols.address = physical

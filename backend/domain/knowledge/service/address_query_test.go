@@ -101,6 +101,37 @@ func TestAddressQueryNoMatchAndCount(t *testing.T) {
 	}
 }
 
+func TestAddressAgentDistrictColumnAliases(t *testing.T) {
+	for _, name := range []string{"区", "县", "区县", "区/县", "区（县）", "区(县)"} {
+		t.Run(name, func(t *testing.T) {
+			svc, db, doc := addressFixture()
+			doc.TableInfo.Columns[2].Name = name
+			db.total = 0
+			request := &RetrieveContext{
+				OriginQuery: "广东省深圳市南山区南头街道桃园路89号（桃园路与南山大道交汇处）",
+				Documents:   []*model.KnowledgeDocument{doc},
+				AutoAddress: true,
+				ResolveAddress: func(context.Context) (*knowledgeModel.AddressRecall, error) {
+					return &knowledgeModel.AddressRecall{Handled: true, Province: "广东省", City: "深圳市", District: "南山区", Address: "南头街道桃园路89号"}, nil
+				},
+			}
+			response, handled, err := svc.retrieveAddress(context.Background(), request)
+			if err != nil || !handled || len(response.RetrieveSlices) != 1 {
+				t.Fatalf("使用%s列查询库外地址不应中断智能体：handled=%v err=%v", name, handled, err)
+			}
+			var count *rdb.ExecuteSQLRequest
+			for _, query := range db.queries {
+				if strings.HasPrefix(query.SQL, "SELECT COUNT") {
+					count = query
+				}
+			}
+			if count == nil || !strings.Contains(count.SQL, "`c_3`") || len(count.Params) < 3 || count.Params[0] != "广东省" || count.Params[1] != "深圳市" || count.Params[2] != "南山区" {
+				t.Fatalf("不能忽略或替换用户指定的行政区条件：%+v", count)
+			}
+		})
+	}
+}
+
 func TestAddressQueryValidation(t *testing.T) {
 	for _, tc := range []struct {
 		name   string

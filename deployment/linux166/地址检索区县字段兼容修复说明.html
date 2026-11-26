@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Coze Studio linux166 部署与运维说明，包含存储规划、容量控制、服务管理、模型配置与备份。">
+<meta name="source-sha256" content="c5bc2c80c3a7659ed57398a078f78413acdaf637fc72a5c5896465ddc5cbc75b"><title>地址检索区县字段兼容修复说明 · 部署与运维</title>
+<style>
+:root{--ink:#172b3a;--muted:#60717f;--line:#dce5e9;--accent:#087c70;--paper:#fff;--canvas:#f3f6f7;--nav:#122c38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;color:var(--ink);background:var(--canvas);font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:#045d54}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e6ad42;outline-offset:4px}
+.skip{position:absolute;left:20px;top:-80px;background:white;padding:8px 16px;z-index:10}.skip:focus{top:10px}
+.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--nav);color:#edf5f7;padding:36px 25px;position:sticky;top:0;height:100vh;overflow:auto}.brand{font-size:21px;letter-spacing:.02em;font-weight:750}.brand small{display:block;font-size:12px;color:#92b6c2;font-weight:500;letter-spacing:.12em;margin-top:4px}.nav-caption{font-size:12px;color:#92b6c2;margin:32px 0 14px}
+.toc ul{list-style:none;padding:0;margin:0}.toc li{margin:4px 0}.toc a{display:block;color:#d7e6eb;text-decoration:none;font-size:14px;padding:7px 10px;border-radius:6px;line-height:1.55;overflow-wrap:anywhere}.toc a:hover,.toc a.active{background:#244550;color:white}.toc ul ul a{font-size:12px;color:#a5c1cb;padding-left:23px}.sidebar-note{border-top:1px solid #36515c;margin-top:30px;padding-top:18px;font-size:12px;color:#a5c1cb}
+main{min-width:0;padding:46px 54px 30px}.eyebrow{font-size:12px;color:var(--accent);letter-spacing:.12em;font-weight:750}.hero h1{font-size:34px;line-height:1.4;letter-spacing:-.025em;margin:10px 0 12px}.intro{color:var(--muted);font-size:14px;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);padding:8px 14px;border-radius:7px;text-decoration:none;background:white;font-size:13px;color:var(--ink);line-height:1.5}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button:hover{filter:brightness(.97)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0 32px}.metric{background:white;border:1px solid var(--line);border-radius:9px;padding:16px 20px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;font-weight:700;margin-top:4px;line-height:1.5}.metric small{font-size:11px;color:var(--muted)}
+article{background:var(--paper);padding:12px 34px 30px;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}article h2{font-size:23px;line-height:1.5;padding-top:22px;margin:16px 0 18px;border-top:1px solid var(--line)}article h2:first-child{border-top:0}article h3{font-size:18px;margin:25px 0 12px}article p{margin:12px 0}article ul,article ol{padding-left:24px;margin:12px 0}article li{margin:7px 0}article code{font:13px/1.6 Consolas,"Cascadia Code",monospace;color:#175b65;background:#edf4f5;padding:3px 5px;border-radius:4px;overflow-wrap:anywhere}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:7px;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px;text-align:left}th{background:#eef4f4;font-weight:650;color:#2c4654}th,td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfc}
+.code-wrap{position:relative;margin:20px 0}pre{margin:0;padding:45px 20px 20px;background:#142c38;color:#deedf2;border-radius:7px;overflow:auto;line-height:1.75}pre code{background:none!important;color:inherit!important;padding:0!important;white-space:pre;overflow-wrap:normal!important}.copy{position:absolute;right:10px;top:8px;background:#2b4652;border:1px solid #48616b;color:#eff7fa;padding:3px 10px;border-radius:5px;font-size:12px;line-height:1.6}.copy:hover{background:#385865}.code-label{position:absolute;left:18px;top:10px;color:#91b4c3;font-size:11px;letter-spacing:.08em}
+.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:12px;padding:23px 2px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:9px 20px;background:var(--nav);color:white;border-radius:7px;font-size:13px;box-shadow:0 4px 20px #122c3820}.toast[hidden]{display:none}
+@media(min-width:1500px){.layout{margin:24px auto;min-height:calc(100vh - 48px);box-shadow:0 10px 45px #1733440b}.sidebar{border-radius:12px 0 0 12px;height:calc(100vh - 48px);top:24px}}
+@media(max-width:1000px){main{padding:32px 28px}.layout{grid-template-columns:225px minmax(0,1fr)}article{padding:10px 23px 25px}.sidebar{padding:30px 18px}.hero h1{font-size:29px}.metric{padding:13px}.metric strong{font-size:21px}}
+@media(max-width:720px){.layout{display:block}.sidebar{height:auto;position:static;padding:20px}.brand small{display:inline;margin-left:12px;letter-spacing:.02em}.nav-caption,.sidebar-note{display:none}.toc>ul{display:flex;flex-wrap:wrap;gap:3px;margin-top:12px}.toc ul ul{display:none}.toc a{font-size:12px;padding:5px 8px}main{padding:24px 16px}.hero h1{font-size:26px}.summary{gap:7px;margin:22px 0}.metric{padding:10px}.metric strong{font-size:18px}.metric span{font-size:11px}.metric small{font-size:10px}article{padding:4px 18px 24px}article h2{font-size:21px}.footer{display:block}.footer span{display:block;margin:4px 0}body{font-size:15px}}
+@media print{body{background:white;color:black;font-size:10pt;line-height:1.6}.layout{display:block;max-width:none;margin:0;box-shadow:none}.sidebar,.actions,.copy,.toast,.skip{display:none!important}main{padding:0}.hero h1{font-size:24pt}.intro{font-size:10pt}.summary{margin:16px 0;gap:8px}.metric{padding:10px}.metric strong{font-size:16pt}article{border:0;padding:0}article h2{font-size:16pt;break-after:avoid}article h3{font-size:12pt;break-after:avoid}pre{background:#f3f5f6!important;color:black!important;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;break-inside:avoid}pre code{white-space:pre-wrap!important}.code-label{display:none}.code-wrap{break-inside:avoid}table{font-size:9pt}th,td{padding:7px}tr{break-inside:avoid}.table-wrap{overflow:visible}a{color:inherit}.footer{border-top:1px solid #ddd;margin-top:20px;font-size:8pt}@page{size:A4;margin:17mm}}
+</style></head><body><a href="#content" class="skip">跳转到正文</a>
+<div class="layout"><aside class="sidebar"><div class="brand">Coze Studio<small>部署与运维手册</small></div>
+<div class="nav-caption">文档目录</div><nav class="toc" aria-label="文档目录"><div class="toc">
+<ul>
+<li><a href="#_1">问题与原因</a></li>
+<li><a href="#_2">修复内容</a></li>
+<li><a href="#_3">验证</a></li>
+<li><a href="#_4">部署与回退</a></li>
+<li><a href="#_5">检查时发现的独立事项</a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-note">来源：地址检索区县字段兼容修复说明.md<br>与 Markdown 同步生成<br>支持离线阅读与打印</div></aside>
+<main><header class="hero"><div class="eyebrow">部署环境 / 开发验证环境</div><h1>地址检索区县字段兼容修复说明</h1>
+<p class="intro">部署配置、磁盘规划与日常维护操作。容量和验收状态为原文记录的历史快照。</p>
+<div class="actions"><a class="button primary" href="https://ai.yaoxiaoyi.com/agent/" target="_blank" rel="noopener noreferrer">打开平台</a>
+<a class="button" href="地址检索区县字段兼容修复说明.md" download>下载 Markdown</a><button class="button" id="print" type="button">打印 / 保存 PDF</button></div></header>
+<article id="content"><p>日期：2026-11-26。</p>
+<p>平台入口：<code>https://ai.yaoxiaoyi.com/agent/</code>。</p>
+<h2 id="_1">问题与原因</h2>
+<p>智能体“通过地址查询医疗机构详情”在预览与调试中，输入“广东省深圳市南山区南头街道桃园路89号（桃园路与南山大道交汇处）”，返回 <code>Something error:Internal Server Error</code>。新建预览会话也能复现，排除了仅由旧会话消息引起的情况。</p>
+<p>对应后端日志为：<code>[NodeRunError] 该表格缺少查询所需的行政区字段</code>。当前绑定的“浙江省医院档案01”使用“区”作为区县列名，而地址检索代码只识别“区县”“区/县”等列名。识别地址后，执行结构化筛选时找不到区县字段，错误传递至智能体运行链路，对外显示通用内部错误。此错误发生在插件执行之前。</p>
+<h2 id="_2">修复内容</h2>
+<p><code>backend/domain/knowledge/service/address_query.go</code> 的区县字段识别增加“区”“县”两个常用列名，保留原有别名。</p>
+<p>查询仍保留省、市、区县、详细地址条件，使用参数化 SQL。没有为了返回结果而删除行政区条件，也没有修改客户表结构或重新切片。查不到目标地址时应返回零匹配记录，后续由智能体结合原有提示词和已配置工具处理。</p>
+<h2 id="_3">验证</h2>
+<ul>
+<li>原问题修复前：新建预览会话约 2.3 秒返回内部错误；日志确认缺少行政区字段。</li>
+<li>地址解析包测试通过：<code>go test -p 3 ./domain/knowledge/address</code>。</li>
+<li>地址检索服务相关测试通过：<code>go test -p 3 ./domain/knowledge/service -run "TestAddress" -count=1</code>。</li>
+<li>新增回归覆盖“区”“县”“区县”“区/县”“区（县）”“区(县)”六种列名，并检查查询库外地址时保留广东省、深圳市、南山区条件。</li>
+<li><code>git diff --check</code> 通过。</li>
+</ul>
+<p>整个 knowledge/service 包的既有测试依赖本机 127.0.0.1:3306 测试库和 Mockey 编译参数，当前隔离构建环境未配置该测试库，全包测试不能作为通过依据；本次相关地址测试不连接生产数据库，已单独运行通过。</p>
+<p>线上使用用户当前有效会话，调用与“预览与调试”一致的接口进行回归，不保存登录凭据：</p>
+<ul>
+<li>原深圳地址：约 14.81 秒正常返回结构化 JSON，并出现工具调用与工具响应事件，未再返回 <code>Internal Server Error</code>。这项验证确认运行链路恢复，不代表对联网结果内容作了独立事实核验。</li>
+<li>“杭州市西湖区有多少家医疗机构”：约 6.02 秒正常返回知识库计数，并提示匹配记录数不等同于去重机构数。</li>
+<li>修复版本启动后的错误日志筛查，未发现新的错误。</li>
+<li>隔离构建目录 1,098 个受版本控制的 Go 源码及依赖清单文件与本地当前版本摘要一致。</li>
+</ul>
+<h2 id="_4">部署与回退</h2>
+<p>仅构建和替换后端镜像。升级前检查分区容量、消息队列和活动作业，执行现有备份脚本，保存原 Compose 配置。镜像切换后核对后端二进制摘要、管理页和系统联网插件健康接口、公网 <code>/agent/</code> 入口及前端内容摘要。</p>
+<p>保留原有模型、插件授权、知识库、发布版本、数据卷、Embedding 配置及前端容器。若启动或健康检查失败，恢复备份的 Compose 文件并重新启动原后端镜像。</p>
+<p>实际镜像和备份路径在远端 <code>/home/coze/ops/nov26-district-alias.json</code> 中记录。</p>
+<p>本次于 2026-11-26 11:46（Asia/Shanghai）完成切换：</p>
+<ul>
+<li>原镜像：<code>coze-local/server:plugin-categories-e07e69038fef</code>。</li>
+<li>新镜像：<code>coze-local/server:district-alias-8419dc265d5e</code>。</li>
+<li>新二进制 SHA-256：<code>8419dc265d5ec8ee4cb57ab8a1491ae7d9f324cea2650f9cc356b6b3013fb17c</code>。</li>
+<li>原 Compose 备份：<code>/home/coze/backups/district-alias-20261126-114634/compose.json</code>。</li>
+<li>已完成元数据及现有备份流程，切换前消息队列无待处理任务。</li>
+<li>前端容器及入口内容摘要保持一致，后端管理页及系统联网查询健康接口正常。</li>
+</ul>
+<p>修复源码同时同步到远端 <code>/home/coze/src/coze-studio/backend/domain/knowledge/service/</code>，便于后续构建保留该修复。本次提交包含修复源码、回归测试以及本说明的 Markdown 和 HTML；对应 Git 提交记录在远端 <code>/home/coze/ops/nov26-district-alias.json</code> 的 <code>source_git_commit</code> 字段中。</p>
+<h2 id="_5">检查时发现的独立事项</h2>
+<p>MinIO 容器的 Docker 健康检查报告其 mc 配置 JSON 损坏，但 <code>/minio/health/live</code> 实际返回 HTTP 200。该事项不属于本次地址字段识别问题，未在本次修复中修改 MinIO 数据或配置。</p></article><footer class="footer"><span>原始 Markdown 保留；本页为对应 HTML 阅读版本。</span><span>内容记录：2026-11-26 · 无外部资源依赖</span></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div><script>
+const toast=document.getElementById('toast');let toastTimer;
+function announce(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,2200)}
+document.querySelectorAll('pre').forEach(pre=>{const wrap=document.createElement('div');wrap.className='code-wrap';pre.before(wrap);wrap.append(pre);const label=document.createElement('span');label.className='code-label';label.textContent='命令';wrap.append(label);const button=document.createElement('button');button.type='button';button.className='copy';button.textContent='复制';button.setAttribute('aria-label','复制此命令块');wrap.append(button);button.addEventListener('click',async()=>{const text=pre.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text)}else{const input=document.createElement('textarea');input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();const copied=document.execCommand('copy');input.remove();button.focus();if(!copied)throw new Error('copy')}announce('命令已复制')}catch{announce('请选中命令后手动复制')}})});
+document.querySelectorAll('table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table)});
+document.getElementById('print').addEventListener('click',()=>window.print());
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.hash==='#'+entry.target.id))}})},{rootMargin:'0px 0px -65% 0px'});document.querySelectorAll('article h2,article h3').forEach(h=>observer.observe(h))}
+</script></body></html>
